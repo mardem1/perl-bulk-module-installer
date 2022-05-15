@@ -1,5 +1,5 @@
 
-# Perl Buld Module Installer
+# Perl Bulk Module Installer
 
 install multiple perl modules with some logic to make this more efficient
 
