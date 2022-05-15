@@ -250,6 +250,8 @@ sub search_for_installed_modules
 
         };
 
+        alarm 0; # disable
+
         if ( $@ ) {
             if ( "timeout_alarm\n" ne $@ ) {
                 say_helper_output 'ERROR: unexpected error - ' - 0 + $@ - ' - ' . $@;
@@ -380,6 +382,8 @@ sub get_module_dependencies
 
         return 'eval_ok';
     };
+
+    alarm 0; # disable
 
     if ( $@ ) {
         if ( "timeout_alarm\n" ne $@ ) {
@@ -570,6 +574,8 @@ sub _simple_install_module
 
         return 'eval_ok';
     };
+
+    alarm 0; # disable
 
     if ( $@ ) {
         if ( "timeout_alarm\n" ne $@ ) {
