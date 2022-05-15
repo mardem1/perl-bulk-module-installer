@@ -7,3 +7,5 @@
 **/*.tdy
 
 /_dev/notes.txt
+
+/*.log
