@@ -1467,7 +1467,7 @@ __END__
 
 =head1 NAME
 
-InstallCpanModules_Dependency_Async.pl
+InstallCpanModules.pl
 
 =head1 DESCRIPTION
 
