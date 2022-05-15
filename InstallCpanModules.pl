@@ -111,7 +111,7 @@ sub _old_get_module_dependencies
         } @output;
 
     %dependencies = map {
-        my @t = split /~/io;
+        my @t = split /~/io, $_;
         if ( ( scalar @t ) <= 1 ) {
             $t[ 0 ] => undef;
         }
@@ -433,7 +433,7 @@ sub get_module_dependencies
         } @output;
 
     %dependencies = map {
-        my @t = split /~/io;
+        my @t = split /~/io, $_;
         if ( ( scalar @t ) <= 1 ) {
             $t[ 0 ] => undef;
         }
