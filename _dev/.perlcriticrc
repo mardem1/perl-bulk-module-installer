@@ -1,0 +1,56 @@
+
+only = 0
+
+severity = brutal
+
+# freenode is alias to community
+theme = !freenode
+
+[-Mardem::ProhibitBlockComplexity]
+[-Mardem::ProhibitConditionComplexity]
+[-Mardem::ProhibitLargeBlock]
+[-Mardem::ProhibitLargeSub]
+[-Mardem::ProhibitManyConditionsInSub]
+[-Mardem::ProhibitReturnBooleanAsInt]
+
+[-CodeLayout::RequireTidyCode]
+perltidyrc = ".perltidyrc"
+
+[-CodeLayout::ProhibitSpaceIndentation]
+[-CodeLayout::RequireTrailingCommaAtNewline]
+[-CodeLayout::TabIndentSpaceAlign]
+[-Community::EmptyReturn]
+[-Community::PreferredAlternatives]
+[-CompileTime]
+[-Documentation::RequirePodSections]
+[-Documentation::RequirePod]
+[-Editor::RequireEmacsFileVariables]
+[-InputOutput::RequireCheckedSyscalls]
+[-logicLAB::RequireParamsValidate]
+[-logicLAB::RequireSheBang]
+[-Miscellanea::RequireRcsKeywords]
+[-ProhibitImplicitImport]
+[-Reneeb::RequirePostderef]
+[-Subroutines::ProhibitCallsToUndeclaredSubs]
+[-Subroutines::ProhibitCallsToUnexportedSubs]
+[-Tics::ProhibitUseBase]
+[-TooMuchCode::ProhibitDuplicateLiteral]
+[-TooMuchCode::ProhibitExtraStricture]
+[-TooMuchCode::ProhibitUnnecessaryUTF8Pragma]
+[-ValuesAndExpressions::RestrictLongStrings]
+[-Variables::RequireHungarianNotation]
+
+[-Tics::ProhibitLongLines]
+base_max = 120
+hard_max = 160
+
+# bug - info is also error ?
+[CognitiveComplexity::ProhibitExcessCognitiveComplexity]
+warn_level = 20
+info_level = 20
+
+[Modules::ProhibitExcessMainComplexity]
+max_mccabe = 9
+
+[Subroutines::ProhibitExcessComplexity]
+max_mccabe = 9
