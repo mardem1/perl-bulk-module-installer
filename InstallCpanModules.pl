@@ -1,4 +1,3 @@
-#!perl
 
 use utf8;
 
@@ -23,13 +22,29 @@ my %modules_already_installed = ();
 my %modules_need_to_install   = ();
 
 my %modules_install_ok     = ();
-my %modules_install_failed = (
-    'B:C'  => undef,
-    'B:CC' => undef,
-    'only' => undef,
+my %modules_install_failed = ();
+
+my %modules_install_not_found = (
+'B' => undef,
+'B::Asmdata' => undef,
+'B::Assembler' => undef,
+'B::Bblock' => undef,
+'B::Bytecode' => undef,
+'B::C' => undef,
+'B::CC' => undef,
+'B::Debug' => undef,
+'B::Deobfuscate' => undef,
+'B::Deparse' => undef,
+'B::Disassembler' => undef,
+'B::Lint' => undef,
+'B::Showlex' => undef,
+'B::Stash' => undef,
+'B::Terse' => undef,
+'B::Xref' => undef,
+'only' => undef,
 );
 
-my $INSTALL_TIMEOUT_IN_SECONDS = 60;
+my $INSTALL_TIMEOUT_IN_SECONDS = 120;
 
 sub ltrim { my $s = shift; $s =~ s/^\s+//;       return $s }
 sub rtrim { my $s = shift; $s =~ s/\s+$//;       return $s }
@@ -196,14 +211,25 @@ sub add_module_to_failed
     return;
 }
 
+
+sub add_module_to_not_found
+{
+    my ( $module, $version ) = @_;
+
+    $modules_install_not_found{ $module } = $version;
+
+    delete $modules_need_to_install{ $module };    # remove module - don't care if faile - no retry of failed
+
+    return;
+}
+
 sub print_install_state_summary
 {
     say_helper_output '';
     say_helper_output 'modules_need_to_install left - ' . scalar( keys %modules_need_to_install );
     say_helper_output 'modules_install_ok: ' . scalar( keys %modules_install_ok );
-    say_helper_output 'modules_install_failed: '
-        . scalar( keys %modules_install_failed ) . "\n"
-        . Dumper( \%modules_install_failed );
+    say_helper_output 'modules_install_not_found: ' . scalar( keys %modules_install_not_found ) . "\n" . Dumper( \%modules_install_not_found );
+    say_helper_output 'modules_install_failed: ' . scalar( keys %modules_install_failed ) . "\n" . Dumper( \%modules_install_failed );
     say_helper_output '';
 
     return;
@@ -483,12 +509,19 @@ sub install_module_with_dep
     my $dep_ref = get_module_dependencies( $module );
     if ( !defined $dep_ref ) {
         say_helper_output 'ERROR: module - ' . $module . ' - not found - abort !';
-        add_module_to_failed( $module, undef );
+        add_module_to_not_found( $module, undef );
 
         print_install_state_summary();
 
         return 1;
     }
+
+      print_install_state_summary();
+
+     delete $modules_need_to_install{ $module };
+
+    return 0;
+
 
     my %dep = %{ $dep_ref };
     if ( %dep ) {
@@ -638,7 +671,9 @@ sub simple_install_module
         return $tried;
     }
 
-    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '1>NUL', '2>&1' );    # no output
+    # my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '1>NUL', '2>&1' );    # no output
+
+    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '2>&1' );    # no output
 
     # update needs force
     if ( exists $installed_module_version{ $module } ) {
@@ -737,12 +772,24 @@ sub module_already_tried
         return 1;
     }
 
+    if ( exists $modules_install_not_found{ $module } ) {
+        delete $modules_need_to_install{ $module };    # delete if something wrong - should not happen
+
+        say_helper_output 'WARN: install module - ' . $module . ' - already mot found - abort';
+
+        return 1;
+    }
+
     return undef;
 }
 
 sub get_next_module_to_install
 {
-    return ( reverse sort keys %modules_need_to_install )[ 0 ];
+    # return ( reverse sort keys %modules_need_to_install )[ 0 ];
+
+    use List::Util qw/shuffle/;
+
+    return ( shuffle keys %modules_need_to_install )[ 0 ];
 }
 
 sub import_module_list_from_data
@@ -794,8 +841,13 @@ sub main
         }
     }
 
+
     say_helper_output '';
     say_helper_output 'summary';
+    say_helper_output '';
+    say_helper_output 'modules_install_not_found: '
+        . scalar( keys %modules_install_not_found ) . "\n"
+        . Dumper( \%modules_install_not_found );
     say_helper_output '';
     say_helper_output 'modules_install_failed: '
         . scalar( keys %modules_install_failed ) . "\n"
@@ -852,9 +904,6 @@ __DATA__
 
 Any::Moose
 AnyDBM_File
-Apache::DBI
-Apache::Perldoc
-Apache::Pod
 App::Ack
 App::Cpan
 App::cpanminus
@@ -870,8 +919,8 @@ Attribute::Types
 AutoLoader
 AutoSplit
 B
-B::Asmada
-B::Assemble
+B::Asmdata
+B::Assembler
 B::Bblock
 B::Bytecode
 B::C
@@ -882,9 +931,10 @@ B::Deparse
 B::Disassembler
 B::Lint
 B::Showlex
-B::StashB::Terse
+B::Stash
+B::Terse
 B::Xref
-BarkeleyDB
+BerkeleyDB
 Benchmark
 Benchmark::Forking
 BioPerl
@@ -918,9 +968,9 @@ Class::Std
 Class::Std::Utils
 Class::Struct
 Class::Tables
-Clone::AnyDBM_FileCode::Splice
+Clone::Any
+DBM_Filter
 Code::Statistics
-Color::Conversion
 Config
 Config::General
 Config::IniFiles
@@ -928,33 +978,27 @@ Config::JSON
 Config::Scoped
 Config::Std
 Config::Tiny
-ConfigReader:::Simple
+ConfigReader::Simple
 Const::Fast
 Contextual::Return
-Contextual::ReturnCPAN
 CPAN
-CPAN-Uploader
+CPAN::Uploader
 CPAN::Mini
 CPAN::Mini::Inject
 CPAN::Reporter
 CPAN::Reporter::PrereqCheck
-CPAN::YACSmoke
-CPANCwd
+CPAN
 CPANPLUS
 CPANPLUS::YACSmoke
-CPANTS
 criticism
 Cwd
-CWD
 Dancer
-DATA
-Data:::Constraint
+Data::Constraint
 Data::Alias
 Data::Dump
 Data::Dump::Streamer
 Data::Dumper
-Data::DUmper
-Data::DumperData::Printer
+Data::Printer
 Data::MessagePack
 DateTime
 DB
@@ -968,14 +1012,13 @@ DBI
 DBI::Profile
 DBI::ProfileDumper
 DBICx::TestDatabase
-DBIFatal
+DBI
+Fatal
 DBIx::Class
-DBM
 DBM::Deep
 DB_File
 Devel::CheckOS
 Devel::Cover
-Devel::Coverage
 Devel::Declare
 Devel::DProf
 Devel::ebug
@@ -984,7 +1027,6 @@ Devel::hdb
 Devel::NYTProf
 Devel::Peek
 Devel::ptkdb
-Devel::SelfStgubber
 Devel::SelfStubber
 Devel::Size
 Devel::SmallProf
@@ -992,24 +1034,21 @@ Devel::Trace
 Device::SerialPort
 diagnostics
 Digest
-Digests
 Dist::Zilla
 Dist::Zilla::Plugin::Test::Perl::Critic
 Dist::Zilla::Plugin::Test::Perl::Critic::Subset
-Distribution::Coocker
 Distribution::Cooker
 Dumbbench
 EMail
 Email::Send::SMTP
-Email::SimpleEmail::Stuff
+Email::Simple
+Email::Stuff
 Encode
 Encoding::FixLatin
 English
-Env::Sourced
 Errno
 Error
 Exception::Class
-Execption::Class
 Expect::Simple
 Exporter
 ExtUtils::Command
@@ -1017,8 +1056,6 @@ ExtUtils::Embed
 ExtUtils::Install
 ExtUtils::Installed
 ExtUtils::Liblist
-ExtUtils::LiblistMakeMaker
-ExtUtils::Makemaker
 ExtUtils::MakeMaker
 ExtUtils::Manifest
 ExtUtils::MM_Any
@@ -1035,28 +1072,24 @@ File::Compare
 File::Copy
 File::DosGlob
 File::Find
-File::FInd
-File::Find::Closures
 File::Find::Rule
 File::Finder
 File::Glob
 File::Path
 File::pushd
-FIle::Slurp
+File::Slurp
 File::Slurp
 File::Slurper
 File::Spec
-FIle::Spec
 File::Spec::Functions
 File::stat
 File::Temp
 FileHandle
 Filter::Macro
-Find::File::Closure
+File::Find::Closures
 FindBin
-FynaLoader
+DynaLoader
 Getopt::Attribute
-Getopt::Clade
 Getopt::Declare
 Getopt::Easy
 Getopt::Euclid
@@ -1078,20 +1111,16 @@ HTTP::Recorder
 HTTP::SimpleLinkChecker
 HTTP::Size
 Image::Info
-Image::Magic
+Image::Magick
 Image::Size
 Imager
-Inlice::C
-Inline
 Inline::C
+Inline
 Inline::Java
 IO::All
 IO::Dir
 IO::File
-IO::FileHandle
 IO::Handle
-IO::Handler
-IO::HandlersIRC
 IO::InSitu
 IO::Interactive
 IO::Null
@@ -1120,41 +1149,33 @@ JSON::Syck
 Lexical::Alias
 lib::relative
 List::Cycle
-List::MoreUtil
 List::MoreUtils
 List::Util
-Local::Error
-Local::Math
 Log::Dispatch
 Log::Log4perl
 Log::Log4perl::Appender::DBI
 Log::Log4perl::Appender::File
 Log::Log4perl::Layout::PatternLayout
-Log::Stdlog
-LWP
+Log::StdLog
 LWP::Simple
-LWPPOSIX
+LWP
+POSIX
 Mac::PropertyList
 Mac::Speech
-Mail
 Mardem::RefactoringPerlCriticPolicies
 Mason
 Math::BigFloat
 Math::BigInt
 Math::Complex
 Math::Trig
-Matrix
 Memoize
-Memorize
-Message
+Memoize
 Method::Signatures
 MIDI
-MIME
-Mobule::Build::TestReporter
+Module::Build::TestReporter
 Modern::Perl
 ModPerl::PerlRun
 Module::Build
-Module::Build::API
 Module::CoreList
 Module::Info::File
 Module::License::Report
@@ -1164,10 +1185,9 @@ Module::Signature
 Module::Starter
 Module::Starter::AddModule
 Module::Starter::PBP
-Module::Starter::Plugin
-Module::Starter
 Mojolicious
-Monkey::PatchNet::FTP
+Monkey::Patch
+Net::FTP
 Moo
 Moops
 Moose
@@ -1180,7 +1200,6 @@ MooseX::Declare
 MooseX::MultiMethods
 MooseX::Params::Validate
 MooseX::Types
-My::list::Utiln
 namespace::autoclean
 NDBM_File
 Net::hostent
@@ -1191,7 +1210,6 @@ Net::protoent
 Net::servent
 Net::SMTP
 Net::SMTP::SSL
-Netr::proto
 NEXT
 Object::Iterate
 Opcode
@@ -1203,7 +1221,7 @@ Parse::RecDescent
 Path::Class
 Path::Class::Dir
 Path::Class::File
-Path::ClassFile::Temp
+File::Temp
 Path::This
 PDL
 Perl6::Builtins
@@ -1256,12 +1274,11 @@ Perl::Metrics::Lite
 Perl::Metrics::Simple
 Perl::Tidy
 Plack
-POD
 Pod::Checker
 Pod::Coverage
 Pod::Functions
 Pod::Html
-Pod::InputOBject
+Pod::Parser
 Pod::Man
 Pod::Man
 Pod::Parser
@@ -1275,7 +1292,6 @@ Pod::PseudoPod
 Pod::Select
 Pod::Text
 Pod::Simple
-Pod::Simple::Subclassing
 Pod::Spell
 Pod::Text::Termcap
 Pod::TOC
@@ -1289,9 +1305,7 @@ Pod::Checker
 Regexp::Assemble
 Readonly
 ReadonlyX
-Regexp
 Regexp::Assemble
-Regexp::Autoflags
 Regexp::Common
 Regexp::Debugger
 Regexp::English
@@ -1299,10 +1313,8 @@ Regexp::MatchContext
 Regexp::Trie
 ReturnValue
 Role::Tiny
-RPerl
 Safe
 Scalar::Util
-Storeable
 SelfLoader
 Sereal
 Sereal::Decoder
@@ -1313,16 +1325,13 @@ Socket
 Sort::Maker
 Spreadsheet::ParseExcel
 Spreadsheet::WriteExcel
-Sqitch
-SQL
-SQLite
+App::Sqitch
+SQLite::DB
 Storable
-Storeable
-Struckt::Class
-Sub::Call::Tail
+Class::Struct
 Sub::Exporter
 Sub::Identify
-Sub::INstall
+Sub::Install
 Sub::Installer
 Sub::Name
 Surveyor::App
@@ -1331,51 +1340,49 @@ Sx
 Symbol
 Sys::Hostname
 Sys::Syslog
-Taint::UtilTemplate
-TAP
+Taint::Util
+Template
 TAP::Harness
 Task::Kensho
 Task::Perl::Critic
-Template::BaseToTemplate::Exception
+Template::Base
+Template::Exception
 Template::Toolkit
 Term::ANSIColor
 Term::ANSIScreen
-Term::Carp
+Term::Cap
 Term::Complete
 Term::ReadKey
 Term::ReadLine
+Term::Completion
 Term::Rendezvous
 Test
 Test2::Tools::PerlCritic
-Test:::WWW::Mechanize
-Test::Between
+Test::WWW::Mechanize
 Test::Builder
 Test::Builder::Tester
 Test::Builder::Tester::Color
 Test::CheckManifest
 Test::Class
-Test::FileTest::Harness
+Test::File
+Test::Harness
 Test::Cmd
-Test::Cmd::Cmmon
-Test::CSV
-Test::CSV_XS
+Test::Cmd::Common
 Test::Database
 Test::DatabaseRow
 Test::Deep
-Test::Difference
 Test::Differences
 Test::Exception
 Test::Expect
 Test::Fatal
 Test::Harness
-Test::Harness::Strap
 Test::HTML::Lint
 Test::HTML::Tidy
 Test::Kwalitee
 Test::Inline
 Test::LongString
 Test::Manifest
-Test::MemoryCycle
+Test::Memory::Cycle
 Test::MockDBI
 Test::MockModule
 Test::MockObject
@@ -1383,11 +1390,9 @@ Test::MockObject::Extends
 Test::Mojibake
 Test::More
 Test::Most
-Test::My::List::Util
 Test::NoWarnings
 Test::Number::Delta
 Test::Output
-Test::Output::Tie
 Test::Perl::Critic
 Test::Perl::Critic::Git
 Test::Perl::Critic::Progressive
@@ -1397,7 +1402,7 @@ Test::PerlTidy
 Test::Pod
 Test::Pod::Coverage
 Test::Pod
-Test::Harness::Strap
+Test::Harness::Straps
 Test::Reporter
 Test::Routine
 Test::Signature
@@ -1405,7 +1410,7 @@ Test::Simple
 Test::Spelling
 Test::Taint
 Test::Tutorial
-Test::Utils
+Test2::Util
 Test::Vars
 Test::Warn
 Test::WWW::Mechanize
@@ -1416,7 +1421,6 @@ Text::Autoformat
 Text::CSV
 Text::CSV::Simple
 Text::CSV_XS
-Text::CVS_XS
 Text::ParseWords
 Text::Template
 Text::Template::Simple::IO
@@ -1435,10 +1439,7 @@ Tie::Counter
 Tie::Cycle
 Tie::Cycle::Sinewave
 Tie::DBI
-Tie::DevNull
-Tie::DevRandom
 Tie::File
-Tie::File::Timestamp
 Tie::Handle
 Tie::Hash
 Tie::Persistent
@@ -1450,7 +1451,7 @@ Tie::STDERR
 Tie::StdHash
 Tie::StdScalar
 Tie::SubstrHash
-Tie::SyslogTee
+Tie::Syslog
 Tie::TextDir
 Tie::TransactHash
 Tie::VecArray
@@ -1462,7 +1463,7 @@ Time::localtime
 Time::tm
 Tk
 Test::Perl::Critic
-Test::Perl::Critic::Progresive
+Test::Perl::Critic::Progressive
 Try::Tiny
 Try::Tiny
 UNIVERSAL
@@ -1473,7 +1474,7 @@ Unicode::Collate
 UNIVERSAL
 User::grent
 User::pwent
-Vim::Debugger
+Vim::Debug
 WeakRef
 Win32
 Win32::Registry
@@ -1484,7 +1485,8 @@ Win32::Event
 Win32::EventLog
 Win32::FileSecurity
 Win32::Internet
-Win32::IPCMutex
+Win32::IPC
+Mutex
 Win32::NetAdmin
 Win32::NetResource
 Win32::ODBC
@@ -1492,7 +1494,7 @@ Win32::OLE
 Win32::OLE::Const
 Win32::OLE::NLS
 Win32::OLE::Variant
-Win32::OSLE::Enum
+Win32::OLE::Enum
 Win32::PerfLib
 Win32::Pipe
 Win32::Process
