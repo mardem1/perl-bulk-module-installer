@@ -44,7 +44,7 @@ my %modules_install_not_found = (
 'only' => undef,
 );
 
-my $INSTALL_TIMEOUT_IN_SECONDS = 120;
+my $INSTALL_TIMEOUT_IN_SECONDS = 60*5;
 
 sub ltrim { my $s = shift; $s =~ s/^\s+//;       return $s }
 sub rtrim { my $s = shift; $s =~ s/\s+$//;       return $s }
@@ -515,13 +515,6 @@ sub install_module_with_dep
 
         return 1;
     }
-
-      print_install_state_summary();
-
-     delete $modules_need_to_install{ $module };
-
-    return 0;
-
 
     my %dep = %{ $dep_ref };
     if ( %dep ) {
