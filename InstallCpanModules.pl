@@ -938,6 +938,8 @@ ByteLoader
 Cache::Mmap
 Carp
 Carp::Always
+Carp::Assert
+Carp::Assert::More
 Carp::Notify
 Carton
 Catalyst
@@ -1008,6 +1010,7 @@ DBIx::Class
 DBM::Deep
 DBM_Filter
 DB_File
+Devel::Assert
 Devel::CheckOS
 Devel::Cover
 Devel::Declare
@@ -1224,7 +1227,11 @@ Perl::Critic::Deprecated
 Perl::Critic::Dynamic
 Perl::Critic::Itch
 Perl::Critic::Lax
+Perl::Critic::Mardem
+Perl::Critic::Moose
 Perl::Critic::More
+Perl::Critic::Nits
+Perl::Critic::PetPeeves::JTRAMMELL
 Perl::Critic::Policy
 Perl::Critic::Policy::BadStrings
 Perl::Critic::Policy::BuiltinFunctions::ProhibitReturnOr
@@ -1251,6 +1258,7 @@ Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter
 Perl::Critic::Policy::Variables::RequireHungarianNotation
 Perl::Critic::Pulp
 Perl::Critic::RENEEB
+Perl::Critic::Storable
 Perl::Critic::StricterSubs
 Perl::Critic::Swift
 Perl::Critic::Tics
@@ -1274,6 +1282,7 @@ Pod::Perldoc::ToToc
 Pod::PseudoPod
 Pod::Select
 Pod::Simple
+Pod::Simple::Subclassing
 Pod::Spell
 Pod::Text
 Pod::Text::Termcap
@@ -1306,6 +1315,7 @@ Socket
 Sort::Maker
 Spreadsheet::ParseExcel
 Spreadsheet::WriteExcel
+SQL
 SQLite::DB
 Storable
 String::Util
@@ -1478,6 +1488,7 @@ Win32API::File
 Win32API::Net
 Win32API::Registry
 WWW::Mechanize
+XML
 XML::Compile
 XML::Parser
 XML::Rabbit
