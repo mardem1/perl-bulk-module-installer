@@ -1152,7 +1152,6 @@ LWP
 LWP::Simple
 Mac::PropertyList
 Mac::Speech
-Mardem::RefactoringPerlCriticPolicies
 Mason
 Math::BigFloat
 Math::BigInt
