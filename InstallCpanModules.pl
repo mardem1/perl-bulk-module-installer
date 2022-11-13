@@ -25,26 +25,26 @@ my %modules_install_ok     = ();
 my %modules_install_failed = ();
 
 my %modules_install_not_found = (
-'B' => undef,
-'B::Asmdata' => undef,
-'B::Assembler' => undef,
-'B::Bblock' => undef,
-'B::Bytecode' => undef,
-'B::C' => undef,
-'B::CC' => undef,
-'B::Debug' => undef,
-'B::Deobfuscate' => undef,
-'B::Deparse' => undef,
-'B::Disassembler' => undef,
-'B::Lint' => undef,
-'B::Showlex' => undef,
-'B::Stash' => undef,
-'B::Terse' => undef,
-'B::Xref' => undef,
-'only' => undef,
+    'B'               => undef,
+    'B::Asmdata'      => undef,
+    'B::Assembler'    => undef,
+    'B::Bblock'       => undef,
+    'B::Bytecode'     => undef,
+    'B::C'            => undef,
+    'B::CC'           => undef,
+    'B::Debug'        => undef,
+    'B::Deobfuscate'  => undef,
+    'B::Deparse'      => undef,
+    'B::Disassembler' => undef,
+    'B::Lint'         => undef,
+    'B::Showlex'      => undef,
+    'B::Stash'        => undef,
+    'B::Terse'        => undef,
+    'B::Xref'         => undef,
+    'only'            => undef,
 );
 
-my $INSTALL_TIMEOUT_IN_SECONDS = 60*5;
+my $INSTALL_TIMEOUT_IN_SECONDS = 60 * 5;
 
 sub ltrim { my $s = shift; $s =~ s/^\s+//;       return $s }
 sub rtrim { my $s = shift; $s =~ s/\s+$//;       return $s }
@@ -211,7 +211,6 @@ sub add_module_to_failed
     return;
 }
 
-
 sub add_module_to_not_found
 {
     my ( $module, $version ) = @_;
@@ -228,8 +227,12 @@ sub print_install_state_summary
     say_helper_output '';
     say_helper_output 'modules_need_to_install left - ' . scalar( keys %modules_need_to_install );
     say_helper_output 'modules_install_ok: ' . scalar( keys %modules_install_ok );
-    say_helper_output 'modules_install_not_found: ' . scalar( keys %modules_install_not_found ) . "\n" . Dumper( \%modules_install_not_found );
-    say_helper_output 'modules_install_failed: ' . scalar( keys %modules_install_failed ) . "\n" . Dumper( \%modules_install_failed );
+    say_helper_output 'modules_install_not_found: '
+        . scalar( keys %modules_install_not_found ) . "\n"
+        . Dumper( \%modules_install_not_found );
+    say_helper_output 'modules_install_failed: '
+        . scalar( keys %modules_install_failed ) . "\n"
+        . Dumper( \%modules_install_failed );
     say_helper_output '';
 
     return;
@@ -276,7 +279,7 @@ sub search_for_installed_modules
 
         };
 
-        alarm 0; # disable
+        alarm 0;    # disable
 
         if ( $@ ) {
             if ( "timeout_alarm\n" ne $@ ) {
@@ -409,7 +412,7 @@ sub get_module_dependencies
         return 'eval_ok';
     };
 
-    alarm 0; # disable
+    alarm 0;    # disable
 
     if ( $@ ) {
         if ( "timeout_alarm\n" ne $@ ) {
@@ -601,7 +604,7 @@ sub _simple_install_module
         return 'eval_ok';
     };
 
-    alarm 0; # disable
+    alarm 0;    # disable
 
     if ( $@ ) {
         if ( "timeout_alarm\n" ne $@ ) {
@@ -793,14 +796,14 @@ sub import_module_list_from_data
     #
     my $data_found = 0;
 
-    while (my $line = <DATA>) {
-        $line = trim($line);
-        if(!$line) {
+    while ( my $line = <DATA> ) {
+        $line = trim( $line );
+        if ( !$line ) {
         }
-        elsif('__DATA__' eq $line) {
+        elsif ( '__DATA__' eq $line ) {
             $data_found = 1;
         }
-        elsif($data_found) {
+        elsif ( $data_found ) {
             push @modules_to_install, $line;
         }
     }
@@ -833,7 +836,6 @@ sub main
             $install_module = '';
         }
     }
-
 
     say_helper_output '';
     say_helper_output 'summary';
