@@ -7,7 +7,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 use Readonly;
 use Path::This qw( $THISDIR );
@@ -48,7 +48,7 @@ sub reduce_filepath_to_relapth
 
 sub get_all_files
 {
-    my $include_all = File::Find::Rule->new()->file()->name( '*.pl', '*.pm', '*.t' );
+    my $include_all = File::Find::Rule->new()->file()->name( qr/[.](t|pm|pl)$/sxmio );
 
     my $search = File::Find::Rule->new()->or( $include_all );
 
@@ -153,7 +153,7 @@ Helper script to run a pod on all files.
 
 =head1 AFFILIATION
 
-This policy is part of L<Mardem::RefactoringPerlCriticPolicies>.
+This policy is part of L<Perl::Critic::Mardem>.
 
 =head1 AUTHOR
 
@@ -163,8 +163,8 @@ Markus Demml, mardem@cpan.com
 
 Copyright (c) 2022, Markus Demml
 
-This library is free software; you can redistribute it and/or modify it 
-under the same terms as the Perl 5 programming language system itself. 
+This library is free software; you can redistribute it and/or modify it
+under the same terms as the Perl 5 programming language system itself.
 The full text of this license can be found in the LICENSE file included
 with this module.
 
