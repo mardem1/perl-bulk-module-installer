@@ -4,7 +4,9 @@ only = 0
 severity = brutal
 
 # freenode is alias to community
-theme = !freenode
+# theme = !freenode
+
+exclude = Freenode
 
 [-Mardem::ProhibitBlockComplexity]
 [-Mardem::ProhibitConditionComplexity]
@@ -54,3 +56,6 @@ max_mccabe = 9
 
 [Subroutines::ProhibitExcessComplexity]
 max_mccabe = 9
+
+[-RegularExpressions::RequireDefault]
+# regex /aa requires Perl 5.14
