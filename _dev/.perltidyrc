@@ -12,16 +12,16 @@
 #-bt=1 # Medium brace tightness
 #-sbt=1 # Medium square bracket tightness
 #-bbt=1 # Medium block brace tightness
--nsfs # No space before semicolons
+#-nsfs # No space before semicolons
 -nolq # Don't outdent long quoted strings
 -wbb="% + - * / x != == >= <= =~ !~ < > | & **= += *= &= <<= &&= -=/= |= >>= ||= .= %= ^= x=" # Break before all operators
 
 # personal preference
 
--pt=0
--sbt=0
--bt=0
--bbt=0
+-pt=0 # paren-tightness
+-sbt=0 # square-bracket-tightness
+-bt=0 # brace-tightness
+-bbt=0 # block-brace-tightness
 -aws # add whitespaces
 -asc # add optional semicolons
 -dws # delete whitespaces
@@ -29,7 +29,24 @@
 -asbl # opening sub anonymous brace on new line
 -xci # extended-continuation-indentation
 -nbbc # don't force blank lines before comments (bad for else blocks)
+-sfs # space-for-semicolon
+-dsm # delete-semicolons
+-otr # not place a break between a comma and an opening token
+-vtc=0 # Vertical tightness of non-block curly braces, parentheses, and square brackets.
+-atnl # add-terminal-newline
 
 -l=120 # Max line width is 120 cols
 
+-ole=unix # output-line-ending / dos ?
+#-ple # preserve-line-endings
+
+-it=2 # iterations
+
 -b # inplace changes
+
+# code with much deep nested idents - don't count leading whitespaces
+# -vmll # variable-maximum-line-length
+# -wc=0 # whitespace-cycle
+
+# Allman / BSD Style
+# -bl # opening-brace-on-new-line
