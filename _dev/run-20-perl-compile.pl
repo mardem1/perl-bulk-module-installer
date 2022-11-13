@@ -7,18 +7,21 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 use Readonly;
 use Path::This qw( $THISDIR );
 use Cwd qw( getcwd abs_path );
 use File::Find::Rule;
 use English qw( -no_match_vars );
+use Time::HiRes qw( time );
 
 Readonly::Scalar my $SYSTEM_START_FAILURE     => -1;
 Readonly::Scalar my $SYSTEM_CALL_SIGNAL_BIT   => 127;
 Readonly::Scalar my $SYSTEM_CALL_COREDUMP_BIT => 127;
 Readonly::Scalar my $EXITCODE_OFFSET          => 8;
+
+my %file_duration = ();
 
 sub reduce_filepath_to_relapth
 {
@@ -48,7 +51,7 @@ sub reduce_filepath_to_relapth
 
 sub get_all_files
 {
-    my $include_all = File::Find::Rule->new()->file()->name( '*.pl', '*.pm', '*.t' );
+    my $include_all = File::Find::Rule->new()->file()->name( qr/[.](t|pm|pl)$/sxmio );
 
     my $search = File::Find::Rule->new()->or( $include_all );
 
@@ -63,7 +66,6 @@ sub run_system_visible
 {
     my ( @params ) = @_;
 
-    say q{};
     say 'execute ' . ( join q{ }, @params );
 
     my $failure = system @params;
@@ -83,8 +85,6 @@ sub run_system_visible
         }
     }
 
-    say q{};
-
     return !!$failure;
 }
 
@@ -92,7 +92,18 @@ sub run_compile_test
 {
     my ( $filepath ) = @_;
 
+    say q{};
+
+    my $time_start = time();
+
     my $failure = run_system_visible( 'perl', '-c', $filepath );
+
+    my $time_end = time();
+    my $duration = $time_end - $time_start;
+    printf( "%6.4f Seconds\n", $duration );
+    $file_duration{ $filepath } = $duration;
+
+    say q{};
 
     return !!$failure;
 }
@@ -127,6 +138,13 @@ sub main
         say q{};
         say q{};
 
+        foreach my $filepath ( sort { $file_duration{ $a } <=> $file_duration{ $b } } keys %file_duration ) {
+            printf( "%6.4f - %s\n", $file_duration{ $filepath }, $filepath );
+        }
+
+        say q{};
+        say q{};
+
         say 'All Successful';
 
         say q{};
@@ -156,7 +174,7 @@ Helper script to run a perl compile-check on all files.
 
 =head1 AFFILIATION
 
-This policy is part of L<Mardem::RefactoringPerlCriticPolicies>.
+This policy is part of L<Perl::Critic::Mardem>.
 
 =head1 AUTHOR
 
@@ -166,8 +184,8 @@ Markus Demml, mardem@cpan.com
 
 Copyright (c) 2022, Markus Demml
 
-This library is free software; you can redistribute it and/or modify it 
-under the same terms as the Perl 5 programming language system itself. 
+This library is free software; you can redistribute it and/or modify it
+under the same terms as the Perl 5 programming language system itself.
 The full text of this license can be found in the LICENSE file included
 with this module.
 
