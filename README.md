@@ -1,7 +1,16 @@
-
 # Perl Bulk Module Installer
 
-install multiple perl modules with some logic to make this more efficient
+...
+
+## PURPOSE
+
+Install multiple perl modules with some logic to make this more efficient.
+
+Vision:
+
+1. get a portable Windows-Perl from [Strawberry](https://strawberryperl.com/releases.html)
+2. run bulk-installer to add all needed modules
+3. have a portable Windows-Perl with all modules :)
 
 ...
 
