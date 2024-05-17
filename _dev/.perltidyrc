@@ -37,12 +37,17 @@
 
 -l=120 # Max line width is 120 cols
 
--ole=unix # output-line-ending / dos ?
+#-ole=unix # output-line-ending / dos ?
+-ole=unix
+-output-line-ending=unix
 #-ple # preserve-line-endings
+
+-enc=utf8
 
 -it=2 # iterations
 
 -b # inplace changes
+-bext=/ # delete backup if successful
 
 # code with much deep nested idents - don't count leading whitespaces
 # -vmll # variable-maximum-line-length
@@ -50,3 +55,6 @@
 
 # Allman / BSD Style
 # -bl # opening-brace-on-new-line
+
+# -se
+# -opt
