@@ -12,6 +12,12 @@ use Carp::Always;
 use IPC::Open3;
 use Data::Dumper qw( Dumper );
 
+BEGIN {
+    if ( $^O !~ /win32/io ) {
+        die 'sorry this is only for windows :(';
+    }
+}
+
 our $VERSION = '0.01';
 
 my @modules_to_install = ();
@@ -827,6 +833,8 @@ sub main
     import_module_list_from_file( $filepath );
 
     renew_local_module_information();
+
+    die '!tmp-disabled!';
 
     my $install_module = get_next_module_to_install();
     while ( $install_module ) {
