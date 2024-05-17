@@ -148,52 +148,6 @@ sub _old_get_module_dependencies
     return \%dependencies;
 }
 
-sub _old_simple_install_module
-{
-    my ( $module ) = @_;
-
-    my $tried = module_already_tried( $module );
-    if ( defined $tried ) {
-        return $tried;
-    }
-
-    my @cmd = ( 'cmd.exe', '/c', 'cpanm', $module );
-
-    # update needs force
-    if ( exists $installed_module_version{ $module } ) {
-        say_helper_output 'update module - ' . $module;
-    }
-    else {
-        say_helper_output 'install module - ' . $module;
-    }
-
-    say_helper_output 'cmd: ' . ( join ' ', @cmd );
-    say_helper_output '';
-
-    die "debug out";
-
-    my $exitcode = system( @cmd );
-    say_helper_output '';
-    my $action = '';
-
-    if ( $exitcode ) {
-        $action = 'failed';
-
-        add_module_to_failed( $module, undef );
-    }
-    else {
-        $action = 'success';
-
-        add_module_to_ok( $module, 999_999 );    # newest version - so real number not relevant.
-    }
-
-    say_helper_output 'install module - ' . $module . ' - ' . $action;
-
-    print_install_state_summary();
-
-    return $exitcode ? 1 : 0;
-}
-
 sub add_module_to_ok
 {
     my ( $module, $version ) = @_;
