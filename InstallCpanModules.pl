@@ -92,62 +92,6 @@ sub _old_search_for_installed_modules
     return;
 }
 
-sub _old_get_module_dependencies
-{
-    my ( $module ) = @_;
-
-    my %dependencies = ();
-
-    # --> Working on Perl::Critic
-    # Fetching http://www.cpan.org/authors/id/P/PE/PETDANCE/Perl-Critic-1.140.tar.gz ... OK
-    # Configuring Perl-Critic-1.140 ... OK
-    # Module::Build~0.4204
-    # ExtUtils::Install~1.46
-    # Fatal
-
-    my $now = localtime;
-    say_helper_output 'get module dependencies - ' . $module;
-
-    my @output = `cpanm --showdeps $module 2>&1`;
-
-    if ( $? ) {
-        if ( ( join '', @output ) =~ /Couldn't find module or a distribution/io ) {
-            say_helper_output 'ERROR: module not found - ' . $module;
-        }
-        else {
-            say_helper_output 'ERROR: search failed - exitcode - ' . $?;
-        }
-        return undef;    # not found
-    }
-
-    @output = map { trim( $_ ) } @output;
-
-    @output =
-        grep {
-               $_ !~ /Working on/io
-            && $_ !~ /Fetching http/io
-            && $_ !~ /^Configuring /io
-            && $_ !~ /^skipping /io
-            && $_ !~ /^! /io
-        } @output;
-
-    %dependencies = map {
-        my @t = split /~/io, $_;
-        if ( ( scalar @t ) <= 1 ) {
-            $t[ 0 ] => undef;
-        }
-        else {
-            $t[ 0 ] => $t[ 1 ];
-        }
-    } @output;
-
-    delete $dependencies{ 'perl' };    # not perl itself
-
-    say_helper_output 'dependencies found: ' . scalar( keys %dependencies ) . "\n" . Dumper( \%dependencies );
-
-    return \%dependencies;
-}
-
 sub add_module_to_ok
 {
     my ( $module, $version ) = @_;
