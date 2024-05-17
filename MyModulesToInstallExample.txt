@@ -1,0 +1,16 @@
+Carp
+Carp::Always
+Data::Dumper
+DateTime
+File::Slurp
+IPC::Open3
+LWP
+LWP::Simple
+Perl::Critic
+Perl::Tidy
+POSIX
+Scalar::Util
+String::Util
+Test::Class
+Test::More
+Test::Simple
