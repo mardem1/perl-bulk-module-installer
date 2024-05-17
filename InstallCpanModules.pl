@@ -794,7 +794,7 @@ sub get_next_module_to_install
     return ( shuffle keys %modules_need_to_install )[ 0 ];
 }
 
-sub import_module_list_from_file
+sub simple_file_read
 {
     my ( $filepath ) = @_;
 
@@ -812,11 +812,20 @@ sub import_module_list_from_file
     my @raw_file_lines = <$fh>;
     close( $fh );
 
-    my @trimed_file_lines = map { trim( $_ ) } @raw_file_lines;
-    @raw_file_lines = ();
+    return @raw_file_lines;
+}
 
-    @modules_to_install = grep { q{} ne $_ } @trimed_file_lines;
-    @trimed_file_lines  = ();
+sub import_module_list_from_file
+{
+    my ( $filepath ) = @_;
+
+    my @file_lines = simple_file_read( $filepath );
+
+    @file_lines = map  { trim( $_ ) } @file_lines;
+    @file_lines = grep { q{} ne $_ } @file_lines;
+
+    @modules_to_install = @file_lines;
+    @file_lines         = ();
 
     return;
 }
@@ -833,8 +842,6 @@ sub main
     import_module_list_from_file( $filepath );
 
     renew_local_module_information();
-
-    die '!tmp-disabled!';
 
     my $install_module = get_next_module_to_install();
     while ( $install_module ) {
