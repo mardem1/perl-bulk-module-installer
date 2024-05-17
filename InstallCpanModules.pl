@@ -66,32 +66,6 @@ sub say_helper_output
     return;
 }
 
-sub _old_search_for_installed_modules
-{
-    %installed_module_version = ();
-
-    my @output = `cmd.exe /c cpan -l`;
-    @output = map { trim( $_ ) } @output;
-
-    foreach my $line ( @output ) {
-        if ( 'Loading internal logger. Log::Log4perl recommended for better logging' eq $line ) {
-            next;
-        }
-
-        my @t = split /\s+/, $line;
-        $installed_module_version{ $t[ 0 ] } =
-            ( 'undef' eq $t[ 1 ] ? undef : $t[ 1 ] );
-    }
-
-    say_helper_output '';
-    say_helper_output 'installed_module_version: '
-        . scalar( keys %installed_module_version ) . "\n"
-        . Dumper( \%installed_module_version );
-    say_helper_output '';
-
-    return;
-}
-
 sub add_module_to_ok
 {
     my ( $module, $version ) = @_;
