@@ -815,6 +815,29 @@ sub simple_file_read
     return @raw_file_lines;
 }
 
+sub simple_file_write
+{
+    my ( $filepath, $header, @content ) = @_;
+
+    say_helper_output "write '$filepath'";
+
+    my $fh = undef;
+    if ( !open( $fh, '>', $filepath ) ) {
+        die "Couldn't open file $filepath, $!";
+    }
+
+    say { $fh } $header;
+    say { $fh } '';
+    say { $fh } '';
+    foreach my $line ( @content ) {
+        say { $fh } $line;
+    }
+
+    close( $fh );
+
+    return;
+}
+
 sub import_module_list_from_file
 {
     my ( $filepath ) = @_;
@@ -866,17 +889,60 @@ sub main
     say_helper_output '';
     say_helper_output 'summary';
     say_helper_output '';
+
+    say_helper_output '';
     say_helper_output 'modules_install_not_found: '
         . scalar( keys %modules_install_not_found ) . "\n"
         . Dumper( \%modules_install_not_found );
+    simple_file_write(
+        $filepath . '_modules_install_not_found.log',
+        'modules_install_not_found: ' . scalar( keys %modules_install_not_found ),
+        Dumper( \%modules_install_not_found )
+    );
+    say_helper_output '';
+
     say_helper_output '';
     say_helper_output 'modules_install_failed: '
         . scalar( keys %modules_install_failed ) . "\n"
         . Dumper( \%modules_install_failed );
+    simple_file_write(
+        $filepath . 'modules_install_failed.log',
+        'modules_install_failed: ' . scalar( keys %modules_install_failed ),
+        Dumper( \%modules_install_failed )
+    );
+    say_helper_output '';
+
     say_helper_output '';
     say_helper_output 'modules_install_ok: '
         . scalar( keys %modules_install_ok ) . "\n"
         . Dumper( \%modules_install_ok );
+    simple_file_write(
+        $filepath . 'modules_install_ok.log',
+        'modules_install_ok: ' . scalar( keys %modules_install_ok ),
+        Dumper( \%modules_install_ok )
+    );
+    say_helper_output '';
+
+    say_helper_output '';
+    say_helper_output 'modules_need_to_install: '
+        . scalar( keys %modules_need_to_install ) . "\n"
+        . Dumper( \%modules_need_to_install );
+    simple_file_write(
+        $filepath . 'modules_need_to_install.log',
+        'modules_need_to_install: ' . scalar( keys %modules_need_to_install ),
+        Dumper( \%modules_need_to_install )
+    );
+    say_helper_output '';
+
+    say_helper_output '';
+    say_helper_output 'modules_already_installed: '
+        . scalar( keys %modules_already_installed ) . "\n"
+        . Dumper( \%modules_already_installed );
+    simple_file_write(
+        $filepath . 'modules_already_installed.log',
+        'modules_already_installed: ' . scalar( keys %modules_already_installed ),
+        Dumper( \%modules_already_installed )
+    );
     say_helper_output '';
 
     return;
