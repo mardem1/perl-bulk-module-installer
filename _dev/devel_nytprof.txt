@@ -1,0 +1,9 @@
+
+perl -d:NYTProf some_perl.pl
+
+PERL5DB='use Devel::NYTProf'
+perl -d some_perl.pl
+
+set PERL5OPT=-d:NYTProf
+set NYTPROF=trace=2:start=begin:optimize=0:file=/tmp/nytprof.out
+perl some_perl.pl
