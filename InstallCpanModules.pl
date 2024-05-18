@@ -206,6 +206,41 @@ sub mark_module_as_not_found
     return;
 }
 
+sub was_module_already_tried
+{
+    my ( $module ) = @_;
+
+    if ( _is_string_empty( $module ) ) {
+        croak 'param module empty!';
+    }
+
+    if ( exists $modules_install_ok{ $module } ) {
+        delete $modules_need_to_install{ $module };    # delete if something wrong - should not happen
+
+        _say_ex 'WARN: install module - ' . $module . ' - already ok - abort';
+
+        return 0;
+    }
+
+    if ( exists $modules_install_failed{ $module } ) {
+        delete $modules_need_to_install{ $module };    # delete if something wrong - should not happen
+
+        _say_ex 'WARN: install module - ' . $module . ' - already failed - abort';
+
+        return 1;
+    }
+
+    if ( exists $modules_install_not_found{ $module } ) {
+        delete $modules_need_to_install{ $module };    # delete if something wrong - should not happen
+
+        _say_ex 'WARN: install module - ' . $module . ' - already mot found - abort';
+
+        return 1;
+    }
+
+    return undef;
+}
+
 sub reduce_modules_to_install
 {
     %modules_already_installed = ();    # rest info
@@ -760,41 +795,6 @@ sub install_single_module
     print_install_state_summary();
 
     return $child_exit_status ? 1 : 0;
-}
-
-sub was_module_already_tried
-{
-    my ( $module ) = @_;
-
-    if ( _is_string_empty( $module ) ) {
-        croak 'param module empty!';
-    }
-
-    if ( exists $modules_install_ok{ $module } ) {
-        delete $modules_need_to_install{ $module };    # delete if something wrong - should not happen
-
-        _say_ex 'WARN: install module - ' . $module . ' - already ok - abort';
-
-        return 0;
-    }
-
-    if ( exists $modules_install_failed{ $module } ) {
-        delete $modules_need_to_install{ $module };    # delete if something wrong - should not happen
-
-        _say_ex 'WARN: install module - ' . $module . ' - already failed - abort';
-
-        return 1;
-    }
-
-    if ( exists $modules_install_not_found{ $module } ) {
-        delete $modules_need_to_install{ $module };    # delete if something wrong - should not happen
-
-        _say_ex 'WARN: install module - ' . $module . ' - already mot found - abort';
-
-        return 1;
-    }
-
-    return undef;
 }
 
 sub get_next_module_to_install
