@@ -436,6 +436,10 @@ sub install_module_with_dep
 {
     my ( $module ) = @_;
 
+    if ( is_string_empty( $module ) ) {
+        croak 'param module empty!';
+    }
+
     say_helper_output 'analyze module - ' . $module;
 
     my $dep_ref = get_module_dependencies( $module );
