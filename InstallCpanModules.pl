@@ -667,12 +667,14 @@ sub reduce_dependency_modules_which_are_not_installed
 
     foreach my $module ( keys %dependencies ) {
         if ( !exists $installed_module_version{ $module } ) {
+            _say_ex 'dependency not installed: ' . $module;
             $not_installed{ $module } = $dependencies{ $module };
         }
         elsif (defined $dependencies{ $module }
             && defined $installed_module_version{ $module }
             && ( 0.0 + $installed_module_version{ $module } ) < ( 0.0 + $dependencies{ $module } ) )
         {
+            _say_ex 'dependency old version - update needed: ' . $module;
             $not_installed{ $module } = $dependencies{ $module };    # to old version
         }
     }
