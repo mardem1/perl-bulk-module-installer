@@ -606,7 +606,7 @@ sub install_single_module
         croak 'param module empty!';
     }
 
-    my $tried = module_already_tried( $module );
+    my $tried = was_module_already_tried( $module );
     if ( defined $tried ) {
         return $tried;
     }
@@ -692,7 +692,7 @@ sub install_single_module
     return $child_exit_status ? 1 : 0;
 }
 
-sub module_already_tried
+sub was_module_already_tried
 {
     my ( $module ) = @_;
 
@@ -703,7 +703,7 @@ sub module_already_tried
     if ( exists $modules_install_ok{ $module } ) {
         delete $modules_need_to_install{ $module };    # delete if something wrong - should not happen
 
-        _say_ex 'WARN: install module - ' . $module . ' - already done - abort';
+        _say_ex 'WARN: install module - ' . $module . ' - already ok - abort';
 
         return 0;
     }
@@ -711,7 +711,7 @@ sub module_already_tried
     if ( exists $modules_install_failed{ $module } ) {
         delete $modules_need_to_install{ $module };    # delete if something wrong - should not happen
 
-        _say_ex 'WARN: install module - ' . $module . ' - already tried - abort';
+        _say_ex 'WARN: install module - ' . $module . ' - already failed - abort';
 
         return 1;
     }
