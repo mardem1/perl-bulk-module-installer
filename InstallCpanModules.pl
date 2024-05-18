@@ -54,7 +54,7 @@ my $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS = 60 * 1;
 my $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS = 60 * 1;
 my $EMPTY_STRING                                    = q{};
 
-sub trim
+sub _trim
 {
     my ( $s ) = @_;
 
@@ -202,7 +202,7 @@ sub search_for_installed_modules
         alarm $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS;
 
         while ( my $line = <$chld_out> ) {
-            $line = trim( $line );
+            $line = _trim( $line );
 
             # say_helper_output 'STDOUT: ' . $line;
             my @t = split /\s+/, $line;
@@ -375,7 +375,7 @@ sub get_module_dependencies
         alarm $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS;
 
         while ( my $line = <$chld_out> ) {
-            $line = trim( $line );
+            $line = _trim( $line );
 
             # say_helper_output 'STDOUT: ' . $line;
             push @output, $line;
@@ -434,7 +434,7 @@ sub get_module_dependencies
         if ( $line =~ /Found dependencies: (.+)/o ) {
             my @module_names = split /[,]/io, $1;
             foreach my $module_name ( @module_names ) {
-                $module_name = trim($module_name);
+                $module_name = _trim($module_name);
                 $dependencies{ $module_name } = undef;
             }
         }
@@ -755,7 +755,7 @@ sub import_module_list_from_file
 
     my @file_lines = simple_file_read( $filepath );
 
-    @file_lines = map  { trim( $_ ) } @file_lines;
+    @file_lines = map  { _trim( $_ ) } @file_lines;
     @file_lines = grep { $EMPTY_STRING ne $_ } @file_lines;
 
     @modules_to_install = @file_lines;
@@ -873,7 +873,7 @@ sub main
 {
     my ( $filepath ) = @_;
 
-    $filepath = trim( $filepath );
+    $filepath = _trim( $filepath );
     if ( is_string_empty( $filepath ) ) {
         croak 'no file arg given';
     }
