@@ -314,7 +314,7 @@ sub get_module_dependencies
     if ( 1 > $pid ) {
         say_helper_output 'ERROR: cmd start failed!';
 
-        return undef;    # as >not found
+        return undef;    # as not found
     }
 
     say_helper_output 'pid: ' . $pid;
