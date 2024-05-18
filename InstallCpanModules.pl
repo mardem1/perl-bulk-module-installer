@@ -631,6 +631,8 @@ sub get_module_dependencies
             && $_ !~ /^vars$/io
             && $_ !~ /^lib$/io
             && $_ !~ /^overload$/io
+            && $_ !~ /^if$/io
+            && $_ !~ /^utf8$/io
         } @output;
 
     %dependencies = map {
@@ -649,6 +651,8 @@ sub get_module_dependencies
     delete $dependencies{ 'vars' };
     delete $dependencies{ 'lib' };
     delete $dependencies{ 'overload' };
+    delete $dependencies{ 'if' };
+    delete $dependencies{ 'utf8' };
 
     _say_ex 'dependencies found: ' . scalar( keys %dependencies ) . "\n" . Dumper( \%dependencies );
 
