@@ -838,11 +838,11 @@ sub get_next_module_to_install
 sub install_modules
 {
     my $install_module = get_next_module_to_install();
-    while ( $install_module ) {
+    while ( !_is_string_empty( $install_module ) ) {
         install_module_with_dep( $install_module );
 
         my $next_module = get_next_module_to_install();
-        if ( !$next_module ) {
+        if ( _is_string_empty( $next_module ) ) {
             _say_ex 'no more modules to do';
 
             $install_module = '';
