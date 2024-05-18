@@ -288,6 +288,10 @@ sub get_module_dependencies
 {
     my ( $module ) = @_;
 
+    if ( is_string_empty( $module ) ) {
+        croak 'param module empty!';
+    }
+
     my %dependencies = ();
 
     # --> Working on Perl::Critic
@@ -306,6 +310,7 @@ sub get_module_dependencies
     say_helper_output 'start cmd: ' . ( join ' ', @cmd );
 
     my $pid = open3( $chld_in, $chld_out, '>&STDERR', @cmd );
+
     if ( 1 > $pid ) {
         say_helper_output 'ERROR: cmd start failed!';
 
