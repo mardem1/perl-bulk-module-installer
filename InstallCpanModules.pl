@@ -759,19 +759,8 @@ sub print_install_end_summary
     return;
 }
 
-sub main
+sub install_modules
 {
-    my ( $filepath ) = @_;
-
-    $filepath = trim( $filepath );
-    if ( !defined $filepath || $EMPTY_STRING eq $filepath ) {
-        die 'no file arg given';
-    }
-
-    import_module_list_from_file( $filepath );
-
-    renew_local_module_information();
-
     my $install_module = get_next_module_to_install();
     while ( $install_module ) {
         install_module_with_dep( $install_module );
@@ -791,6 +780,24 @@ sub main
             $install_module = '';
         }
     }
+
+    return;
+}
+
+sub main
+{
+    my ( $filepath ) = @_;
+
+    $filepath = trim( $filepath );
+    if ( !defined $filepath || $EMPTY_STRING eq $filepath ) {
+        die 'no file arg given';
+    }
+
+    import_module_list_from_file( $filepath );
+
+    renew_local_module_information();
+
+    install_modules();
 
     print_install_end_summary();
 
