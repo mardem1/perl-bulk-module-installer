@@ -593,12 +593,12 @@ sub install_module_with_dep
         _say_ex 'module - ' . $module . ' - no dependencies to install';
     }
 
-    my $ret = simple_install_module( $module );
+    my $ret = install_single_module( $module );
 
     return $ret ? 1 : 0;
 }
 
-sub simple_install_module
+sub install_single_module
 {
     my ( $module ) = @_;
 
