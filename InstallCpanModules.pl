@@ -427,6 +427,19 @@ sub get_module_dependencies
         return undef;    # as not found
     }
 
+    my @dependencie_lines =
+        grep { $_ =~ /Found dependencies: /io } @output;
+
+    foreach my $line ( @dependencie_lines ) {
+        if ( $line =~ /Found dependencies: (.+)/o ) {
+            my @module_names = split /[,]/io, $1;
+            foreach my $module_name ( @module_names ) {
+                $module_name = trim($module_name);
+                $dependencies{ $module_name } = undef;
+            }
+        }
+    }
+
     @output =
         grep {
                $_ !~ /Working on/io
