@@ -75,7 +75,7 @@ sub _say_ex
     return;
 }
 
-sub is_string_empty
+sub _is_string_empty
 {
     my ( $s ) = @_;
 
@@ -88,11 +88,11 @@ sub add_module_to_ok
 {
     my ( $module, $version ) = @_;
 
-    if ( is_string_empty( $module ) ) {
+    if ( _is_string_empty( $module ) ) {
         croak 'param module empty!';
     }
 
-    if ( is_string_empty( $version ) ) {
+    if ( _is_string_empty( $version ) ) {
         $version = undef;    # force undef if empty - param optional
     }
 
@@ -112,11 +112,11 @@ sub add_module_to_failed
 {
     my ( $module, $version ) = @_;
 
-    if ( is_string_empty( $module ) ) {
+    if ( _is_string_empty( $module ) ) {
         croak 'param module empty!';
     }
 
-    if ( is_string_empty( $version ) ) {
+    if ( _is_string_empty( $version ) ) {
         $version = undef;    # force undef if empty - param optional
     }
 
@@ -133,11 +133,11 @@ sub add_module_to_not_found
 {
     my ( $module, $version ) = @_;
 
-    if ( is_string_empty( $module ) ) {
+    if ( _is_string_empty( $module ) ) {
         croak 'param module empty!';
     }
 
-    if ( is_string_empty( $version ) ) {
+    if ( _is_string_empty( $version ) ) {
         $version = undef;    # force undef if empty - param optional
     }
 
@@ -291,7 +291,7 @@ sub get_module_dependencies
 {
     my ( $module ) = @_;
 
-    if ( is_string_empty( $module ) ) {
+    if ( _is_string_empty( $module ) ) {
         croak 'param module empty!';
     }
 
@@ -505,7 +505,7 @@ sub install_module_with_dep
 {
     my ( $module ) = @_;
 
-    if ( is_string_empty( $module ) ) {
+    if ( _is_string_empty( $module ) ) {
         croak 'param module empty!';
     }
 
@@ -555,7 +555,7 @@ sub simple_install_module
 {
     my ( $module ) = @_;
 
-    if ( is_string_empty( $module ) ) {
+    if ( _is_string_empty( $module ) ) {
         croak 'param module empty!';
     }
 
@@ -649,7 +649,7 @@ sub module_already_tried
 {
     my ( $module ) = @_;
 
-    if ( is_string_empty( $module ) ) {
+    if ( _is_string_empty( $module ) ) {
         croak 'param module empty!';
     }
 
@@ -693,7 +693,7 @@ sub simple_file_read
 {
     my ( $filepath ) = @_;
 
-    if ( is_string_empty( $filepath ) ) {
+    if ( _is_string_empty( $filepath ) ) {
         croak 'param filepath empty!';
     }
 
@@ -718,11 +718,11 @@ sub simple_file_write
 {
     my ( $filepath, $header, @content ) = @_;
 
-    if ( is_string_empty( $filepath ) ) {
+    if ( _is_string_empty( $filepath ) ) {
         croak 'param filepath empty!';
     }
 
-    if ( is_string_empty( $header ) ) {
+    if ( _is_string_empty( $header ) ) {
         croak 'param header empty!';
     }
 
@@ -749,7 +749,7 @@ sub import_module_list_from_file
 {
     my ( $filepath ) = @_;
 
-    if ( is_string_empty( $filepath ) ) {
+    if ( _is_string_empty( $filepath ) ) {
         croak 'param filepath empty!';
     }
 
@@ -768,7 +768,7 @@ sub print_install_end_summary
 {
     my ( $filepath ) = @_;
 
-    if ( is_string_empty( $filepath ) ) {
+    if ( _is_string_empty( $filepath ) ) {
         croak 'param filepath empty!';
     }
 
@@ -874,7 +874,7 @@ sub main
     my ( $filepath ) = @_;
 
     $filepath = _trim( $filepath );
-    if ( is_string_empty( $filepath ) ) {
+    if ( _is_string_empty( $filepath ) ) {
         croak 'no file arg given';
     }
 
