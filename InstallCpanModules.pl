@@ -680,6 +680,10 @@ sub import_module_list_from_file
 {
     my ( $filepath ) = @_;
 
+    if ( is_string_empty( $filepath ) ) {
+        croak 'param filepath empty!';
+    }
+
     my @file_lines = simple_file_read( $filepath );
 
     @file_lines = map  { trim( $_ ) } @file_lines;
