@@ -140,7 +140,7 @@ sub _write_file
     return;
 }
 
-sub add_module_to_ok
+sub mark_module_as_ok
 {
     my ( $module, $version ) = @_;
 
@@ -691,7 +691,7 @@ sub simple_install_module
     else {
         $action = 'success';
 
-        add_module_to_ok( $module, 999_999 );    # newest version - so real number not relevant.
+        mark_module_as_ok( $module, 999_999 );    # newest version - so real number not relevant.
     }
 
     _say_ex 'install module - ' . $module . ' - ' . $action;
