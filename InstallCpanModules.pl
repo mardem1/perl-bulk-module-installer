@@ -486,6 +486,10 @@ sub simple_install_module
 {
     my ( $module ) = @_;
 
+    if ( is_string_empty( $module ) ) {
+        croak 'param module empty!';
+    }
+
     my $tried = module_already_tried( $module );
     if ( defined $tried ) {
         return $tried;
