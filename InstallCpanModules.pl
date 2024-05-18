@@ -434,6 +434,15 @@ sub get_module_dependencies
             && $_ !~ /^Configuring /io
             && $_ !~ /^skipping /io
             && $_ !~ /^! /io
+            && $_ !~ /^==>/io
+            && $_ !~ /^-->/io
+            && $_ !~ /^OK$/io
+            && $_ !~ /^perl~.+/io
+            && $_ !~ /^warnings$/io
+            && $_ !~ /^strict$/io
+            && $_ !~ /^vars$/io
+            && $_ !~ /^lib$/io
+            && $_ !~ /^overload$/io
         } @output;
 
     %dependencies = map {
@@ -447,6 +456,11 @@ sub get_module_dependencies
     } @output;
 
     delete $dependencies{ 'perl' };    # not perl itself
+    delete $dependencies{ 'warnings' };
+    delete $dependencies{ 'strict' };
+    delete $dependencies{ 'vars' };
+    delete $dependencies{ 'lib' };
+    delete $dependencies{ 'overload' };
 
     say_helper_output 'dependencies found: ' . scalar( keys %dependencies ) . "\n" . Dumper( \%dependencies );
 
