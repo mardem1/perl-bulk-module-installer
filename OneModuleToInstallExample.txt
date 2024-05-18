@@ -1,2 +1,4 @@
 
 Log::Log4perl
+Perl::Critic
+Perl::Tidy
