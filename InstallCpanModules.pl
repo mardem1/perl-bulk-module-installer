@@ -140,6 +140,94 @@ sub _write_file
     return;
 }
 
+sub _detached_execute
+{
+    my ( $timeout, $show_live_output, @cmd ) = @_;
+
+    if ( _is_string_empty( $timeout ) ) {
+        croak 'param timeout empty!';
+    }
+
+    if ( 1 > $timeout ) {
+        croak 'param timeout greater 0!';
+    }
+
+    if ( _is_string_empty( $show_live_output ) ) {
+        croak 'param show_live_output empty!';
+    }
+
+    if ( ( ( scalar @cmd ) == 0 ) || _is_string_empty( $cmd[ 0 ] ) ) {
+        croak 'param @cmd empty!';
+    }
+
+    my $child_exit_status = undef;
+    my @output            = ();
+
+    my $chld_in  = undef;
+    my $chld_out = undef;
+
+    _say_ex 'start cmd: ' . ( join ' ', @cmd );
+    my $pid = open3( $chld_in, $chld_out, '>&STDERR', @cmd );
+
+    if ( 1 > $pid ) {
+        _say_ex 'ERROR: cmd start failed!';
+        return ( $child_exit_status, @output );
+    }
+
+    _say_ex 'pid: ' . $pid;
+
+    _say_ex 'close chld_in';
+    close $chld_in;
+
+    _say_ex 'read output ... ';
+
+    local $@;
+    my $eval_ok = eval {
+        local $SIG{ 'ALRM' } = sub { die "timeout_alarm\n"; };    # NB: \n required
+        alarm $timeout;
+
+        while ( my $line = <$chld_out> ) {
+            $line = _trim( $line );
+            push @output, $line;
+
+            if ( $show_live_output ) {
+                _say_ex 'STDOUT: ' . $line;
+            }
+        }
+
+        return 'eval_ok';
+    };
+
+    alarm 0;    # disable
+
+    if ( $@ ) {
+        if ( "timeout_alarm\n" ne $@ ) {
+            _say_ex 'ERROR: unexpected error - ' - 0 + $@ - ' - ' . $@;
+            kill -9, $pid;    # kill
+        }
+        else {
+            _say_ex 'ERROR: timeout - ' - 0 + $@ - ' - ' . $@;
+            kill -9, $pid;    # kill
+        }
+    }
+    elsif ( 'eval_ok' ne $eval_ok ) {
+        _say_ex 'ERROR: eval failed ? - ' - 0 + $@ - ' - ' . $@;
+        kill -9, $pid;        # kill
+    }
+    else {
+        _say_ex 'close chld_out';
+        close $chld_out;
+
+        _say_ex 'wait for exit...';
+        # reap zombie and retrieve exit status
+        waitpid( $pid, 0 );
+        $child_exit_status = $? >> 8;
+        _say_ex '$child_exit_status: ' . $child_exit_status;
+    }
+
+    return ( $child_exit_status, @output );
+}
+
 sub mark_module_as_ok
 {
     my ( $module, $version ) = @_;
@@ -494,76 +582,13 @@ sub get_module_dependencies
 
     _say_ex 'get module dependencies - ' . $module;
 
-    my $chld_in  = undef;
-    my $chld_out = undef;
-
     my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--showdeps', $module, '2>&1' );
-    _say_ex 'start cmd: ' . ( join ' ', @cmd );
 
-    my $pid = open3( $chld_in, $chld_out, '>&STDERR', @cmd );
+    my ( $child_exit_status, @output ) = _detached_execute( $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS, 0, @cmd );
 
-    if ( 1 > $pid ) {
-        _say_ex 'ERROR: cmd start failed!';
-
+    if ( !defined $child_exit_status ) {
         return undef;    # as not found
     }
-
-    _say_ex 'pid: ' . $pid;
-
-    _say_ex 'close chld_in';
-    close $chld_in;
-
-    _say_ex 'read output ... ';
-
-    my @output = ();
-
-    local $@;
-    my $eval_ok = eval {
-        local $SIG{ 'ALRM' } = sub { die "timeout_alarm\n"; };    # NB: \n required
-        alarm $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS;
-
-        while ( my $line = <$chld_out> ) {
-            $line = _trim( $line );
-
-            # _say_ex 'STDOUT: ' . $line;
-            push @output, $line;
-        }
-
-        return 'eval_ok';
-    };
-
-    alarm 0;    # disable
-
-    if ( $@ ) {
-        if ( "timeout_alarm\n" ne $@ ) {
-            _say_ex 'ERROR: unexpected error - ' - 0 + $@ - ' - ' . $@;
-
-            kill -9, $pid;    # kill
-            return undef;     # as >not found
-        }
-        else {
-            _say_ex 'ERROR: timeout - ' - 0 + $@ - ' - ' . $@;
-
-            kill -9, $pid;    # kill
-            return undef;     # as not found
-        }
-    }
-    elsif ( 'eval_ok' ne $eval_ok ) {
-        _say_ex 'ERROR: eval failed ? - ' - 0 + $@ - ' - ' . $@;
-
-        kill -9, $pid;    # kill
-        return undef;     # as not found
-    }
-
-    _say_ex 'close chld_out';
-    close $chld_out;
-
-    _say_ex 'wait for exit...';
-
-    # reap zombie and retrieve exit status
-    waitpid( $pid, 0 );
-    my $child_exit_status = $? >> 8;
-    _say_ex '$child_exit_status: ' . $child_exit_status;
 
     if ( $child_exit_status && !@output ) {
         _say_ex 'ERROR: search failed - exitcode - ' . $child_exit_status;
