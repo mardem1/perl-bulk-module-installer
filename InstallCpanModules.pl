@@ -173,67 +173,68 @@ sub search_for_installed_modules
     my @cmd = ( 'cmd.exe', '/c', 'cpan', '-l' );
     say_helper_output 'start cmd: ' . ( join ' ', @cmd );
     my $pid = open3( $chld_in, $chld_out, '>&STDERR', @cmd );
+
     if ( 1 > $pid ) {
         say_helper_output 'ERROR: cmd start failed!';
+        return;
     }
-    else {
-        say_helper_output 'pid: ' . $pid;
 
-        say_helper_output 'close chld_in';
-        close $chld_in;
+    say_helper_output 'pid: ' . $pid;
 
-        say_helper_output 'read output ... ';
+    say_helper_output 'close chld_in';
+    close $chld_in;
 
-        my $timeout_in_seconds = 60 * 1;
+    say_helper_output 'read output ... ';
 
-        local $@;
-        my $eval_ok = eval {
-            local $SIG{ 'ALRM' } = sub { die "timeout_alarm\n"; };    # NB: \n required
-            alarm $timeout_in_seconds;
+    my $timeout_in_seconds = 60 * 1;
 
-            while ( my $line = <$chld_out> ) {
-                $line = trim( $line );
+    local $@;
+    my $eval_ok = eval {
+        local $SIG{ 'ALRM' } = sub { die "timeout_alarm\n"; };    # NB: \n required
+        alarm $timeout_in_seconds;
 
-                # say_helper_output 'STDOUT: ' . $line;
-                my @t = split /\s+/, $line;
-                $installed_module_version{ $t[ 0 ] } =
-                    ( 'undef' eq $t[ 1 ] ? undef : $t[ 1 ] );
-            }
+        while ( my $line = <$chld_out> ) {
+            $line = trim( $line );
 
-            return 'eval_ok';
-
-        };
-
-        alarm 0;    # disable
-
-        if ( $@ ) {
-            if ( "timeout_alarm\n" ne $@ ) {
-                say_helper_output 'ERROR: unexpected error - ' - 0 + $@ - ' - ' . $@;
-
-                kill -9, $pid;    # kill
-            }
-            else {
-                say_helper_output 'ERROR: timeout - ' - 0 + $@ - ' - ' . $@;
-
-                kill -9, $pid;    # kill
-            }
+            # say_helper_output 'STDOUT: ' . $line;
+            my @t = split /\s+/, $line;
+            $installed_module_version{ $t[ 0 ] } =
+                ( 'undef' eq $t[ 1 ] ? undef : $t[ 1 ] );
         }
-        elsif ( 'eval_ok' ne $eval_ok ) {
-            say_helper_output 'ERROR: eval failed ? - ' - 0 + $@ - ' - ' . $@;
 
-            kill -9, $pid;        # kill
+        return 'eval_ok';
+
+    };
+
+    alarm 0;    # disable
+
+    if ( $@ ) {
+        if ( "timeout_alarm\n" ne $@ ) {
+            say_helper_output 'ERROR: unexpected error - ' - 0 + $@ - ' - ' . $@;
+
+            kill -9, $pid;    # kill
         }
         else {
-            say_helper_output 'close chld_out';
-            close $chld_out;
+            say_helper_output 'ERROR: timeout - ' - 0 + $@ - ' - ' . $@;
 
-            say_helper_output 'wait for exit...';
-
-            # reap zombie and retrieve exit status
-            waitpid( $pid, 0 );
-            my $child_exit_status = $? >> 8;
-            say_helper_output '$child_exit_status: ' . $child_exit_status;
+            kill -9, $pid;    # kill
         }
+    }
+    elsif ( 'eval_ok' ne $eval_ok ) {
+        say_helper_output 'ERROR: eval failed ? - ' - 0 + $@ - ' - ' . $@;
+
+        kill -9, $pid;        # kill
+    }
+    else {
+        say_helper_output 'close chld_out';
+        close $chld_out;
+
+        say_helper_output 'wait for exit...';
+
+        # reap zombie and retrieve exit status
+        waitpid( $pid, 0 );
+        my $child_exit_status = $? >> 8;
+        say_helper_output '$child_exit_status: ' . $child_exit_status;
     }
 
     say_helper_output '';
