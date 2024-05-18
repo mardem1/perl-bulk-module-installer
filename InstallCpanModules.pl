@@ -84,6 +84,31 @@ sub _is_string_empty
     return $t;
 }
 
+sub _read_file_lines
+{
+    my ( $filepath ) = @_;
+
+    if ( _is_string_empty( $filepath ) ) {
+        croak 'param filepath empty!';
+    }
+
+    if ( !( -e -f -r -s $filepath ) ) {
+        croak "filepath '$filepath' - not exists, readable or empty";
+    }
+
+    _say_ex "read modules from file '$filepath'";
+
+    my $fh = undef;
+    if ( !open( $fh, '<', $filepath ) ) {
+        croak "Couldn't open file $filepath, $!";
+    }
+
+    my @raw_file_lines = <$fh>;
+    close( $fh );
+
+    return @raw_file_lines;
+}
+
 sub add_module_to_ok
 {
     my ( $module, $version ) = @_;
@@ -687,31 +712,6 @@ sub get_next_module_to_install
     use List::Util qw/shuffle/;
 
     return ( shuffle keys %modules_need_to_install )[ 0 ];
-}
-
-sub _read_file_lines
-{
-    my ( $filepath ) = @_;
-
-    if ( _is_string_empty( $filepath ) ) {
-        croak 'param filepath empty!';
-    }
-
-    if ( !( -e -f -r -s $filepath ) ) {
-        croak "filepath '$filepath' - not exists, readable or empty";
-    }
-
-    _say_ex "read modules from file '$filepath'";
-
-    my $fh = undef;
-    if ( !open( $fh, '<', $filepath ) ) {
-        croak "Couldn't open file $filepath, $!";
-    }
-
-    my @raw_file_lines = <$fh>;
-    close( $fh );
-
-    return @raw_file_lines;
 }
 
 sub simple_file_write
