@@ -692,6 +692,11 @@ sub import_module_list_from_file
 
 sub print_install_end_summary
 {
+    my ( $filepath ) = @_;
+
+    if ( is_string_empty( $filepath ) ) {
+        croak 'param filepath empty!';
+    }
 
     say_helper_output '';
     say_helper_output 'summary';
@@ -807,7 +812,7 @@ sub main
 
     install_modules();
 
-    print_install_end_summary();
+    print_install_end_summary( $filepath );
 
     return;
 }
