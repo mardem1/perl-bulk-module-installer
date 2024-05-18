@@ -328,9 +328,7 @@ sub print_install_end_summary
     _say_ex '';
 
     _say_ex '';
-    _say_ex 'modules_install_ok: '
-        . scalar( keys %modules_install_ok ) . "\n"
-        . Dumper( \%modules_install_ok );
+    _say_ex 'modules_install_ok: ' . scalar( keys %modules_install_ok ) . "\n" . Dumper( \%modules_install_ok );
     _write_file(
         $filepath . 'modules_install_ok.log',
         'modules_install_ok: ' . scalar( keys %modules_install_ok ),
@@ -448,12 +446,12 @@ sub get_module_dependencies
     }
 
     ## old 2022-05-15 ?
-# --> Working on Perl::Critic
-# Fetching http://www.cpan.org/authors/id/P/PE/PETDANCE/Perl-Critic-1.140.tar.gz ... OK
-# Configuring Perl-Critic-1.140 ... OK
-# Module::Build~0.4204
-# ExtUtils::Install~1.46
-# Fatal
+    # --> Working on Perl::Critic
+    # Fetching http://www.cpan.org/authors/id/P/PE/PETDANCE/Perl-Critic-1.140.tar.gz ... OK
+    # Configuring Perl-Critic-1.140 ... OK
+    # Module::Build~0.4204
+    # ExtUtils::Install~1.46
+    # Fatal
 
     ## 2024-05-18 cpan new style or bug -> fetch all and use exit 1 ?
 # start cmd: cmd.exe /c cpanm --showdeps Perl::Critic 2>&1
@@ -586,7 +584,7 @@ sub get_module_dependencies
         if ( $line =~ /Found dependencies: (.+)/o ) {
             my @module_names = split /[,]/io, $1;
             foreach my $module_name ( @module_names ) {
-                $module_name = _trim($module_name);
+                $module_name = _trim( $module_name );
                 $dependencies{ $module_name } = undef;
             }
         }
