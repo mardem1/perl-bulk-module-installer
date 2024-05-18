@@ -689,7 +689,7 @@ sub get_next_module_to_install
     return ( shuffle keys %modules_need_to_install )[ 0 ];
 }
 
-sub simple_file_read
+sub _read_file_lines
 {
     my ( $filepath ) = @_;
 
@@ -753,7 +753,7 @@ sub import_module_list_from_file
         croak 'param filepath empty!';
     }
 
-    my @file_lines = simple_file_read( $filepath );
+    my @file_lines = _read_file_lines( $filepath );
 
     @file_lines = map  { _trim( $_ ) } @file_lines;
     @file_lines = grep { $EMPTY_STRING ne $_ } @file_lines;
