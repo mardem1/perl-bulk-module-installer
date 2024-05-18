@@ -580,6 +580,10 @@ sub module_already_tried
 {
     my ( $module ) = @_;
 
+    if ( is_string_empty( $module ) ) {
+        croak 'param module empty!';
+    }
+
     if ( exists $modules_install_ok{ $module } ) {
         delete $modules_need_to_install{ $module };    # delete if something wrong - should not happen
 
