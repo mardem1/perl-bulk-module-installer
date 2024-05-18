@@ -206,6 +206,35 @@ sub mark_module_as_not_found
     return;
 }
 
+sub reduce_modules_to_install
+{
+    %modules_already_installed = ();    # rest info
+    %modules_need_to_install   = ();
+
+    foreach my $module ( @modules_to_install ) {
+        if ( exists $installed_module_version{ $module } ) {
+            $modules_already_installed{ $module } = undef;
+        }
+        else {
+            $modules_need_to_install{ $module } = undef;
+        }
+    }
+
+    _say_ex '';
+    _say_ex 'modules_already_installed: '
+        . scalar( keys %modules_already_installed ) . "\n"
+        . Dumper( \%modules_already_installed );
+
+    _say_ex '';
+    _say_ex 'modules_need_to_install: '
+        . scalar( keys %modules_need_to_install ) . "\n"
+        . Dumper( \%modules_need_to_install );
+
+    _say_ex '';
+
+    return;
+}
+
 sub print_install_state_summary
 {
     _say_ex '';
@@ -300,35 +329,6 @@ sub search_for_installed_modules
     _say_ex 'installed_module_version: '
         . scalar( keys %installed_module_version ) . "\n"
         . Dumper( \%installed_module_version );
-    _say_ex '';
-
-    return;
-}
-
-sub reduce_modules_to_install
-{
-    %modules_already_installed = ();    # rest info
-    %modules_need_to_install   = ();
-
-    foreach my $module ( @modules_to_install ) {
-        if ( exists $installed_module_version{ $module } ) {
-            $modules_already_installed{ $module } = undef;
-        }
-        else {
-            $modules_need_to_install{ $module } = undef;
-        }
-    }
-
-    _say_ex '';
-    _say_ex 'modules_already_installed: '
-        . scalar( keys %modules_already_installed ) . "\n"
-        . Dumper( \%modules_already_installed );
-
-    _say_ex '';
-    _say_ex 'modules_need_to_install: '
-        . scalar( keys %modules_need_to_install ) . "\n"
-        . Dumper( \%modules_need_to_install );
-
     _say_ex '';
 
     return;
