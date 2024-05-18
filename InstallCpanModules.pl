@@ -75,6 +75,15 @@ sub say_helper_output
     return;
 }
 
+sub is_string_empty
+{
+    my ( $s ) = @_;
+
+    my $t = !defined $s || $EMPTY_STRING eq $s;
+
+    return $t;
+}
+
 sub add_module_to_ok
 {
     my ( $module, $version ) = @_;
