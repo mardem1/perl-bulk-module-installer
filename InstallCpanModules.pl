@@ -185,7 +185,7 @@ sub mark_module_as_failed
     return;
 }
 
-sub add_module_to_not_found
+sub mark_module_as_not_found
 {
     my ( $module, $version ) = @_;
 
@@ -570,7 +570,7 @@ sub install_module_with_dep
     my $dep_ref = get_module_dependencies( $module );
     if ( !defined $dep_ref ) {
         _say_ex 'ERROR: module - ' . $module . ' - not found - abort !';
-        add_module_to_not_found( $module, undef );
+        mark_module_as_not_found( $module, undef );
 
         print_install_state_summary();
 
