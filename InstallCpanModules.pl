@@ -67,7 +67,9 @@ sub say_helper_output
 {
     my @args = @_;
 
-    my $now = localtime;
+    my @local = ( localtime )[ 0 .. 5 ];
+    my $now   = POSIX::strftime( '%Y-%m-%d_%H-%M-%S', @local );
+
     say '# ' . $now . ' # ' . join( '', @args );
 
     return;
