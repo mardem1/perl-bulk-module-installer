@@ -1,2 +1,2 @@
 
-LWP::Simple
+Log::Log4perl
