@@ -247,7 +247,7 @@ sub search_for_installed_modules
 
 sub reduce_modules_to_install
 {
-    %modules_already_installed = ();
+    %modules_already_installed = ();    # rest info
     %modules_need_to_install   = ();
 
     foreach my $module ( @modules_to_install ) {
