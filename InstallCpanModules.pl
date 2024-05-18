@@ -624,14 +624,14 @@ sub simple_file_read
     }
 
     if ( !( -e -f -r -s $filepath ) ) {
-        die "filepath '$filepath' - not exists, readable or empty";
+        croak "filepath '$filepath' - not exists, readable or empty";
     }
 
     say_helper_output "read modules from file '$filepath'";
 
     my $fh = undef;
     if ( !open( $fh, '<', $filepath ) ) {
-        die "Couldn't open file $filepath, $!";
+        croak "Couldn't open file $filepath, $!";
     }
 
     my @raw_file_lines = <$fh>;
@@ -656,7 +656,7 @@ sub simple_file_write
 
     my $fh = undef;
     if ( !open( $fh, '>', $filepath ) ) {
-        die "Couldn't open file $filepath, $!";
+        croak "Couldn't open file $filepath, $!";
     }
 
     say { $fh } $header;
@@ -786,7 +786,7 @@ sub main
 
     $filepath = trim( $filepath );
     if ( is_string_empty( $filepath ) ) {
-        die 'no file arg given';
+        croak 'no file arg given';
     }
 
     import_module_list_from_file( $filepath );
