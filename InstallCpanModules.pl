@@ -117,7 +117,7 @@ sub add_module_to_failed
 
     $modules_install_failed{ $module } = $version;
 
-    delete $modules_need_to_install{ $module };    # remove module - don't care if faile - no retry of failed
+    delete $modules_need_to_install{ $module };    # remove module - don't care if failed - no retry of failed
 
     return;
 }
@@ -136,7 +136,7 @@ sub add_module_to_not_found
 
     $modules_install_not_found{ $module } = $version;
 
-    delete $modules_need_to_install{ $module };    # remove module - don't care if faile - no retry of failed
+    delete $modules_need_to_install{ $module };    # remove module - don't care if not found - no retry of not found
 
     return;
 }
