@@ -334,15 +334,6 @@ sub reduce_modules_to_install
     return;
 }
 
-sub renew_local_module_information
-{
-    search_for_installed_modules();
-
-    reduce_modules_to_install();
-
-    return;
-}
-
 sub get_module_dependencies
 {
     my ( $module ) = @_;
@@ -882,7 +873,9 @@ sub main
 
     import_module_list_from_file( $filepath );
 
-    renew_local_module_information();
+    search_for_installed_modules();
+
+    reduce_modules_to_install();
 
     install_modules();
 
