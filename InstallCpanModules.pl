@@ -5,8 +5,8 @@ use 5.010;
 use strict;
 use warnings;
 
-use POSIX ":sys_wait_h";
-use Carp qw( croak );
+use POSIX qw(:sys_wait_h);
+use Carp  qw(croak);
 use Carp::Always;
 use IPC::Open3;
 use Data::Dumper qw(Dumper);
