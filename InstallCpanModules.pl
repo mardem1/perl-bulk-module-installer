@@ -203,7 +203,6 @@ sub search_for_installed_modules
         }
 
         return 'eval_ok';
-
     };
 
     alarm 0;    # disable
@@ -211,18 +210,15 @@ sub search_for_installed_modules
     if ( $@ ) {
         if ( "timeout_alarm\n" ne $@ ) {
             say_helper_output 'ERROR: unexpected error - ' - 0 + $@ - ' - ' . $@;
-
             kill -9, $pid;    # kill
         }
         else {
             say_helper_output 'ERROR: timeout - ' - 0 + $@ - ' - ' . $@;
-
             kill -9, $pid;    # kill
         }
     }
     elsif ( 'eval_ok' ne $eval_ok ) {
         say_helper_output 'ERROR: eval failed ? - ' - 0 + $@ - ' - ' . $@;
-
         kill -9, $pid;        # kill
     }
     else {
@@ -230,7 +226,6 @@ sub search_for_installed_modules
         close $chld_out;
 
         say_helper_output 'wait for exit...';
-
         # reap zombie and retrieve exit status
         waitpid( $pid, 0 );
         my $child_exit_status = $? >> 8;
@@ -697,6 +692,7 @@ sub import_module_list_from_file
 
 sub print_install_end_summary
 {
+
     say_helper_output '';
     say_helper_output 'summary';
     say_helper_output '';
@@ -789,7 +785,7 @@ sub main
     my ( $filepath ) = @_;
 
     $filepath = trim( $filepath );
-    if ( !defined $filepath || $EMPTY_STRING eq $filepath ) {
+    if ( is_string_empty( $filepath ) ) {
         die 'no file arg given';
     }
 
