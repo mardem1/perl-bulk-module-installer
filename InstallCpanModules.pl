@@ -806,25 +806,6 @@ sub get_next_module_to_install
     return ( shuffle keys %modules_need_to_install )[ 0 ];
 }
 
-sub import_module_list_from_file
-{
-    my ( $filepath ) = @_;
-
-    if ( _is_string_empty( $filepath ) ) {
-        croak 'param filepath empty!';
-    }
-
-    my @file_lines = _read_file( $filepath );
-
-    @file_lines = map  { _trim( $_ ) } @file_lines;
-    @file_lines = grep { $EMPTY_STRING ne $_ } @file_lines;
-
-    @modules_to_install = @file_lines;
-    @file_lines         = ();
-
-    return;
-}
-
 sub install_modules
 {
     my $install_module = get_next_module_to_install();
@@ -846,6 +827,25 @@ sub install_modules
             $install_module = '';
         }
     }
+
+    return;
+}
+
+sub import_module_list_from_file
+{
+    my ( $filepath ) = @_;
+
+    if ( _is_string_empty( $filepath ) ) {
+        croak 'param filepath empty!';
+    }
+
+    my @file_lines = _read_file( $filepath );
+
+    @file_lines = map  { _trim( $_ ) } @file_lines;
+    @file_lines = grep { $EMPTY_STRING ne $_ } @file_lines;
+
+    @modules_to_install = @file_lines;
+    @file_lines         = ();
 
     return;
 }
