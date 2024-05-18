@@ -166,7 +166,7 @@ sub print_install_state_summary
 
 sub search_for_installed_modules
 {
-    %installed_module_version = ();
+    %installed_module_version = ();    # reset installed module info
 
     my $chld_in  = undef;
     my $chld_out = undef;
