@@ -342,8 +342,6 @@ sub get_module_dependencies
         croak 'param module empty!';
     }
 
-    my %dependencies = ();
-
     ## old 2022-05-15 ?
 # --> Working on Perl::Critic
 # Fetching http://www.cpan.org/authors/id/P/PE/PETDANCE/Perl-Critic-1.140.tar.gz ... OK
@@ -473,6 +471,8 @@ sub get_module_dependencies
         _say_ex 'ERROR: module not found - ' . $module;
         return undef;    # as not found
     }
+
+    my %dependencies = ();
 
     my @dependencie_lines =
         grep { $_ =~ /Found dependencies: /io } @output;
