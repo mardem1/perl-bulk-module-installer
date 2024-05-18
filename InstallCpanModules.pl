@@ -68,7 +68,6 @@ sub say_helper_output
 
     my @local = ( localtime )[ 0 .. 5 ];
     my $now   = POSIX::strftime( '%Y-%m-%d_%H-%M-%S', @local );
-
     say '# ' . $now . ' # ' . join( '', @args );
 
     return;
@@ -144,14 +143,21 @@ sub add_module_to_not_found
 sub print_install_state_summary
 {
     say_helper_output '';
-    say_helper_output 'modules_need_to_install left - ' . scalar( keys %modules_need_to_install );
-    say_helper_output 'modules_install_ok: ' . scalar( keys %modules_install_ok );
+
     say_helper_output 'modules_install_not_found: '
         . scalar( keys %modules_install_not_found ) . "\n"
         . Dumper( \%modules_install_not_found );
+
     say_helper_output 'modules_install_failed: '
         . scalar( keys %modules_install_failed ) . "\n"
         . Dumper( \%modules_install_failed );
+
+    say_helper_output 'modules_need_to_install left - ' . scalar( keys %modules_need_to_install );
+
+    say_helper_output 'modules_install_ok: ' . scalar( keys %modules_install_ok );
+
+    # no dumper with need and ok - not necessary as temporary state.
+
     say_helper_output '';
 
     return;
