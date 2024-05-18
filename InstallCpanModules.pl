@@ -84,7 +84,7 @@ sub _is_string_empty
     return $t;
 }
 
-sub _read_file_lines
+sub _read_file
 {
     my ( $filepath ) = @_;
 
@@ -753,7 +753,7 @@ sub import_module_list_from_file
         croak 'param filepath empty!';
     }
 
-    my @file_lines = _read_file_lines( $filepath );
+    my @file_lines = _read_file( $filepath );
 
     @file_lines = map  { _trim( $_ ) } @file_lines;
     @file_lines = grep { $EMPTY_STRING ne $_ } @file_lines;
