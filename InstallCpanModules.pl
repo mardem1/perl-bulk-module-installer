@@ -164,7 +164,7 @@ sub mark_module_as_ok
     return;
 }
 
-sub add_module_to_failed
+sub mark_module_as_failed
 {
     my ( $module, $version ) = @_;
 
@@ -590,7 +590,7 @@ sub install_module_with_dep
             my $ret = install_module_with_dep( $dep_module );
             if ( $ret ) {
                 _say_ex 'ERROR: module - ' . $module . ' - aborted - failed dependencies';
-                add_module_to_failed( $module, undef );    # delete if something wrong - should not happen
+                mark_module_as_failed( $module, undef );    # delete if something wrong - should not happen
 
                 print_install_state_summary();
 
@@ -640,7 +640,7 @@ sub simple_install_module
     my $pid = open3( $chld_in, '>&STDOUT', '>&STDERR', @cmd );
     if ( 1 > $pid ) {
         _say_ex 'install module - ' . $module . ' - process start failed';
-        add_module_to_failed( $module, undef );
+        mark_module_as_failed( $module, undef );
         print_install_state_summary();
         return 1;
     }
@@ -686,7 +686,7 @@ sub simple_install_module
     if ( $child_exit_status ) {
         $action = 'failed';
 
-        add_module_to_failed( $module, undef );
+        mark_module_as_failed( $module, undef );
     }
     else {
         $action = 'success';
