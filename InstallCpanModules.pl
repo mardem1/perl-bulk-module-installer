@@ -56,6 +56,7 @@ sub trim
 {
     my ( $s ) = @_;
 
+    $s //= q{};
     $s =~ s/^\s+|\s+$//g;
 
     return $s;
