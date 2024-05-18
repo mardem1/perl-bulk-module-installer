@@ -126,6 +126,14 @@ sub add_module_to_not_found
 {
     my ( $module, $version ) = @_;
 
+    if ( is_string_empty( $module ) ) {
+        croak 'param module empty!';
+    }
+
+    if ( is_string_empty( $version ) ) {
+        $version = undef;    # force undef if empty - param optional
+    }
+
     $modules_install_not_found{ $module } = $version;
 
     delete $modules_need_to_install{ $module };    # remove module - don't care if faile - no retry of failed
