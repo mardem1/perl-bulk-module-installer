@@ -64,7 +64,7 @@ sub _trim
     return $s;
 }
 
-sub say_helper_output
+sub _say_ex
 {
     my @args = @_;
 
@@ -96,13 +96,13 @@ sub add_module_to_ok
         $version = undef;    # force undef if empty - param optional
     }
 
-    say_helper_output 'add ', $module, ' to modules_install_ok';
+    _say_ex 'add ', $module, ' to modules_install_ok';
     $modules_install_ok{ $module } = undef;
 
-    say_helper_output 'add ', $module, ' to installed_module_version';
+    _say_ex 'add ', $module, ' to installed_module_version';
     $installed_module_version{ $module } = $version;
 
-    say_helper_output 'remove ', $module, ' from modules_need_to_install';
+    _say_ex 'remove ', $module, ' from modules_need_to_install';
     delete $modules_need_to_install{ $module };
 
     return;
@@ -120,10 +120,10 @@ sub add_module_to_failed
         $version = undef;    # force undef if empty - param optional
     }
 
-    say_helper_output 'add ', $module, ' to modules_install_failed';
+    _say_ex 'add ', $module, ' to modules_install_failed';
     $modules_install_failed{ $module } = $version;
 
-    say_helper_output 'remove ', $module, ' from modules_need_to_install';
+    _say_ex 'remove ', $module, ' from modules_need_to_install';
     delete $modules_need_to_install{ $module };    # remove module - don't care if failed - no retry of failed
 
     return;
@@ -141,10 +141,10 @@ sub add_module_to_not_found
         $version = undef;    # force undef if empty - param optional
     }
 
-    say_helper_output 'add ', $module, ' to modules_install_not_found';
+    _say_ex 'add ', $module, ' to modules_install_not_found';
     $modules_install_not_found{ $module } = $version;
 
-    say_helper_output 'remove ', $module, ' from modules_need_to_install';
+    _say_ex 'remove ', $module, ' from modules_need_to_install';
     delete $modules_need_to_install{ $module };    # remove module - don't care if not found - no retry of not found
 
     return;
@@ -152,23 +152,23 @@ sub add_module_to_not_found
 
 sub print_install_state_summary
 {
-    say_helper_output '';
+    _say_ex '';
 
-    say_helper_output 'modules_install_not_found: '
+    _say_ex 'modules_install_not_found: '
         . scalar( keys %modules_install_not_found ) . "\n"
         . Dumper( \%modules_install_not_found );
 
-    say_helper_output 'modules_install_failed: '
+    _say_ex 'modules_install_failed: '
         . scalar( keys %modules_install_failed ) . "\n"
         . Dumper( \%modules_install_failed );
 
-    say_helper_output 'modules_need_to_install left - ' . scalar( keys %modules_need_to_install );
+    _say_ex 'modules_need_to_install left - ' . scalar( keys %modules_need_to_install );
 
-    say_helper_output 'modules_install_ok - ' . scalar( keys %modules_install_ok );
+    _say_ex 'modules_install_ok - ' . scalar( keys %modules_install_ok );
 
     # no dumper with need and ok - not necessary as temporary state.
 
-    say_helper_output '';
+    _say_ex '';
 
     return;
 }
@@ -181,20 +181,20 @@ sub search_for_installed_modules
     my $chld_out = undef;
 
     my @cmd = ( 'cmd.exe', '/c', 'cpan', '-l' );
-    say_helper_output 'start cmd: ' . ( join ' ', @cmd );
+    _say_ex 'start cmd: ' . ( join ' ', @cmd );
     my $pid = open3( $chld_in, $chld_out, '>&STDERR', @cmd );
 
     if ( 1 > $pid ) {
-        say_helper_output 'ERROR: cmd start failed!';
+        _say_ex 'ERROR: cmd start failed!';
         return;
     }
 
-    say_helper_output 'pid: ' . $pid;
+    _say_ex 'pid: ' . $pid;
 
-    say_helper_output 'close chld_in';
+    _say_ex 'close chld_in';
     close $chld_in;
 
-    say_helper_output 'read output ... ';
+    _say_ex 'read output ... ';
 
     local $@;
     my $eval_ok = eval {
@@ -204,7 +204,7 @@ sub search_for_installed_modules
         while ( my $line = <$chld_out> ) {
             $line = _trim( $line );
 
-            # say_helper_output 'STDOUT: ' . $line;
+            # _say_ex 'STDOUT: ' . $line;
             my @t = split /\s+/, $line;
             $installed_module_version{ $t[ 0 ] } =
                 ( 'undef' eq $t[ 1 ] ? undef : $t[ 1 ] );
@@ -217,34 +217,34 @@ sub search_for_installed_modules
 
     if ( $@ ) {
         if ( "timeout_alarm\n" ne $@ ) {
-            say_helper_output 'ERROR: unexpected error - ' - 0 + $@ - ' - ' . $@;
+            _say_ex 'ERROR: unexpected error - ' - 0 + $@ - ' - ' . $@;
             kill -9, $pid;    # kill
         }
         else {
-            say_helper_output 'ERROR: timeout - ' - 0 + $@ - ' - ' . $@;
+            _say_ex 'ERROR: timeout - ' - 0 + $@ - ' - ' . $@;
             kill -9, $pid;    # kill
         }
     }
     elsif ( 'eval_ok' ne $eval_ok ) {
-        say_helper_output 'ERROR: eval failed ? - ' - 0 + $@ - ' - ' . $@;
+        _say_ex 'ERROR: eval failed ? - ' - 0 + $@ - ' - ' . $@;
         kill -9, $pid;        # kill
     }
     else {
-        say_helper_output 'close chld_out';
+        _say_ex 'close chld_out';
         close $chld_out;
 
-        say_helper_output 'wait for exit...';
+        _say_ex 'wait for exit...';
         # reap zombie and retrieve exit status
         waitpid( $pid, 0 );
         my $child_exit_status = $? >> 8;
-        say_helper_output '$child_exit_status: ' . $child_exit_status;
+        _say_ex '$child_exit_status: ' . $child_exit_status;
     }
 
-    say_helper_output '';
-    say_helper_output 'installed_module_version: '
+    _say_ex '';
+    _say_ex 'installed_module_version: '
         . scalar( keys %installed_module_version ) . "\n"
         . Dumper( \%installed_module_version );
-    say_helper_output '';
+    _say_ex '';
 
     return;
 }
@@ -263,17 +263,17 @@ sub reduce_modules_to_install
         }
     }
 
-    say_helper_output '';
-    say_helper_output 'modules_already_installed: '
+    _say_ex '';
+    _say_ex 'modules_already_installed: '
         . scalar( keys %modules_already_installed ) . "\n"
         . Dumper( \%modules_already_installed );
 
-    say_helper_output '';
-    say_helper_output 'modules_need_to_install: '
+    _say_ex '';
+    _say_ex 'modules_need_to_install: '
         . scalar( keys %modules_need_to_install ) . "\n"
         . Dumper( \%modules_need_to_install );
 
-    say_helper_output '';
+    _say_ex '';
 
     return;
 }
@@ -344,28 +344,28 @@ sub get_module_dependencies
 # Exporter
 # Test::Builder::Module
 
-    say_helper_output 'get module dependencies - ' . $module;
+    _say_ex 'get module dependencies - ' . $module;
 
     my $chld_in  = undef;
     my $chld_out = undef;
 
     my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--showdeps', $module, '2>&1' );
-    say_helper_output 'start cmd: ' . ( join ' ', @cmd );
+    _say_ex 'start cmd: ' . ( join ' ', @cmd );
 
     my $pid = open3( $chld_in, $chld_out, '>&STDERR', @cmd );
 
     if ( 1 > $pid ) {
-        say_helper_output 'ERROR: cmd start failed!';
+        _say_ex 'ERROR: cmd start failed!';
 
         return undef;    # as not found
     }
 
-    say_helper_output 'pid: ' . $pid;
+    _say_ex 'pid: ' . $pid;
 
-    say_helper_output 'close chld_in';
+    _say_ex 'close chld_in';
     close $chld_in;
 
-    say_helper_output 'read output ... ';
+    _say_ex 'read output ... ';
 
     my @output = ();
 
@@ -377,7 +377,7 @@ sub get_module_dependencies
         while ( my $line = <$chld_out> ) {
             $line = _trim( $line );
 
-            # say_helper_output 'STDOUT: ' . $line;
+            # _say_ex 'STDOUT: ' . $line;
             push @output, $line;
         }
 
@@ -388,42 +388,42 @@ sub get_module_dependencies
 
     if ( $@ ) {
         if ( "timeout_alarm\n" ne $@ ) {
-            say_helper_output 'ERROR: unexpected error - ' - 0 + $@ - ' - ' . $@;
+            _say_ex 'ERROR: unexpected error - ' - 0 + $@ - ' - ' . $@;
 
             kill -9, $pid;    # kill
             return undef;     # as >not found
         }
         else {
-            say_helper_output 'ERROR: timeout - ' - 0 + $@ - ' - ' . $@;
+            _say_ex 'ERROR: timeout - ' - 0 + $@ - ' - ' . $@;
 
             kill -9, $pid;    # kill
             return undef;     # as not found
         }
     }
     elsif ( 'eval_ok' ne $eval_ok ) {
-        say_helper_output 'ERROR: eval failed ? - ' - 0 + $@ - ' - ' . $@;
+        _say_ex 'ERROR: eval failed ? - ' - 0 + $@ - ' - ' . $@;
 
         kill -9, $pid;    # kill
         return undef;     # as not found
     }
 
-    say_helper_output 'close chld_out';
+    _say_ex 'close chld_out';
     close $chld_out;
 
-    say_helper_output 'wait for exit...';
+    _say_ex 'wait for exit...';
 
     # reap zombie and retrieve exit status
     waitpid( $pid, 0 );
     my $child_exit_status = $? >> 8;
-    say_helper_output '$child_exit_status: ' . $child_exit_status;
+    _say_ex '$child_exit_status: ' . $child_exit_status;
 
     if ( $child_exit_status && !@output ) {
-        say_helper_output 'ERROR: search failed - exitcode - ' . $child_exit_status;
+        _say_ex 'ERROR: search failed - exitcode - ' . $child_exit_status;
         return undef;    # as not found
     }
 
     if ( ( join '', @output ) =~ /Couldn't find module or a distribution/io ) {
-        say_helper_output 'ERROR: module not found - ' . $module;
+        _say_ex 'ERROR: module not found - ' . $module;
         return undef;    # as not found
     }
 
@@ -475,7 +475,7 @@ sub get_module_dependencies
     delete $dependencies{ 'lib' };
     delete $dependencies{ 'overload' };
 
-    say_helper_output 'dependencies found: ' . scalar( keys %dependencies ) . "\n" . Dumper( \%dependencies );
+    _say_ex 'dependencies found: ' . scalar( keys %dependencies ) . "\n" . Dumper( \%dependencies );
 
     return \%dependencies;
 }
@@ -509,11 +509,11 @@ sub install_module_with_dep
         croak 'param module empty!';
     }
 
-    say_helper_output 'analyze module - ' . $module;
+    _say_ex 'analyze module - ' . $module;
 
     my $dep_ref = get_module_dependencies( $module );
     if ( !defined $dep_ref ) {
-        say_helper_output 'ERROR: module - ' . $module . ' - not found - abort !';
+        _say_ex 'ERROR: module - ' . $module . ' - not found - abort !';
         add_module_to_not_found( $module, undef );
 
         print_install_state_summary();
@@ -523,17 +523,17 @@ sub install_module_with_dep
 
     my %dep = %{ $dep_ref };
     if ( %dep ) {
-        say_helper_output 'module has dependencies - ' . $module . ' - reduce to not installed';
+        _say_ex 'module has dependencies - ' . $module . ' - reduce to not installed';
         %dep = reduce_dependency_modules_which_are_not_installed( %dep );
     }
 
     if ( %dep ) {
-        say_helper_output 'module - ' . $module . ' has not installed dependencies ' . "\n" . Dumper( \%dep );
+        _say_ex 'module - ' . $module . ' has not installed dependencies ' . "\n" . Dumper( \%dep );
 
         foreach my $dep_module ( keys %dep ) {
             my $ret = install_module_with_dep( $dep_module );
             if ( $ret ) {
-                say_helper_output 'ERROR: module - ' . $module . ' - aborted - failed dependencies';
+                _say_ex 'ERROR: module - ' . $module . ' - aborted - failed dependencies';
                 add_module_to_failed( $module, undef );    # delete if something wrong - should not happen
 
                 print_install_state_summary();
@@ -543,7 +543,7 @@ sub install_module_with_dep
         }
     }
     else {
-        say_helper_output 'module - ' . $module . ' - no dependencies to install';
+        _say_ex 'module - ' . $module . ' - no dependencies to install';
     }
 
     my $ret = simple_install_module( $module );
@@ -570,31 +570,31 @@ sub simple_install_module
 
     # update needs force
     if ( exists $installed_module_version{ $module } ) {
-        say_helper_output 'update module - ' . $module;
+        _say_ex 'update module - ' . $module;
     }
     else {
-        say_helper_output 'install module - ' . $module;
+        _say_ex 'install module - ' . $module;
     }
 
-    say_helper_output 'start cmd: ' . ( join ' ', @cmd );
-    say_helper_output '';
+    _say_ex 'start cmd: ' . ( join ' ', @cmd );
+    _say_ex '';
 
     my $chld_in = undef;
 
     my $pid = open3( $chld_in, '>&STDOUT', '>&STDERR', @cmd );
     if ( 1 > $pid ) {
-        say_helper_output 'install module - ' . $module . ' - process start failed';
+        _say_ex 'install module - ' . $module . ' - process start failed';
         add_module_to_failed( $module, undef );
         print_install_state_summary();
         return 1;
     }
 
-    say_helper_output 'started pid: ' . $pid;
+    _say_ex 'started pid: ' . $pid;
 
-    say_helper_output 'close chld_in';
+    _say_ex 'close chld_in';
     close $chld_in;
 
-    say_helper_output 'read output ... ';
+    _say_ex 'read output ... ';
     my $child_exit_status = undef;
 
     my $timeout_time    = $INSTALL_MODULE_TIMEOUT_IN_SECONDS + time;
@@ -603,10 +603,10 @@ sub simple_install_module
     my $kid;
     do {
         $kid = waitpid( $pid, WNOHANG );
-        # say_helper_output 'kid: ' . $kid;
+        # _say_ex 'kid: ' . $kid;
         if ( 0 == $kid ) {
             if ( $timeout_time < time ) {
-                say_helper_output 'ERROR: timeout reached';
+                _say_ex 'ERROR: timeout reached';
                 $timeout_reached = 1;
             }
             else {
@@ -617,10 +617,10 @@ sub simple_install_module
 
     if ( !$timeout_reached ) {
         $child_exit_status = $? >> 8;
-        say_helper_output '$child_exit_status: ' . $child_exit_status;
+        _say_ex '$child_exit_status: ' . $child_exit_status;
     }
     else {
-        say_helper_output 'ERROR: kill child process pid - ' . $pid;
+        _say_ex 'ERROR: kill child process pid - ' . $pid;
         $child_exit_status = 1;
         kill -9, $pid;    # kill
     }
@@ -638,7 +638,7 @@ sub simple_install_module
         add_module_to_ok( $module, 999_999 );    # newest version - so real number not relevant.
     }
 
-    say_helper_output 'install module - ' . $module . ' - ' . $action;
+    _say_ex 'install module - ' . $module . ' - ' . $action;
 
     print_install_state_summary();
 
@@ -656,7 +656,7 @@ sub module_already_tried
     if ( exists $modules_install_ok{ $module } ) {
         delete $modules_need_to_install{ $module };    # delete if something wrong - should not happen
 
-        say_helper_output 'WARN: install module - ' . $module . ' - already done - abort';
+        _say_ex 'WARN: install module - ' . $module . ' - already done - abort';
 
         return 0;
     }
@@ -664,7 +664,7 @@ sub module_already_tried
     if ( exists $modules_install_failed{ $module } ) {
         delete $modules_need_to_install{ $module };    # delete if something wrong - should not happen
 
-        say_helper_output 'WARN: install module - ' . $module . ' - already tried - abort';
+        _say_ex 'WARN: install module - ' . $module . ' - already tried - abort';
 
         return 1;
     }
@@ -672,7 +672,7 @@ sub module_already_tried
     if ( exists $modules_install_not_found{ $module } ) {
         delete $modules_need_to_install{ $module };    # delete if something wrong - should not happen
 
-        say_helper_output 'WARN: install module - ' . $module . ' - already mot found - abort';
+        _say_ex 'WARN: install module - ' . $module . ' - already mot found - abort';
 
         return 1;
     }
@@ -701,7 +701,7 @@ sub simple_file_read
         croak "filepath '$filepath' - not exists, readable or empty";
     }
 
-    say_helper_output "read modules from file '$filepath'";
+    _say_ex "read modules from file '$filepath'";
 
     my $fh = undef;
     if ( !open( $fh, '<', $filepath ) ) {
@@ -726,7 +726,7 @@ sub simple_file_write
         croak 'param header empty!';
     }
 
-    say_helper_output "write '$filepath'";
+    _say_ex "write '$filepath'";
 
     my $fh = undef;
     if ( !open( $fh, '>', $filepath ) ) {
@@ -772,12 +772,12 @@ sub print_install_end_summary
         croak 'param filepath empty!';
     }
 
-    say_helper_output '';
-    say_helper_output 'summary';
-    say_helper_output '';
+    _say_ex '';
+    _say_ex 'summary';
+    _say_ex '';
 
-    say_helper_output '';
-    say_helper_output 'modules_install_not_found: '
+    _say_ex '';
+    _say_ex 'modules_install_not_found: '
         . scalar( keys %modules_install_not_found ) . "\n"
         . Dumper( \%modules_install_not_found );
     simple_file_write(
@@ -785,10 +785,10 @@ sub print_install_end_summary
         'modules_install_not_found: ' . scalar( keys %modules_install_not_found ),
         Dumper( \%modules_install_not_found ),
     );
-    say_helper_output '';
+    _say_ex '';
 
-    say_helper_output '';
-    say_helper_output 'modules_install_failed: '
+    _say_ex '';
+    _say_ex 'modules_install_failed: '
         . scalar( keys %modules_install_failed ) . "\n"
         . Dumper( \%modules_install_failed );
     simple_file_write(
@@ -796,10 +796,10 @@ sub print_install_end_summary
         'modules_install_failed: ' . scalar( keys %modules_install_failed ),
         Dumper( \%modules_install_failed ),
     );
-    say_helper_output '';
+    _say_ex '';
 
-    say_helper_output '';
-    say_helper_output 'modules_install_ok: '
+    _say_ex '';
+    _say_ex 'modules_install_ok: '
         . scalar( keys %modules_install_ok ) . "\n"
         . Dumper( \%modules_install_ok );
     simple_file_write(
@@ -807,10 +807,10 @@ sub print_install_end_summary
         'modules_install_ok: ' . scalar( keys %modules_install_ok ),
         Dumper( \%modules_install_ok ),
     );
-    say_helper_output '';
+    _say_ex '';
 
-    say_helper_output '';
-    say_helper_output 'modules_need_to_install: '
+    _say_ex '';
+    _say_ex 'modules_need_to_install: '
         . scalar( keys %modules_need_to_install ) . "\n"
         . Dumper( \%modules_need_to_install );
     simple_file_write(
@@ -818,10 +818,10 @@ sub print_install_end_summary
         'modules_need_to_install: ' . scalar( keys %modules_need_to_install ),
         Dumper( \%modules_need_to_install ),
     );
-    say_helper_output '';
+    _say_ex '';
 
-    say_helper_output '';
-    say_helper_output 'modules_already_installed: '
+    _say_ex '';
+    _say_ex 'modules_already_installed: '
         . scalar( keys %modules_already_installed ) . "\n"
         . Dumper( \%modules_already_installed );
     simple_file_write(
@@ -829,7 +829,7 @@ sub print_install_end_summary
         'modules_already_installed: ' . scalar( keys %modules_already_installed ),
         Dumper( \%modules_already_installed ),
     );
-    say_helper_output '';
+    _say_ex '';
 
     return;
 }
@@ -842,7 +842,7 @@ sub install_modules
 
         my $next_module = get_next_module_to_install();
         if ( !$next_module ) {
-            say_helper_output 'no more modules to do';
+            _say_ex 'no more modules to do';
 
             $install_module = '';
         }
@@ -850,7 +850,7 @@ sub install_modules
             $install_module = $next_module;
         }
         else {
-            say_helper_output 'ERROR: next module not changed ' . $next_module . ' - abort !';
+            _say_ex 'ERROR: next module not changed ' . $next_module . ' - abort !';
 
             $install_module = '';
         }
@@ -862,9 +862,9 @@ sub install_modules
 sub print_perl_detail_info
 {
     my @cmd = ( 'cmd.exe', '/c', 'perl', '-V' );
-    say_helper_output 'start cmd: ' . ( join ' ', @cmd );
+    _say_ex 'start cmd: ' . ( join ' ', @cmd );
     system( @cmd );
-    say_helper_output 'cmd ended';
+    _say_ex 'cmd ended';
 
     return;
 }
@@ -893,11 +893,11 @@ sub main
 
 $| = 1;
 
-say_helper_output "started $0";
+_say_ex "started $0";
 
 main( $ARGV[ 0 ] // '' );
 
-say_helper_output "ended $0";
+_say_ex "ended $0";
 
 __END__
 
