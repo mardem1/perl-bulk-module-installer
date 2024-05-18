@@ -780,6 +780,16 @@ sub install_modules
     return;
 }
 
+sub print_perl_detail_info
+{
+    my @cmd = ( 'cmd.exe', '/c', 'perl', '-V' );
+    say_helper_output 'start cmd: ' . ( join ' ', @cmd );
+    system( @cmd );
+    say_helper_output 'cmd ended';
+
+    return;
+}
+
 sub main
 {
     my ( $filepath ) = @_;
@@ -788,6 +798,8 @@ sub main
     if ( is_string_empty( $filepath ) ) {
         croak 'no file arg given';
     }
+
+    print_perl_detail_info();
 
     import_module_list_from_file( $filepath );
 
