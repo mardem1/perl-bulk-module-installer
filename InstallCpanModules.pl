@@ -714,7 +714,7 @@ sub get_next_module_to_install
     return ( shuffle keys %modules_need_to_install )[ 0 ];
 }
 
-sub simple_file_write
+sub _write_file
 {
     my ( $filepath, $header, @content ) = @_;
 
@@ -780,7 +780,7 @@ sub print_install_end_summary
     _say_ex 'modules_install_not_found: '
         . scalar( keys %modules_install_not_found ) . "\n"
         . Dumper( \%modules_install_not_found );
-    simple_file_write(
+    _write_file(
         $filepath . '_modules_install_not_found.log',
         'modules_install_not_found: ' . scalar( keys %modules_install_not_found ),
         Dumper( \%modules_install_not_found ),
@@ -791,7 +791,7 @@ sub print_install_end_summary
     _say_ex 'modules_install_failed: '
         . scalar( keys %modules_install_failed ) . "\n"
         . Dumper( \%modules_install_failed );
-    simple_file_write(
+    _write_file(
         $filepath . 'modules_install_failed.log',
         'modules_install_failed: ' . scalar( keys %modules_install_failed ),
         Dumper( \%modules_install_failed ),
@@ -802,7 +802,7 @@ sub print_install_end_summary
     _say_ex 'modules_install_ok: '
         . scalar( keys %modules_install_ok ) . "\n"
         . Dumper( \%modules_install_ok );
-    simple_file_write(
+    _write_file(
         $filepath . 'modules_install_ok.log',
         'modules_install_ok: ' . scalar( keys %modules_install_ok ),
         Dumper( \%modules_install_ok ),
@@ -813,7 +813,7 @@ sub print_install_end_summary
     _say_ex 'modules_need_to_install: '
         . scalar( keys %modules_need_to_install ) . "\n"
         . Dumper( \%modules_need_to_install );
-    simple_file_write(
+    _write_file(
         $filepath . 'modules_need_to_install.log',
         'modules_need_to_install: ' . scalar( keys %modules_need_to_install ),
         Dumper( \%modules_need_to_install ),
@@ -824,7 +824,7 @@ sub print_install_end_summary
     _say_ex 'modules_already_installed: '
         . scalar( keys %modules_already_installed ) . "\n"
         . Dumper( \%modules_already_installed );
-    simple_file_write(
+    _write_file(
         $filepath . 'modules_already_installed.log',
         'modules_already_installed: ' . scalar( keys %modules_already_installed ),
         Dumper( \%modules_already_installed ),
