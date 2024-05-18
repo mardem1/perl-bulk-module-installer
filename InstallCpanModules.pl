@@ -1,4 +1,3 @@
-
 use utf8;
 
 use 5.010;
@@ -7,10 +6,10 @@ use strict;
 use warnings;
 
 use POSIX ":sys_wait_h";
-use Carp;
+use Carp qw( croak );
 use Carp::Always;
 use IPC::Open3;
-use Data::Dumper qw( Dumper );
+use Data::Dumper qw(Dumper);
 
 BEGIN {
     if ( $^O !~ /win32/io ) {
@@ -87,6 +86,14 @@ sub is_string_empty
 sub add_module_to_ok
 {
     my ( $module, $version ) = @_;
+
+    if ( is_string_empty( $module ) ) {
+        croak 'param module empty!';
+    }
+
+    if ( is_string_empty( $version ) ) {
+        $version = undef;    # force undef if empty - param optional
+    }
 
     $modules_install_ok{ $module }       = undef;
     $installed_module_version{ $module } = $version;
@@ -678,7 +685,7 @@ sub main
     simple_file_write(
         $filepath . '_modules_install_not_found.log',
         'modules_install_not_found: ' . scalar( keys %modules_install_not_found ),
-        Dumper( \%modules_install_not_found )
+        Dumper( \%modules_install_not_found ),
     );
     say_helper_output '';
 
@@ -689,7 +696,7 @@ sub main
     simple_file_write(
         $filepath . 'modules_install_failed.log',
         'modules_install_failed: ' . scalar( keys %modules_install_failed ),
-        Dumper( \%modules_install_failed )
+        Dumper( \%modules_install_failed ),
     );
     say_helper_output '';
 
@@ -700,7 +707,7 @@ sub main
     simple_file_write(
         $filepath . 'modules_install_ok.log',
         'modules_install_ok: ' . scalar( keys %modules_install_ok ),
-        Dumper( \%modules_install_ok )
+        Dumper( \%modules_install_ok ),
     );
     say_helper_output '';
 
@@ -711,7 +718,7 @@ sub main
     simple_file_write(
         $filepath . 'modules_need_to_install.log',
         'modules_need_to_install: ' . scalar( keys %modules_need_to_install ),
-        Dumper( \%modules_need_to_install )
+        Dumper( \%modules_need_to_install ),
     );
     say_helper_output '';
 
@@ -722,7 +729,7 @@ sub main
     simple_file_write(
         $filepath . 'modules_already_installed.log',
         'modules_already_installed: ' . scalar( keys %modules_already_installed ),
-        Dumper( \%modules_already_installed )
+        Dumper( \%modules_already_installed ),
     );
     say_helper_output '';
 
