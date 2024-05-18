@@ -695,39 +695,8 @@ sub import_module_list_from_file
     return;
 }
 
-sub main
+sub print_install_end_summary
 {
-    my ( $filepath ) = @_;
-
-    $filepath = trim( $filepath );
-    if ( !defined $filepath || $EMPTY_STRING eq $filepath ) {
-        die 'no file arg given';
-    }
-
-    import_module_list_from_file( $filepath );
-
-    renew_local_module_information();
-
-    my $install_module = get_next_module_to_install();
-    while ( $install_module ) {
-        install_module_with_dep( $install_module );
-
-        my $next_module = get_next_module_to_install();
-        if ( !$next_module ) {
-            say_helper_output 'no more modules to do';
-
-            $install_module = '';
-        }
-        elsif ( $next_module ne $install_module ) {
-            $install_module = $next_module;
-        }
-        else {
-            say_helper_output 'ERROR: next module not changed ' . $next_module . ' - abort !';
-
-            $install_module = '';
-        }
-    }
-
     say_helper_output '';
     say_helper_output 'summary';
     say_helper_output '';
@@ -786,6 +755,44 @@ sub main
         Dumper( \%modules_already_installed ),
     );
     say_helper_output '';
+
+    return;
+}
+
+sub main
+{
+    my ( $filepath ) = @_;
+
+    $filepath = trim( $filepath );
+    if ( !defined $filepath || $EMPTY_STRING eq $filepath ) {
+        die 'no file arg given';
+    }
+
+    import_module_list_from_file( $filepath );
+
+    renew_local_module_information();
+
+    my $install_module = get_next_module_to_install();
+    while ( $install_module ) {
+        install_module_with_dep( $install_module );
+
+        my $next_module = get_next_module_to_install();
+        if ( !$next_module ) {
+            say_helper_output 'no more modules to do';
+
+            $install_module = '';
+        }
+        elsif ( $next_module ne $install_module ) {
+            $install_module = $next_module;
+        }
+        else {
+            say_helper_output 'ERROR: next module not changed ' . $next_module . ' - abort !';
+
+            $install_module = '';
+        }
+    }
+
+    print_install_end_summary();
 
     return;
 }
