@@ -258,6 +258,76 @@ sub print_install_state_summary
     return;
 }
 
+sub print_install_end_summary
+{
+    my ( $filepath ) = @_;
+
+    if ( _is_string_empty( $filepath ) ) {
+        croak 'param filepath empty!';
+    }
+
+    _say_ex '';
+    _say_ex 'summary';
+    _say_ex '';
+
+    _say_ex '';
+    _say_ex 'modules_install_not_found: '
+        . scalar( keys %modules_install_not_found ) . "\n"
+        . Dumper( \%modules_install_not_found );
+    _write_file(
+        $filepath . '_modules_install_not_found.log',
+        'modules_install_not_found: ' . scalar( keys %modules_install_not_found ),
+        Dumper( \%modules_install_not_found ),
+    );
+    _say_ex '';
+
+    _say_ex '';
+    _say_ex 'modules_install_failed: '
+        . scalar( keys %modules_install_failed ) . "\n"
+        . Dumper( \%modules_install_failed );
+    _write_file(
+        $filepath . 'modules_install_failed.log',
+        'modules_install_failed: ' . scalar( keys %modules_install_failed ),
+        Dumper( \%modules_install_failed ),
+    );
+    _say_ex '';
+
+    _say_ex '';
+    _say_ex 'modules_install_ok: '
+        . scalar( keys %modules_install_ok ) . "\n"
+        . Dumper( \%modules_install_ok );
+    _write_file(
+        $filepath . 'modules_install_ok.log',
+        'modules_install_ok: ' . scalar( keys %modules_install_ok ),
+        Dumper( \%modules_install_ok ),
+    );
+    _say_ex '';
+
+    _say_ex '';
+    _say_ex 'modules_need_to_install: '
+        . scalar( keys %modules_need_to_install ) . "\n"
+        . Dumper( \%modules_need_to_install );
+    _write_file(
+        $filepath . 'modules_need_to_install.log',
+        'modules_need_to_install: ' . scalar( keys %modules_need_to_install ),
+        Dumper( \%modules_need_to_install ),
+    );
+    _say_ex '';
+
+    _say_ex '';
+    _say_ex 'modules_already_installed: '
+        . scalar( keys %modules_already_installed ) . "\n"
+        . Dumper( \%modules_already_installed );
+    _write_file(
+        $filepath . 'modules_already_installed.log',
+        'modules_already_installed: ' . scalar( keys %modules_already_installed ),
+        Dumper( \%modules_already_installed ),
+    );
+    _say_ex '';
+
+    return;
+}
+
 sub search_for_installed_modules
 {
     %installed_module_version = ();    # reset installed module info
@@ -751,76 +821,6 @@ sub import_module_list_from_file
 
     @modules_to_install = @file_lines;
     @file_lines         = ();
-
-    return;
-}
-
-sub print_install_end_summary
-{
-    my ( $filepath ) = @_;
-
-    if ( _is_string_empty( $filepath ) ) {
-        croak 'param filepath empty!';
-    }
-
-    _say_ex '';
-    _say_ex 'summary';
-    _say_ex '';
-
-    _say_ex '';
-    _say_ex 'modules_install_not_found: '
-        . scalar( keys %modules_install_not_found ) . "\n"
-        . Dumper( \%modules_install_not_found );
-    _write_file(
-        $filepath . '_modules_install_not_found.log',
-        'modules_install_not_found: ' . scalar( keys %modules_install_not_found ),
-        Dumper( \%modules_install_not_found ),
-    );
-    _say_ex '';
-
-    _say_ex '';
-    _say_ex 'modules_install_failed: '
-        . scalar( keys %modules_install_failed ) . "\n"
-        . Dumper( \%modules_install_failed );
-    _write_file(
-        $filepath . 'modules_install_failed.log',
-        'modules_install_failed: ' . scalar( keys %modules_install_failed ),
-        Dumper( \%modules_install_failed ),
-    );
-    _say_ex '';
-
-    _say_ex '';
-    _say_ex 'modules_install_ok: '
-        . scalar( keys %modules_install_ok ) . "\n"
-        . Dumper( \%modules_install_ok );
-    _write_file(
-        $filepath . 'modules_install_ok.log',
-        'modules_install_ok: ' . scalar( keys %modules_install_ok ),
-        Dumper( \%modules_install_ok ),
-    );
-    _say_ex '';
-
-    _say_ex '';
-    _say_ex 'modules_need_to_install: '
-        . scalar( keys %modules_need_to_install ) . "\n"
-        . Dumper( \%modules_need_to_install );
-    _write_file(
-        $filepath . 'modules_need_to_install.log',
-        'modules_need_to_install: ' . scalar( keys %modules_need_to_install ),
-        Dumper( \%modules_need_to_install ),
-    );
-    _say_ex '';
-
-    _say_ex '';
-    _say_ex 'modules_already_installed: '
-        . scalar( keys %modules_already_installed ) . "\n"
-        . Dumper( \%modules_already_installed );
-    _write_file(
-        $filepath . 'modules_already_installed.log',
-        'modules_already_installed: ' . scalar( keys %modules_already_installed ),
-        Dumper( \%modules_already_installed ),
-    );
-    _say_ex '';
 
     return;
 }
