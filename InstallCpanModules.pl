@@ -297,12 +297,52 @@ sub get_module_dependencies
 
     my %dependencies = ();
 
-    # --> Working on Perl::Critic
-    # Fetching http://www.cpan.org/authors/id/P/PE/PETDANCE/Perl-Critic-1.140.tar.gz ... OK
-    # Configuring Perl-Critic-1.140 ... OK
-    # Module::Build~0.4204
-    # ExtUtils::Install~1.46
-    # Fatal
+    ## old 2022-05-15 ?
+# --> Working on Perl::Critic
+# Fetching http://www.cpan.org/authors/id/P/PE/PETDANCE/Perl-Critic-1.140.tar.gz ... OK
+# Configuring Perl-Critic-1.140 ... OK
+# Module::Build~0.4204
+# ExtUtils::Install~1.46
+# Fatal
+
+    ## 2024-05-18 cpan new style or bug -> fetch all and use exit 1 ?
+# start cmd: cmd.exe /c cpanm --showdeps Perl::Critic 2>&1
+# --> Working on Perl::Critic
+# Fetching http://www.cpan.org/authors/id/P/PE/PETDANCE/Perl-Critic-1.152.tar.gz ... OK
+# ==> Found dependencies: B::Keywords, List::SomeUtils
+# --> Working on B::Keywords
+# Fetching http://www.cpan.org/authors/id/R/RU/RURBAN/B-Keywords-1.26.tar.gz ... OK
+# Configuring B-Keywords-1.26 ... OK
+# ExtUtils::MakeMaker~6.58
+# ExtUtils::MakeMaker
+# B
+# --> Working on List::SomeUtils
+# Fetching http://www.cpan.org/authors/id/D/DR/DROLSKY/List-SomeUtils-0.59.tar.gz ... OK
+# Configuring List-SomeUtils-0.59 ... ! Installing the dependencies failed: Module 'List::SomeUtils' is not installed, Module 'B::Keywords' is not installed
+# ! Bailing out the installation for Perl-Critic-1.152.
+# OK
+# ExtUtils::MakeMaker~6.58
+# Text::ParseWords
+# Test::LeakTrace
+# Storable
+# perl~5.006
+# Test::More~0.96
+# vars
+# lib
+# Tie::Array
+# Module::Implementation~0.04
+# List::Util
+# strict
+# base
+# List::SomeUtils::XS~0.54
+# Scalar::Util
+# overload
+# warnings
+# ExtUtils::MakeMaker
+# Carp
+# File::Spec
+# Exporter
+# Test::Builder::Module
 
     say_helper_output 'get module dependencies - ' . $module;
 
@@ -377,14 +417,13 @@ sub get_module_dependencies
     my $child_exit_status = $? >> 8;
     say_helper_output '$child_exit_status: ' . $child_exit_status;
 
-    if ( $child_exit_status ) {
-        if ( ( join '', @output ) =~ /Couldn't find module or a distribution/io ) {
-            say_helper_output 'ERROR: module not found - ' . $module;
-        }
-        else {
-            say_helper_output 'ERROR: search failed - exitcode - ' . $?;
-        }
+    if ( $child_exit_status && !@output ) {
+        say_helper_output 'ERROR: search failed - exitcode - ' . $child_exit_status;
+        return undef;    # as not found
+    }
 
+    if ( ( join '', @output ) =~ /Couldn't find module or a distribution/io ) {
+        say_helper_output 'ERROR: module not found - ' . $module;
         return undef;    # as not found
     }
 
