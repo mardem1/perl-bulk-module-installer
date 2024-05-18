@@ -51,6 +51,7 @@ my %modules_install_not_found = (
 
 my $INSTALL_MODULE_TIMEOUT_IN_SECONDS               = 60 * 5;
 my $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS = 60 * 1;
+my $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS = 60 * 1;
 my $EMPTY_STRING                                    = q{};
 
 sub trim
@@ -320,12 +321,10 @@ sub get_module_dependencies
 
     my @output = ();
 
-    my $timeout_in_seconds = 60 * 1;
-
     local $@;
     my $eval_ok = eval {
         local $SIG{ 'ALRM' } = sub { die "timeout_alarm\n"; };    # NB: \n required
-        alarm $timeout_in_seconds;
+        alarm $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS;
 
         while ( my $line = <$chld_out> ) {
             $line = trim( $line );
