@@ -51,12 +51,13 @@ my %modules_install_not_found = (
 );
 
 my $INSTALL_MODULE_TIMEOUT_IN_SECONDS = 60 * 5;
+my $EMPTY_STRING                      = q{};
 
 sub trim
 {
     my ( $s ) = @_;
 
-    $s //= q{};
+    $s //= $EMPTY_STRING;
     $s =~ s/^\s+|\s+$//g;
 
     return $s;
@@ -614,7 +615,7 @@ sub import_module_list_from_file
     my @file_lines = simple_file_read( $filepath );
 
     @file_lines = map  { trim( $_ ) } @file_lines;
-    @file_lines = grep { q{} ne $_ } @file_lines;
+    @file_lines = grep { $EMPTY_STRING ne $_ } @file_lines;
 
     @modules_to_install = @file_lines;
     @file_lines         = ();
@@ -627,7 +628,7 @@ sub main
     my ( $filepath ) = @_;
 
     $filepath = trim( $filepath );
-    if ( !defined $filepath || q{} eq $filepath ) {
+    if ( !defined $filepath || $EMPTY_STRING eq $filepath ) {
         die 'no file arg given';
     }
 
