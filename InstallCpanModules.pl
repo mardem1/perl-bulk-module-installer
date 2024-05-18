@@ -96,9 +96,13 @@ sub add_module_to_ok
         $version = undef;    # force undef if empty - param optional
     }
 
-    $modules_install_ok{ $module }       = undef;
+    say_helper_output 'add ', $module, ' to modules_install_ok';
+    $modules_install_ok{ $module } = undef;
+
+    say_helper_output 'add ', $module, ' to installed_module_version';
     $installed_module_version{ $module } = $version;
 
+    say_helper_output 'remove ', $module, ' from modules_need_to_install';
     delete $modules_need_to_install{ $module };
 
     return;
@@ -116,8 +120,10 @@ sub add_module_to_failed
         $version = undef;    # force undef if empty - param optional
     }
 
+    say_helper_output 'add ', $module, ' to modules_install_failed';
     $modules_install_failed{ $module } = $version;
 
+    say_helper_output 'remove ', $module, ' from modules_need_to_install';
     delete $modules_need_to_install{ $module };    # remove module - don't care if failed - no retry of failed
 
     return;
@@ -135,8 +141,10 @@ sub add_module_to_not_found
         $version = undef;    # force undef if empty - param optional
     }
 
+    say_helper_output 'add ', $module, ' to modules_install_not_found';
     $modules_install_not_found{ $module } = $version;
 
+    say_helper_output 'remove ', $module, ' from modules_need_to_install';
     delete $modules_need_to_install{ $module };    # remove module - don't care if not found - no retry of not found
 
     return;
@@ -156,7 +164,7 @@ sub print_install_state_summary
 
     say_helper_output 'modules_need_to_install left - ' . scalar( keys %modules_need_to_install );
 
-    say_helper_output 'modules_install_ok: ' . scalar( keys %modules_install_ok );
+    say_helper_output 'modules_install_ok - ' . scalar( keys %modules_install_ok );
 
     # no dumper with need and ok - not necessary as temporary state.
 
@@ -529,7 +537,7 @@ sub simple_install_module
     my $kid;
     do {
         $kid = waitpid( $pid, WNOHANG );
-        say_helper_output 'kid: ' . $kid;
+        # say_helper_output 'kid: ' . $kid;
         if ( 0 == $kid ) {
             if ( $timeout_time < time ) {
                 say_helper_output 'ERROR: timeout reached';
