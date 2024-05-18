@@ -649,6 +649,14 @@ sub simple_file_write
 {
     my ( $filepath, $header, @content ) = @_;
 
+    if ( is_string_empty( $filepath ) ) {
+        croak 'param filepath empty!';
+    }
+
+    if ( is_string_empty( $header ) ) {
+        croak 'param header empty!';
+    }
+
     say_helper_output "write '$filepath'";
 
     my $fh = undef;
