@@ -50,7 +50,7 @@ my %modules_install_not_found = (
     'only'            => undef,
 );
 
-my $INSTALL_TIMEOUT_IN_SECONDS = 60 * 5;
+my $INSTALL_MODULE_TIMEOUT_IN_SECONDS = 60 * 5;
 
 sub trim
 {
@@ -475,7 +475,7 @@ sub simple_install_module
     say_helper_output 'read output ... ';
     my $child_exit_status = undef;
 
-    my $timeout_time    = $INSTALL_TIMEOUT_IN_SECONDS + time;
+    my $timeout_time    = $INSTALL_MODULE_TIMEOUT_IN_SECONDS + time;
     my $timeout_reached = 0;
 
     my $kid;
