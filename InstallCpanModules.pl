@@ -624,6 +624,10 @@ sub simple_file_read
 {
     my ( $filepath ) = @_;
 
+    if ( is_string_empty( $filepath ) ) {
+        croak 'param filepath empty!';
+    }
+
     if ( !( -e -f -r -s $filepath ) ) {
         die "filepath '$filepath' - not exists, readable or empty";
     }
