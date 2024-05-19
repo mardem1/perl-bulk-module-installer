@@ -228,6 +228,73 @@ sub _get_output_with_detached_execute
     return ( $child_exit_status, @output );
 }
 
+sub _detached_execute_with_direct_output
+{
+    my ( $timeout, @cmd ) = @_;
+
+    if ( _is_string_empty( $timeout ) ) {
+        croak 'param timeout empty!';
+    }
+
+    if ( 1 > $timeout ) {
+        croak 'param timeout greater 0!';
+    }
+
+    if ( ( ( scalar @cmd ) == 0 ) || _is_string_empty( $cmd[ 0 ] ) ) {
+        croak 'param @cmd empty!';
+    }
+
+    my $chld_in = undef;
+
+    _say_ex 'start cmd: ' . ( join ' ', @cmd );
+    my $pid = open3( $chld_in, '>&STDOUT', '>&STDERR', @cmd );
+
+    if ( 1 > $pid ) {
+        _say_ex 'ERROR: cmd start failed!';
+        return;
+    }
+
+    _say_ex 'started pid: ' . $pid;
+
+    _say_ex 'close chld_in';
+    close $chld_in;
+
+    _say_ex 'read output ... ';
+
+    my $timeout_time    = $timeout + time;
+    my $timeout_reached = 0;
+
+    my $kid;
+    do {
+        $kid = waitpid( $pid, WNOHANG );
+        # _say_ex 'kid: ' . $kid;
+        if ( 0 == $kid ) {
+            if ( $timeout_time < time ) {
+                _say_ex 'ERROR: timeout reached';
+                $timeout_reached = 1;
+            }
+            else {
+                sleep 1;
+            }
+        }
+    } while ( ( !$timeout_reached ) && ( 0 == $kid ) );
+
+    my $child_exit_status = undef;
+
+    if ( $timeout_reached ) {
+        _say_ex 'ERROR: kill child process pid - ' . $pid;
+        $child_exit_status = 1;
+        kill -9, $pid;    # kill
+
+    }
+    else {
+        $child_exit_status = $? >> 8;
+        _say_ex '$child_exit_status: ' . $child_exit_status;
+    }
+
+    return ( $child_exit_status );
+}
+
 sub mark_module_as_ok
 {
     my ( $module, $version ) = @_;
@@ -457,7 +524,8 @@ sub search_for_installed_modules
 
     my @cmd = ( 'cmd.exe', '/c', 'cpan', '-l' );
 
-    my ( $child_exit_status, @output ) = _get_output_with_detached_execute( $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS, 0, @cmd );
+    my ( $child_exit_status, @output ) =
+        _get_output_with_detached_execute( $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS, 0, @cmd );
 
     if ( !defined $child_exit_status || ( $child_exit_status && !@output ) ) {
         return;    # error nothing found
@@ -537,7 +605,8 @@ sub get_module_dependencies
 
     my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--showdeps', $module, '2>&1' );
 
-    my ( $child_exit_status, @output ) = _get_output_with_detached_execute( $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS, 0, @cmd );
+    my ( $child_exit_status, @output ) =
+        _get_output_with_detached_execute( $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS, 0, @cmd );
 
     if ( !defined $child_exit_status ) {
         return undef;    # as not found
@@ -698,10 +767,6 @@ sub install_single_module
         return $tried;
     }
 
-    # my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '1>NUL', '2>&1' );    # no output
-
-    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '2>&1' );    # no output
-
     # update needs force
     if ( exists $installed_module_version{ $module } ) {
         _say_ex 'update module - ' . $module;
@@ -710,73 +775,38 @@ sub install_single_module
         _say_ex 'install module - ' . $module;
     }
 
-    _say_ex 'start cmd: ' . ( join ' ', @cmd );
-    _say_ex '';
+    my $action = '';
 
-    my $chld_in = undef;
+    # my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '1>NUL', '2>&1' );    # no output
+    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '2>&1' );    # no output
 
-    my $pid = open3( $chld_in, '>&STDOUT', '>&STDERR', @cmd );
-    if ( 1 > $pid ) {
+    my $child_exit_status = _detached_execute_with_direct_output( $INSTALL_MODULE_TIMEOUT_IN_SECONDS, @cmd );
+
+    if ( !defined $child_exit_status ) {
+        $child_exit_status = 1;
+
         _say_ex 'install module - ' . $module . ' - process start failed';
         mark_module_as_failed( $module, undef );
         print_install_state_summary();
-        return 1;
+
     }
-
-    _say_ex 'started pid: ' . $pid;
-
-    _say_ex 'close chld_in';
-    close $chld_in;
-
-    _say_ex 'read output ... ';
-    my $child_exit_status = undef;
-
-    my $timeout_time    = $INSTALL_MODULE_TIMEOUT_IN_SECONDS + time;
-    my $timeout_reached = 0;
-
-    my $kid;
-    do {
-        $kid = waitpid( $pid, WNOHANG );
-        # _say_ex 'kid: ' . $kid;
-        if ( 0 == $kid ) {
-            if ( $timeout_time < time ) {
-                _say_ex 'ERROR: timeout reached';
-                $timeout_reached = 1;
-            }
-            else {
-                sleep 1;
-            }
-        }
-    } while ( ( !$timeout_reached ) && ( 0 == $kid ) );
-
-    if ( !$timeout_reached ) {
-        $child_exit_status = $? >> 8;
-        _say_ex '$child_exit_status: ' . $child_exit_status;
-    }
-    else {
-        _say_ex 'ERROR: kill child process pid - ' . $pid;
+    elsif ( $child_exit_status ) {
         $child_exit_status = 1;
-        kill -9, $pid;    # kill
-    }
 
-    my $action = '';
-
-    if ( $child_exit_status ) {
         $action = 'failed';
-
         mark_module_as_failed( $module, undef );
     }
     else {
-        $action = 'success';
+        $child_exit_status = 0;
 
+        $action = 'success';
         mark_module_as_ok( $module, 999_999 );    # newest version - so real number not relevant.
     }
 
     _say_ex 'install module - ' . $module . ' - ' . $action;
-
     print_install_state_summary();
 
-    return $child_exit_status ? 1 : 0;
+    return $child_exit_status;
 }
 
 sub get_next_module_to_install
