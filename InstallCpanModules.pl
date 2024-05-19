@@ -455,66 +455,12 @@ sub search_for_installed_modules
 {
     %installed_module_version = ();    # reset installed module info
 
-    my $chld_in  = undef;
-    my $chld_out = undef;
-
     my @cmd = ( 'cmd.exe', '/c', 'cpan', '-l' );
-    _say_ex 'start cmd: ' . ( join ' ', @cmd );
-    my $pid = open3( $chld_in, $chld_out, '>&STDERR', @cmd );
 
-    if ( 1 > $pid ) {
-        _say_ex 'ERROR: cmd start failed!';
-        return;
-    }
+    my ( $child_exit_status, @output ) = _detached_execute( $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS, 0, @cmd );
 
-    _say_ex 'pid: ' . $pid;
-
-    _say_ex 'close chld_in';
-    close $chld_in;
-
-    _say_ex 'read output ... ';
-    my @output = ();
-
-    local $@;
-    my $eval_ok = eval {
-        local $SIG{ 'ALRM' } = sub { die "timeout_alarm\n"; };    # NB: \n required
-        alarm $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS;
-
-        while ( my $line = <$chld_out> ) {
-            $line = _trim( $line );
-            push @output, $line;
-
-            # _say_ex 'STDOUT: ' . $line;
-        }
-
-        return 'eval_ok';
-    };
-
-    alarm 0;    # disable
-
-    if ( $@ ) {
-        if ( "timeout_alarm\n" ne $@ ) {
-            _say_ex 'ERROR: unexpected error - ' - 0 + $@ - ' - ' . $@;
-            kill -9, $pid;    # kill
-        }
-        else {
-            _say_ex 'ERROR: timeout - ' - 0 + $@ - ' - ' . $@;
-            kill -9, $pid;    # kill
-        }
-    }
-    elsif ( 'eval_ok' ne $eval_ok ) {
-        _say_ex 'ERROR: eval failed ? - ' - 0 + $@ - ' - ' . $@;
-        kill -9, $pid;        # kill
-    }
-    else {
-        _say_ex 'close chld_out';
-        close $chld_out;
-
-        _say_ex 'wait for exit...';
-        # reap zombie and retrieve exit status
-        waitpid( $pid, 0 );
-        my $child_exit_status = $? >> 8;
-        _say_ex '$child_exit_status: ' . $child_exit_status;
+    if ( !defined $child_exit_status || ( $child_exit_status && !@output ) ) {
+        return;    # error nothing found
     }
 
     foreach my $line ( @output ) {
