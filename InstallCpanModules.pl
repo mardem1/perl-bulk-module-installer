@@ -473,6 +473,7 @@ sub search_for_installed_modules
     close $chld_in;
 
     _say_ex 'read output ... ';
+    my @output = ();
 
     local $@;
     my $eval_ok = eval {
@@ -481,11 +482,9 @@ sub search_for_installed_modules
 
         while ( my $line = <$chld_out> ) {
             $line = _trim( $line );
+            push @output, $line;
 
             # _say_ex 'STDOUT: ' . $line;
-            my @t = split /\s+/, $line;
-            $installed_module_version{ $t[ 0 ] } =
-                ( 'undef' eq $t[ 1 ] ? undef : $t[ 1 ] );
         }
 
         return 'eval_ok';
@@ -516,6 +515,12 @@ sub search_for_installed_modules
         waitpid( $pid, 0 );
         my $child_exit_status = $? >> 8;
         _say_ex '$child_exit_status: ' . $child_exit_status;
+    }
+
+    foreach my $line ( @output ) {
+        my @t = split /\s+/, $line;
+        $installed_module_version{ $t[ 0 ] } =
+            ( 'undef' eq $t[ 1 ] ? undef : $t[ 1 ] );
     }
 
     _say_ex '';
