@@ -11,6 +11,7 @@ use Carp  qw(croak);
 use Carp::Always;
 use IPC::Open3;
 use Data::Dumper qw(Dumper);
+use List::Util   qw(shuffle);
 
 BEGIN {
     if ( $^O !~ /win32/io ) {
@@ -814,10 +815,6 @@ sub install_single_module
 
 sub get_next_module_to_install
 {
-    # return ( reverse sort keys %modules_need_to_install )[ 0 ];
-
-    use List::Util qw/shuffle/;
-
     return ( shuffle keys %modules_need_to_install )[ 0 ];
 }
 
