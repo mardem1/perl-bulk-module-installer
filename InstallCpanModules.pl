@@ -5,6 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
+use version;
 use POSIX qw(:sys_wait_h);
 use Carp  qw(croak);
 use Carp::Always;
@@ -692,12 +693,14 @@ sub reduce_dependency_modules_which_are_not_installed
             _say_ex 'dependency not installed: ' . $module;
             $not_installed{ $module } = $dependencies{ $module };
         }
-        elsif (defined $dependencies{ $module }
-            && defined $installed_module_version{ $module }
-            && ( 0.0 + $installed_module_version{ $module } ) < ( 0.0 + $dependencies{ $module } ) )
-        {
-            _say_ex 'dependency old version - update needed: ' . $module;
-            $not_installed{ $module } = $dependencies{ $module };    # to old version
+        elsif ( defined $dependencies{ $module } && defined $installed_module_version{ $module } ) {
+            my $installed_version = version->parse( $installed_module_version{ $module } );
+            my $dependent_version = version->parse( $dependencies{ $module } );
+
+            if ( ( $dependent_version cmp $installed_version ) == 1 ) {
+                _say_ex 'dependency old version - update needed: ' . $module;
+                $not_installed{ $module } = $dependencies{ $module };    # to old version
+            }
         }
     }
 
