@@ -363,6 +363,38 @@ sub mark_module_as_not_found
     return;
 }
 
+sub mark_module_as_to_install
+{
+    my ( $module, $version ) = @_;
+
+    if ( _is_string_empty( $module ) ) {
+        croak 'param module empty!';
+    }
+
+    if ( _is_string_empty( $version ) ) {
+        $version = undef;    # force undef if empty - param optional
+    }
+
+    if ( exists $modules_need_to_install{ $module } ) {
+        return;
+    }
+
+    if ( exists $modules_install_not_found{ $module } ) {
+        _say_ex $module, ' already in modules_install_not_found';
+        return;
+    }
+
+    if ( exists $modules_install_failed{ $module } ) {
+        _say_ex $module, ' already in modules_install_failed';
+        return;
+    }
+
+    _say_ex 'add ', $module, ' (dependency) to modules_need_to_install';
+    $modules_need_to_install{ $module } = $version;
+
+    return;
+}
+
 sub was_module_already_tried
 {
     my ( $module ) = @_;
@@ -708,6 +740,55 @@ sub reduce_dependency_modules_which_are_not_installed
     return %not_installed;
 }
 
+sub add_dependency_modules_to_install_list
+{
+    # done for expected install module count
+
+    _say_ex 'add all dependent modules to install list';
+
+    my @current_modules_to_install = sort keys %modules_need_to_install;
+
+    my $check_max = scalar @current_modules_to_install;
+    my $check_i   = 0;
+
+    foreach my $module ( @current_modules_to_install ) {
+        $check_i++;
+        _say_ex "analyze module - ($check_i / $check_max) - $module";
+
+        my $dep_ref = get_module_dependencies( $module );
+        if ( !defined $dep_ref ) {
+            _say_ex 'ERROR: module - ' . $module . ' - not found!';
+            mark_module_as_not_found( $module, undef );
+            next;
+        }
+
+        my %dep = %{ $dep_ref };
+        if ( !%dep ) {
+            _say_ex 'module - ' . $module . ' - has no dependencies';
+            next;
+        }
+
+        _say_ex 'module - ' . $module . ' - has dependencies - reduce to not installed';
+        %dep = reduce_dependency_modules_which_are_not_installed( %dep );
+        if ( !%dep ) {
+            _say_ex 'module - ' . $module . ' - has no uninstalled dependencies';
+            next;
+        }
+
+        _say_ex 'module - ' . $module . ' - has uninstalled dependencies - add to install list';
+
+        my @not_installed_modules = keys %dep;
+        foreach my $not_installed_module ( @not_installed_modules ) {
+            mark_module_as_to_install( $not_installed_module, $dep{ $not_installed_module } );
+            # todo improvement - recursion check with $not_installed_module
+        }
+    }
+
+    print_install_state_summary();
+
+    return;
+}
+
 sub install_module_with_dep
 {
     my ( $module ) = @_;
@@ -888,6 +969,8 @@ sub main
     search_for_installed_modules();
 
     reduce_modules_to_install();
+
+    add_dependency_modules_to_install_list();
 
     install_modules();
 
