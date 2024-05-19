@@ -140,7 +140,7 @@ sub _write_file
     return;
 }
 
-sub _detached_execute
+sub _get_output_with_detached_execute
 {
     my ( $timeout, $show_live_output, @cmd ) = @_;
 
@@ -457,7 +457,7 @@ sub search_for_installed_modules
 
     my @cmd = ( 'cmd.exe', '/c', 'cpan', '-l' );
 
-    my ( $child_exit_status, @output ) = _detached_execute( $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS, 0, @cmd );
+    my ( $child_exit_status, @output ) = _get_output_with_detached_execute( $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS, 0, @cmd );
 
     if ( !defined $child_exit_status || ( $child_exit_status && !@output ) ) {
         return;    # error nothing found
@@ -537,7 +537,7 @@ sub get_module_dependencies
 
     my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--showdeps', $module, '2>&1' );
 
-    my ( $child_exit_status, @output ) = _detached_execute( $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS, 0, @cmd );
+    my ( $child_exit_status, @output ) = _get_output_with_detached_execute( $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS, 0, @cmd );
 
     if ( !defined $child_exit_status ) {
         return undef;    # as not found
