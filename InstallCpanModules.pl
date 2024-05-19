@@ -753,7 +753,7 @@ sub add_dependency_modules_to_install_list
 
     foreach my $module ( @current_modules_to_install ) {
         $check_i++;
-        _say_ex "analyze module - ($check_i / $check_max) - $module";
+        _say_ex "==> analyze module - ($check_i / $check_max) - $module";
 
         my $dep_ref = get_module_dependencies( $module );
         if ( !defined $dep_ref ) {
@@ -896,7 +896,11 @@ sub install_single_module
 
 sub get_next_module_to_install
 {
-    return ( shuffle keys %modules_need_to_install )[ 0 ];
+    my @install_modules =  keys %modules_need_to_install;
+    my $remaining =  scalar @install_modules;
+    _say_ex "==> $remaining remaining modules to install";
+
+    return ( shuffle @install_modules )[ 0 ];
 }
 
 sub install_modules
