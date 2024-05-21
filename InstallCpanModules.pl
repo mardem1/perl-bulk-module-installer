@@ -896,8 +896,8 @@ sub install_single_module
 
 sub get_next_module_to_install
 {
-    my @install_modules =  keys %modules_need_to_install;
-    my $remaining =  scalar @install_modules;
+    my @install_modules = keys %modules_need_to_install;
+    my $remaining       = scalar @install_modules;
     _say_ex "==> $remaining remaining modules to install";
 
     return ( shuffle @install_modules )[ 0 ];
