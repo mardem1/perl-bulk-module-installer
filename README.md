@@ -25,8 +25,8 @@ Vision:
    `cmd.exe /c cpanm Carp Carp::Always Data::Dumper`
 
 5. run bulk-installer to add all needed modules
-  
-   `perl InstallCpanModules.pl MyModulesToInstallExample.txt` 
+
+   `perl InstallCpanModules.pl test-module-lists/MyModulesToInstallExample.txt`
 
 6. have a portable Windows-Perl with all modules :)
 
@@ -35,7 +35,7 @@ If a module needs a module which was already tried cpanm will try it again.
 If you install many module, and not all working correctly it will waste much
 time and, the installation of modules is already not fast :(
 
-So the main enhancement of this script should be this cache of failed 
+So the main enhancement of this script should be this cache of failed
 or not-found dependencies to speed up a bootstrap installation of many modules.
 
 1. check installed modules
@@ -66,7 +66,8 @@ Note: maybe get all dependencies upfront, as to install modules - speedup?
 
 Please report bugs on GitHub.
 
-The source code repository can be found at [https://github.com/mardem1/perl-bulk-module-installer](https://github.com/mardem1/perl-bulk-module-installer)
+The source code repository can be found
+at [https://github.com/mardem1/perl-bulk-module-installer](https://github.com/mardem1/perl-bulk-module-installer)
 
 ## AUTHOR
 
