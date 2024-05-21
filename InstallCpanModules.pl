@@ -637,6 +637,18 @@ sub get_module_dependencies
 
     _say_ex 'get module dependencies - ' . $module;
 
+    # - FIXME - TODO - NOTE -
+
+    # straberry perl 5.16 : cpanm --verbose --force MIYAGAWA/App-cpanminus-1.6005.tar.gz
+    # OK: cpanm --verbose --force MIYAGAWA/App-cpanminus-1.6906.tar.gz
+    # OK: cpanm --verbose --force MIYAGAWA/App-cpanminus-1.6907.tar.gz
+    # NOT FOUND: cpanm --verbose --force MIYAGAWA/App-cpanminus-1.6908.tar.gz
+    # BROKEN: cpanm --verbose --force MIYAGAWA/App-cpanminus-1.6909.tar.gz
+    # straberry perl 5.18 : cpanm --verbose --force MIYAGAWA/App-cpanminus-1.7012.tar.gz
+
+    # some change in 1.6908 has new behavior - so it end's with exit 1 instead of 0
+    # they try to install the modules an not only shows it.
+
     my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--showdeps', $module, '2>&1' );
 
     my ( $child_exit_status, @output ) =
