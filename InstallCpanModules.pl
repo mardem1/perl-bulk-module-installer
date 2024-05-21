@@ -640,7 +640,7 @@ sub get_module_dependencies
     # - FIXME - TODO - NOTE -
 
     # straberry perl 5.16 : cpanm --verbose --force MIYAGAWA/App-cpanminus-1.6005.tar.gz
-    # OK: cpanm --verbose --force MIYAGAWA/App-cpanminus-1.6906.tar.gz
+    # NOT FOUND: cpanm --verbose --force MIYAGAWA/App-cpanminus-1.6906.tar.gz
     # OK: cpanm --verbose --force MIYAGAWA/App-cpanminus-1.6907.tar.gz
     # NOT FOUND: cpanm --verbose --force MIYAGAWA/App-cpanminus-1.6908.tar.gz
     # BROKEN: cpanm --verbose --force MIYAGAWA/App-cpanminus-1.6909.tar.gz
@@ -648,8 +648,11 @@ sub get_module_dependencies
 
     # some change in 1.6908 has new behavior - so it end's with exit 1 instead of 0
     # they try to install the modules an not only shows it.
+    ## - Rather than counting failures, check the requirements once all deps are installed. #237 Tatsuhiko Miyagawa 27.04.2013 02:45
+    # now here i wanted to use showdeps to search for missing dependencies - but with the upper change, it exits if 1 because of failed dependencies :)
 
-    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--showdeps', $module, '2>&1' );
+    # --showdeps - prints the dep-messages an return 1
+    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--no-interactive', '--installdeps', '--showdeps', $module, '2>&1' );
 
     my ( $child_exit_status, @output ) =
         _get_output_with_detached_execute( $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS, 0, @cmd );
