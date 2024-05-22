@@ -771,6 +771,8 @@ sub add_dependency_module_if_needed
     state $recursion = 1;
     _say_ex 'add_dependency_module_if_needed - recursion level: ' . $recursion;
 
+    _say_ex 'import module dependencies for - ' . $module;
+
     if ( 10 < $recursion ) {
         die "deep recursion level $recursion - abort!";
     }
@@ -783,9 +785,7 @@ sub add_dependency_module_if_needed
 
     my $dep_ref = fetch_dependencies_for_module( $module );
     if ( !defined $dep_ref ) {
-        _say_ex 'ERROR: module - ' . $module . ' - not found!';
-
-        mark_module_as_not_found( $module, undef );
+        _say_ex 'module - ' . $module . ' - not found!';
 
         $modules_to_install_with_deps_extended{ $module } = {};    # as no deps
 
