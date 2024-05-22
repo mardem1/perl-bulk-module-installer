@@ -693,18 +693,18 @@ sub get_module_dependencies
             && $_ !~ /Found dependencies: /io
             && $_ !~ /^Configuring /io
             && $_ !~ /^skipping /io
-            && $_ !~ /^! /io
-            && $_ !~ /^==>/io
-            && $_ !~ /^-->/io
+            && $_ !~ /^! /o
+            && $_ !~ /^==>/o
+            && $_ !~ /^-->/o
             && $_ !~ /^OK$/io
             && $_ !~ /^perl~.+/io
-            && $_ !~ /^warnings$/io
-            && $_ !~ /^strict$/io
-            && $_ !~ /^vars$/io
-            && $_ !~ /^lib$/io
-            && $_ !~ /^overload$/io
-            && $_ !~ /^if$/io
-            && $_ !~ /^utf8$/io
+            && $_ !~ /^warnings$/o
+            && $_ !~ /^strict$/o
+            && $_ !~ /^vars$/o
+            && $_ !~ /^lib$/o
+            && $_ !~ /^overload$/o
+            && $_ !~ /^if$/o
+            && $_ !~ /^utf8$/o
             && $_ !~ /^[a-z\d]+$/o
             && $_ !~ /^[a-z\d]+~\d+$/o
             && $_ !~ /^[a-z\d]+~\d+\..+$/o
