@@ -6,12 +6,12 @@ use strict;
 use warnings;
 
 use version;
-use POSIX qw(:sys_wait_h);
-use Carp  qw(croak);
+use POSIX qw( :sys_wait_h );
+use Carp  qw( croak );
 use Carp::Always;
 use IPC::Open3;
-use Data::Dumper qw(Dumper);
-use List::Util   qw(shuffle);
+use Data::Dumper qw( Dumper );
+use List::Util   qw( shuffle );
 
 BEGIN {
     if ( $^O !~ /win32/io ) {
@@ -22,6 +22,8 @@ BEGIN {
 our $VERSION = '0.01';
 
 my @modules_to_install = ();
+
+my %modules_to_install_with_deps_extended = ();
 
 my %installed_module_version = ();
 
@@ -756,7 +758,8 @@ sub add_dependency_modules_to_install_list
 
     _say_ex 'add all dependent modules to install list';
 
-    my @current_modules_to_install = sort keys %modules_need_to_install;
+    # my @current_modules_to_install = sort keys %modules_need_to_install;
+    my @current_modules_to_install = sort @modules_to_install;
 
     my $check_max = scalar @current_modules_to_install;
     my $check_i   = 0;
@@ -764,6 +767,11 @@ sub add_dependency_modules_to_install_list
     foreach my $module ( @current_modules_to_install ) {
         $check_i++;
         _say_ex "==> analyze module - ($check_i / $check_max) - $module";
+
+        if ( exists $modules_to_install_with_deps_extended{ $module } ) {
+            _say_ex 'dependencies for module - ' . $module . ' - already checked';
+            next;
+        }
 
         my $dep_ref = fetch_dependencies_for_module( $module );
         if ( !defined $dep_ref ) {
@@ -775,6 +783,7 @@ sub add_dependency_modules_to_install_list
         my %dep = %{ $dep_ref };
         if ( !%dep ) {
             _say_ex 'module - ' . $module . ' - has no dependencies';
+            $modules_to_install_with_deps_extended{ $module } = {};    # mark module without needed deps
             next;
         }
 
@@ -787,11 +796,9 @@ sub add_dependency_modules_to_install_list
 
         _say_ex 'module - ' . $module . ' - has uninstalled dependencies - add to install list';
 
-        my @not_installed_modules = keys %dep;
-        foreach my $not_installed_module ( @not_installed_modules ) {
-            mark_module_as_to_install( $not_installed_module, $dep{ $not_installed_module } );
-            # todo improvement - recursion check with $not_installed_module
-        }
+        $modules_to_install_with_deps_extended{ $module } = \%dep;    # mark module needed deps
+
+        # todo improvement - recursion check with $not_installed_module
     }
 
     print_install_state_summary();
