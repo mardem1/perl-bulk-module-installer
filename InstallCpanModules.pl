@@ -800,7 +800,7 @@ sub add_dependency_modules_for_all_modules_to_install_list
             next;
         }
 
-        _say_ex 'module - ' . $module . ' - has uninstalled dependencies - add to install list';
+        _say_ex 'module - ' . $module . ' has not installed dependencies - add to install list' . "\n" . Dumper( \%dep );
 
         $modules_to_install_with_deps_extended{ $module } = \%dep;    # mark module needed deps
 
