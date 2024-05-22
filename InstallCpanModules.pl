@@ -758,6 +758,45 @@ sub reduce_dependency_modules_which_are_not_installed
     return %not_installed;
 }
 
+sub add_dependency_module_if_needed
+{
+    my ( $module ) = @_;
+
+    if ( exists $modules_to_install_with_deps_extended{ $module } ) {
+        _say_ex 'dependencies for module - ' . $module . ' - already checked';
+        return;
+    }
+
+    my $dep_ref = fetch_dependencies_for_module( $module );
+    if ( !defined $dep_ref ) {
+        _say_ex 'ERROR: module - ' . $module . ' - not found!';
+        mark_module_as_not_found( $module, undef );
+        return;
+    }
+
+    my %dep = %{ $dep_ref };
+    if ( !%dep ) {
+        _say_ex 'module - ' . $module . ' - has no dependencies';
+        $modules_to_install_with_deps_extended{ $module } = {};    # mark module without needed deps
+        return;
+    }
+
+    _say_ex 'module - ' . $module . ' - has dependencies - reduce to not installed';
+    %dep = reduce_dependency_modules_which_are_not_installed( %dep );
+    if ( !%dep ) {
+        _say_ex 'module - ' . $module . ' - has no uninstalled dependencies';
+        return;
+    }
+
+    _say_ex 'module - ' . $module . ' has not installed dependencies - add to install list' . "\n" . Dumper( \%dep );
+
+    $modules_to_install_with_deps_extended{ $module } = \%dep;    # mark module needed deps
+
+    # todo improvement - recursion check with $not_installed_module
+
+    return;
+}
+
 sub add_dependency_modules_for_all_modules_to_install_list
 {
     # done for expected install module count
@@ -774,37 +813,7 @@ sub add_dependency_modules_for_all_modules_to_install_list
         $check_i++;
         _say_ex "==> analyze module - ($check_i / $check_max) - $module";
 
-        if ( exists $modules_to_install_with_deps_extended{ $module } ) {
-            _say_ex 'dependencies for module - ' . $module . ' - already checked';
-            next;
-        }
-
-        my $dep_ref = fetch_dependencies_for_module( $module );
-        if ( !defined $dep_ref ) {
-            _say_ex 'ERROR: module - ' . $module . ' - not found!';
-            mark_module_as_not_found( $module, undef );
-            next;
-        }
-
-        my %dep = %{ $dep_ref };
-        if ( !%dep ) {
-            _say_ex 'module - ' . $module . ' - has no dependencies';
-            $modules_to_install_with_deps_extended{ $module } = {};    # mark module without needed deps
-            next;
-        }
-
-        _say_ex 'module - ' . $module . ' - has dependencies - reduce to not installed';
-        %dep = reduce_dependency_modules_which_are_not_installed( %dep );
-        if ( !%dep ) {
-            _say_ex 'module - ' . $module . ' - has no uninstalled dependencies';
-            next;
-        }
-
-        _say_ex 'module - ' . $module . ' has not installed dependencies - add to install list' . "\n" . Dumper( \%dep );
-
-        $modules_to_install_with_deps_extended{ $module } = \%dep;    # mark module needed deps
-
-        # todo improvement - recursion check with $not_installed_module
+        add_dependency_module_if_needed( $module );
     }
 
     print_install_state_summary();
