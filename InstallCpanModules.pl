@@ -690,6 +690,7 @@ sub get_module_dependencies
         grep {
                $_ !~ /Working on/io
             && $_ !~ /Fetching http/io
+            && $_ !~ /Found dependencies: /io
             && $_ !~ /^Configuring /io
             && $_ !~ /^skipping /io
             && $_ !~ /^! /io
