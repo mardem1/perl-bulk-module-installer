@@ -473,7 +473,13 @@ sub print_install_state_summary
         . scalar( keys %modules_install_failed ) . "\n"
         . Dumper( \%modules_install_failed );
 
-    _say_ex 'modules_need_to_install left - ' . scalar( keys %modules_need_to_install );
+    _say_ex 'modules_to_install_with_deps_extended left - '
+        . scalar( keys %modules_to_install_with_deps_extended )
+        . Dumper( \%modules_to_install_with_deps_extended );
+
+    _say_ex 'modules_need_to_install left - '
+        . scalar( keys %modules_need_to_install )
+        . Dumper( \%modules_need_to_install );
 
     _say_ex 'modules_install_ok - ' . scalar( keys %modules_install_ok );
 
