@@ -764,20 +764,27 @@ sub add_dependency_module_if_needed
 
     if ( exists $modules_to_install_with_deps_extended{ $module } ) {
         _say_ex 'dependencies for module - ' . $module . ' - already checked';
+
         return;
     }
 
     my $dep_ref = fetch_dependencies_for_module( $module );
     if ( !defined $dep_ref ) {
         _say_ex 'ERROR: module - ' . $module . ' - not found!';
+
         mark_module_as_not_found( $module, undef );
+
+        $modules_to_install_with_deps_extended{ $module } = {};    # as no deps
+
         return;
     }
 
     my %dep = %{ $dep_ref };
     if ( !%dep ) {
         _say_ex 'module - ' . $module . ' - has no dependencies';
+
         $modules_to_install_with_deps_extended{ $module } = {};    # mark module without needed deps
+
         return;
     }
 
@@ -785,6 +792,7 @@ sub add_dependency_module_if_needed
     %dep = reduce_dependency_modules_which_are_not_installed( %dep );
     if ( !%dep ) {
         _say_ex 'module - ' . $module . ' - has no uninstalled dependencies';
+
         return;
     }
 
