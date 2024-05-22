@@ -800,6 +800,8 @@ sub add_dependency_module_if_needed
     if ( !%dep ) {
         _say_ex 'module - ' . $module . ' - has no uninstalled dependencies';
 
+        $modules_to_install_with_deps_extended{ $module } = {};    # mark module without needed deps
+
         return;
     }
 
