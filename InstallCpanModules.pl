@@ -744,8 +744,14 @@ sub reduce_dependency_modules_which_are_not_installed
 
             if ( ( $dependent_version cmp $installed_version ) == 1 ) {
                 _say_ex 'dependency old version - update needed: ' . $module;
-                $not_installed{ $module } = $dependencies{ $module };    # to old version
+                $not_installed{ $module } = $dependencies{ $module }; # to old version
             }
+            else {
+                _say_ex 'dependency installed and version check done: ' . $module;
+            }
+        }
+        else {
+            _say_ex 'dependency installed: ' . $module;
         }
     }
 
