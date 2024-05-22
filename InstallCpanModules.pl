@@ -689,7 +689,7 @@ sub fetch_dependencies_for_module
 # now here i wanted to use showdeps to search for missing dependencies - but with the upper change, it exits if 1 because of failed dependencies :)
 
     # --showdeps - prints the dep-messages an return 1
-    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--no-interactive', '--installdeps', '--showdeps', $module, '2>&1' );
+    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--no-interactive', '--showdeps', $module, '2>&1' );
 
     my ( $child_exit_status, @output ) =
         _get_output_with_detached_execute( $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS, 1, @cmd );
