@@ -580,7 +580,7 @@ sub search_for_installed_modules
     return;
 }
 
-sub get_module_dependencies
+sub fetch_dependencies_for_module
 {
     my ( $module ) = @_;
 
@@ -765,7 +765,7 @@ sub add_dependency_modules_to_install_list
         $check_i++;
         _say_ex "==> analyze module - ($check_i / $check_max) - $module";
 
-        my $dep_ref = get_module_dependencies( $module );
+        my $dep_ref = fetch_dependencies_for_module( $module );
         if ( !defined $dep_ref ) {
             _say_ex 'ERROR: module - ' . $module . ' - not found!';
             mark_module_as_not_found( $module, undef );
@@ -809,7 +809,7 @@ sub install_module_with_dep
 
     _say_ex 'analyze module - ' . $module;
 
-    my $dep_ref = get_module_dependencies( $module );
+    my $dep_ref = fetch_dependencies_for_module( $module );
     if ( !defined $dep_ref ) {
         _say_ex 'ERROR: module - ' . $module . ' - not found - abort !';
         mark_module_as_not_found( $module, undef );
