@@ -350,6 +350,16 @@ sub mark_module_as_failed
     _say_ex 'remove ', $module, ' from modules_need_to_install';
     delete $modules_need_to_install{ $module };    # remove module - don't care if failed - no retry of failed
 
+    _say_ex 'remove ', $module, ' from modules_to_install_with_deps_extended';
+    delete $modules_to_install_with_deps_extended{ $module };
+
+    _say_ex 'mark modules as failed which depends on ', $module;
+    foreach my $key ( keys %modules_to_install_with_deps_extended ) {
+        if ( exists $modules_to_install_with_deps_extended{ $key }->{ $module } ) {
+            mark_module_as_failed( $key );
+        }
+    }
+
     return;
 }
 
