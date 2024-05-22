@@ -320,6 +320,15 @@ sub mark_module_as_ok
     _say_ex 'remove ', $module, ' from modules_need_to_install';
     delete $modules_need_to_install{ $module };
 
+    _say_ex 'remove ', $module, ' from modules_to_install_with_deps_extended';
+    delete $modules_to_install_with_deps_extended{ $module };
+
+    _say_ex 'remove dependencies ', $module, ' from modules_to_install_with_deps_extended';
+    foreach my $key ( keys %modules_to_install_with_deps_extended ) {
+        if ( exists $modules_to_install_with_deps_extended{ $key }->{ $module } ) {
+            delete $modules_to_install_with_deps_extended{ $key }->{ $module };
+        }
+    }
     return;
 }
 
