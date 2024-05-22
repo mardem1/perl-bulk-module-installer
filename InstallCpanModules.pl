@@ -1064,6 +1064,10 @@ sub install_module_dep_version
         croak 'param module empty!';
     }
 
+    _say_ex '';
+    _say_ex( '=' x 80 );
+    _say_ex '';
+
     _say_ex 'analyze module - ' . $module;
 
     my $dep_ref = fetch_dependencies_for_module( $module );
@@ -1090,7 +1094,9 @@ sub get_next_module_to_install_dep_version
 
     my $remaining = scalar @install_modules;
 
+    _say_ex '';
     _say_ex "==> $remaining remaining modules to install";
+    _say_ex '';
 
     if ( $remaining && !@no_deps_modules ) {
         _say_ex 'ERROR: remaining modules but no one without dependencies ?';
