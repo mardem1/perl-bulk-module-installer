@@ -1049,6 +1049,77 @@ sub print_perl_detail_info
     return;
 }
 
+sub install_module_dep_version
+{
+    my ( $module ) = @_;
+
+    if ( _is_string_empty( $module ) ) {
+        croak 'param module empty!';
+    }
+
+    _say_ex 'analyze module - ' . $module;
+
+    my $dep_ref = fetch_dependencies_for_module( $module );
+    if ( !defined $dep_ref ) {
+        _say_ex 'ERROR: module - ' . $module . ' - not found - abort !';
+        mark_module_as_not_found( $module, undef );
+
+        print_install_state_summary();
+
+        return 1;
+    }
+
+    _say_ex 'module - ' . $module . ' - found try install';
+    my $ret = install_single_module( $module );
+
+    return $ret ? 1 : 0;
+}
+
+sub get_next_module_to_install_dep_version
+{
+    my @install_modules = keys %modules_to_install_with_deps_extended;
+    my @no_deps_modules = grep { 0 == ( scalar keys %{ $modules_to_install_with_deps_extended{ $_ } } ) } @install_modules;
+
+    my $remaining = scalar @install_modules;
+
+    _say_ex "==> $remaining remaining modules to install";
+
+    if ( $remaining && !@no_deps_modules ) {
+        _say_ex 'ERROR: remaining modules but no one without dependencies ?';
+    }
+
+    if ( !@no_deps_modules ) {
+        return;
+    }
+
+    return ( shuffle @no_deps_modules )[ 0 ];    # only modules with no other dependencies
+}
+
+sub install_modules_dep_version
+{
+    my $install_module = get_next_module_to_install_dep_version();
+    while ( !_is_string_empty( $install_module ) ) {
+        install_module_dep_version( $install_module );
+
+        my $next_module = get_next_module_to_install_dep_version();
+        if ( _is_string_empty( $next_module ) ) {
+            _say_ex 'no more modules to do';
+
+            $install_module = '';
+        }
+        elsif ( $next_module ne $install_module ) {
+            $install_module = $next_module;
+        }
+        else {
+            _say_ex 'ERROR: next module not changed ' . $next_module . ' - abort !';
+
+            $install_module = '';
+        }
+    }
+
+    return;
+}
+
 sub main
 {
     my ( $filepath ) = @_;
