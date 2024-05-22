@@ -954,6 +954,12 @@ sub import_module_list_from_file
     @modules_to_install = @file_lines;
     @file_lines         = ();
 
+    _say_ex '';
+    _say_ex 'wanted modules to install found: '
+        . ( scalar @modules_to_install ) . "\n"
+        . Dumper( \@modules_to_install );
+    _say_ex '';
+
     return;
 }
 
