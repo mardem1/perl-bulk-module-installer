@@ -53,9 +53,9 @@ my %modules_install_not_found = (
     # 'only'            => undef,
 );
 
-my $INSTALL_MODULE_TIMEOUT_IN_SECONDS               = 60 * 5;
-my $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS = 60 * 1;
-my $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS = 60 * 1;
+my $INSTALL_MODULE_TIMEOUT_IN_SECONDS               = 60 * 10;
+my $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS = 60 * 2;
+my $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS = 60 * 2;
 my $EMPTY_STRING                                    = q{};
 
 sub _trim
