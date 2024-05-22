@@ -474,11 +474,11 @@ sub print_install_state_summary
         . Dumper( \%modules_install_failed );
 
     _say_ex 'modules_to_install_with_deps_extended left - '
-        . scalar( keys %modules_to_install_with_deps_extended )
+        . scalar( keys %modules_to_install_with_deps_extended ) . "\n"
         . Dumper( \%modules_to_install_with_deps_extended );
 
     _say_ex 'modules_need_to_install left - '
-        . scalar( keys %modules_need_to_install )
+        . scalar( keys %modules_need_to_install ) . "\n"
         . Dumper( \%modules_need_to_install );
 
     _say_ex 'modules_install_ok - ' . scalar( keys %modules_install_ok );
@@ -580,9 +580,9 @@ sub search_for_installed_modules
     }
 
     _say_ex '';
-    _say_ex 'installed_module_version: '
-        . scalar( keys %installed_module_version ) . "\n"
-        . Dumper( \%installed_module_version );
+    _say_ex 'installed_module_version: ' . scalar( keys %installed_module_version ) . "\n"
+        # . Dumper( \%installed_module_version );
+        . '';
     _say_ex '';
 
     return;
@@ -657,7 +657,7 @@ sub fetch_dependencies_for_module
     # some change in 1.6908 has new behavior - so it end's with exit 1 instead of 0
     # they try to install the modules an not only shows it.
     ## - Rather than counting failures, check the requirements once all deps are installed. #237 Tatsuhiko Miyagawa 27.04.2013 02:45
-    # now here i wanted to use showdeps to search for missing dependencies - but with the upper change, it exits if 1 because of failed dependencies :)
+# now here i wanted to use showdeps to search for missing dependencies - but with the upper change, it exits if 1 because of failed dependencies :)
 
     # --showdeps - prints the dep-messages an return 1
     my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--no-interactive', '--installdeps', '--showdeps', $module, '2>&1' );
@@ -750,7 +750,7 @@ sub reduce_dependency_modules_which_are_not_installed
 
             if ( ( $dependent_version cmp $installed_version ) == 1 ) {
                 _say_ex 'dependency old version - update needed: ' . $module;
-                $not_installed{ $module } = $dependencies{ $module }; # to old version
+                $not_installed{ $module } = $dependencies{ $module };    # to old version
             }
             else {
                 _say_ex 'dependency installed and version check done: ' . $module;
@@ -1032,17 +1032,17 @@ sub main
         croak 'no file arg given';
     }
 
-    print_perl_detail_info();
+    # print_perl_detail_info();
 
     import_module_list_from_file( $filepath );
 
     search_for_installed_modules();
 
-    reduce_modules_to_install();
+    # reduce_modules_to_install();
 
     add_dependency_modules_for_all_modules_to_install_list();
 
-    install_modules();
+    # install_modules();
 
     print_install_end_summary( $filepath );
 
