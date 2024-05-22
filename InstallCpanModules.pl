@@ -381,6 +381,16 @@ sub mark_module_as_not_found
     _say_ex 'remove ', $module, ' from modules_need_to_install';
     delete $modules_need_to_install{ $module };    # remove module - don't care if not found - no retry of not found
 
+    _say_ex 'remove ', $module, ' from modules_to_install_with_deps_extended';
+    delete $modules_to_install_with_deps_extended{ $module };
+
+    _say_ex 'mark modules as failed which depends on ', $module;
+    foreach my $key ( keys %modules_to_install_with_deps_extended ) {
+        if ( exists $modules_to_install_with_deps_extended{ $key }->{ $module } ) {
+            mark_module_as_failed( $key );
+        }
+    }
+
     return;
 }
 
@@ -970,6 +980,41 @@ sub install_single_module
     return $child_exit_status;
 }
 
+sub install_module_without_dep
+{
+    my ( $module ) = @_;
+
+    if ( _is_string_empty( $module ) ) {
+        croak 'param module empty!';
+    }
+
+    _say_ex 'analyze module - ' . $module;
+
+    my $dep_ref = fetch_dependencies_for_module( $module );
+    if ( !defined $dep_ref ) {
+        _say_ex 'ERROR: module - ' . $module . ' - not found - abort !';
+        mark_module_as_not_found( $module, undef );
+
+        print_install_state_summary();
+
+        return 1;
+    }
+
+    _say_ex 'module - ' . $module . ' - found try install';
+    my $ret = install_single_module( $module );
+
+    return $ret ? 1 : 0;
+}
+
+sub get_next_module_to_install_by_dep_check
+{
+    my @install_modules = keys %modules_need_to_install;
+    my $remaining       = scalar @install_modules;
+    _say_ex "==> $remaining remaining modules to install";
+
+    return ( shuffle @install_modules )[ 0 ];
+}
+
 sub get_next_module_to_install
 {
     my @install_modules = keys %modules_need_to_install;
@@ -1054,7 +1099,7 @@ sub main
 
     search_for_installed_modules();
 
-    reduce_modules_to_install(); # updates should be handled another time ...
+    reduce_modules_to_install();    # updates should be handled another time ...
 
     add_dependency_modules_for_modules_need_to_install();
 
