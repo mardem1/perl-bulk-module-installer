@@ -720,15 +720,6 @@ sub get_module_dependencies
         }
     } @output;
 
-    delete $dependencies{ 'perl' };    # not perl itself
-    delete $dependencies{ 'warnings' };
-    delete $dependencies{ 'strict' };
-    delete $dependencies{ 'vars' };
-    delete $dependencies{ 'lib' };
-    delete $dependencies{ 'overload' };
-    delete $dependencies{ 'if' };
-    delete $dependencies{ 'utf8' };
-
     _say_ex 'dependencies found: ' . scalar( keys %dependencies ) . "\n" . Dumper( \%dependencies );
 
     return \%dependencies;
