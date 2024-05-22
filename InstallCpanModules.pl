@@ -752,7 +752,7 @@ sub reduce_dependency_modules_which_are_not_installed
     return %not_installed;
 }
 
-sub add_dependency_modules_to_install_list
+sub add_dependency_modules_for_all_modules_to_install_list
 {
     # done for expected install module count
 
@@ -997,7 +997,7 @@ sub main
 
     reduce_modules_to_install();
 
-    add_dependency_modules_to_install_list();
+    add_dependency_modules_for_all_modules_to_install_list();
 
     install_modules();
 
