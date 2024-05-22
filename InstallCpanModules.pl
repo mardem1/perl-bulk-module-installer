@@ -1145,6 +1145,8 @@ sub main
 
     reduce_modules_to_install();    # updates should be handled another time ...
 
+    add_dependency_modules_for_modules_need_to_install();
+
     print_install_state_summary();
 
     install_modules_dep_version();
