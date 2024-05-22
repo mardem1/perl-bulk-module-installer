@@ -692,7 +692,7 @@ sub fetch_dependencies_for_module
     my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--no-interactive', '--installdeps', '--showdeps', $module, '2>&1' );
 
     my ( $child_exit_status, @output ) =
-        _get_output_with_detached_execute( $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS, 0, @cmd );
+        _get_output_with_detached_execute( $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS, 1, @cmd );
 
     if ( !defined $child_exit_status ) {
         return undef;    # as not found
