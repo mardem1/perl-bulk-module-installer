@@ -25,11 +25,11 @@ my @modules_to_install = ();
 
 my %installed_module_version = ();
 
-my %modules_already_installed = ();
-my %modules_need_to_install   = ();
+my %modules_need_to_install = ();
 
-my %modules_install_ok     = ();
-my %modules_install_failed = ();
+my %modules_install_already = ();
+my %modules_install_ok      = ();
+my %modules_install_failed  = ();
 
 my %modules_install_not_found = (
     'B'               => undef,
@@ -432,12 +432,12 @@ sub was_module_already_tried
 
 sub reduce_modules_to_install
 {
-    %modules_already_installed = ();    # rest info
-    %modules_need_to_install   = ();
+    %modules_install_already = ();    # rest info
+    %modules_need_to_install = ();
 
     foreach my $module ( @modules_to_install ) {
         if ( exists $installed_module_version{ $module } ) {
-            $modules_already_installed{ $module } = undef;
+            $modules_install_already{ $module } = undef;
         }
         else {
             $modules_need_to_install{ $module } = undef;
@@ -445,9 +445,9 @@ sub reduce_modules_to_install
     }
 
     _say_ex '';
-    _say_ex 'modules_already_installed: '
-        . scalar( keys %modules_already_installed ) . "\n"
-        . Dumper( \%modules_already_installed );
+    _say_ex 'modules_install_already: '
+        . scalar( keys %modules_install_already ) . "\n"
+        . Dumper( \%modules_install_already );
 
     _say_ex '';
     _say_ex 'modules_need_to_install: '
@@ -498,13 +498,13 @@ sub print_install_end_summary
 
     _say_ex '';
     _write_file(
-        $filepath . 'modules_already_installed.log',
-        'modules_already_installed: ' . scalar( keys %modules_already_installed ),
-        Dumper( \%modules_already_installed ),
+        $filepath . 'modules_install_already.log',
+        'modules_install_already: ' . scalar( keys %modules_install_already ),
+        Dumper( \%modules_install_already ),
     );
-    _say_ex 'modules_already_installed: '
-        . scalar( keys %modules_already_installed ) . "\n"
-        . Dumper( \%modules_already_installed );
+    _say_ex 'modules_install_already: '
+        . scalar( keys %modules_install_already ) . "\n"
+        . Dumper( \%modules_install_already );
     _say_ex '';
 
     _say_ex '';
