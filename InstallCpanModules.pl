@@ -705,6 +705,9 @@ sub get_module_dependencies
             && $_ !~ /^overload$/io
             && $_ !~ /^if$/io
             && $_ !~ /^utf8$/io
+            && $_ !~ /^[a-z\d]+$/o
+            && $_ !~ /^[a-z\d]+~\d+$/o
+            && $_ !~ /^[a-z\d]+~\d+\..+$/o
         } @output;
 
     %dependencies = map {
