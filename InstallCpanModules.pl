@@ -827,17 +827,12 @@ sub add_dependency_module_if_needed
 
 sub add_dependency_modules_for_all_modules_to_install_list
 {
-    # done for expected install module count
-
     _say_ex 'add all dependent modules to install list';
 
-    # my @current_modules_to_install = sort keys %modules_need_to_install;
-    my @current_modules_to_install = sort @modules_to_install;
-
-    my $check_max = scalar @current_modules_to_install;
+    my $check_max = scalar @modules_to_install;
     my $check_i   = 0;
 
-    foreach my $module ( @current_modules_to_install ) {
+    foreach my $module ( @modules_to_install ) {
         $check_i++;
         _say_ex "==> analyze module - ($check_i / $check_max) - $module";
 
