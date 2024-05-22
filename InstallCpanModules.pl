@@ -825,14 +825,16 @@ sub add_dependency_module_if_needed
     return;
 }
 
-sub add_dependency_modules_for_all_modules_to_install_list
+sub add_dependency_modules_for_modules_need_to_install
 {
     _say_ex 'add all dependent modules to install list';
 
-    my $check_max = scalar @modules_to_install;
+    my @needed_modules = keys %modules_need_to_install;
+
+    my $check_max = scalar @needed_modules;
     my $check_i   = 0;
 
-    foreach my $module ( @modules_to_install ) {
+    foreach my $module ( @needed_modules ) {
         $check_i++;
         _say_ex "==> analyze module - ($check_i / $check_max) - $module";
 
@@ -1033,9 +1035,9 @@ sub main
 
     search_for_installed_modules();
 
-    # reduce_modules_to_install();
+    reduce_modules_to_install(); # updates should be handled another time ...
 
-    add_dependency_modules_for_all_modules_to_install_list();
+    add_dependency_modules_for_modules_need_to_install();
 
     # install_modules();
 
