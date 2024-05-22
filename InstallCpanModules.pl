@@ -762,6 +762,13 @@ sub add_dependency_module_if_needed
 {
     my ( $module ) = @_;
 
+    state $recursion = 1;
+    _say_ex 'add_dependency_module_if_needed - recursion level: ' . $recursion;
+
+    if ( 10 < $recursion ) {
+        die "deep recursion level $recursion - abort!";
+    }
+
     if ( exists $modules_to_install_with_deps_extended{ $module } ) {
         _say_ex 'dependencies for module - ' . $module . ' - already checked';
 
@@ -800,7 +807,12 @@ sub add_dependency_module_if_needed
 
     $modules_to_install_with_deps_extended{ $module } = \%dep;    # mark module needed deps
 
-    # todo improvement - recursion check with $not_installed_module
+    foreach my $module ( sort keys %dep ) {
+        # only here - not at entry and every return.
+        $recursion++;
+        add_dependency_module_if_needed( $module );
+        $recursion--;
+    }
 
     return;
 }
