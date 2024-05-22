@@ -723,6 +723,10 @@ sub fetch_dependencies_for_module
         }
     }
 
+    _say_ex '';
+    _say_ex 'deps from Found dependencies: ' . scalar( keys %dependencies ) . "\n" . Dumper( \%dependencies );
+    _say_ex '';
+
     @output =
         grep {
                $_ !~ /Working on/io
@@ -749,6 +753,7 @@ sub fetch_dependencies_for_module
 
     %dependencies = map {
         my @t = split /~/io, $_;
+
         if ( ( scalar @t ) <= 1 ) {
             $t[ 0 ] => undef;
         }
@@ -757,7 +762,9 @@ sub fetch_dependencies_for_module
         }
     } @output;
 
+    _say_ex '';
     _say_ex 'dependencies found: ' . scalar( keys %dependencies ) . "\n" . Dumper( \%dependencies );
+    _say_ex '';
 
     return \%dependencies;
 }
@@ -1078,7 +1085,8 @@ sub install_module_dep_version
 sub get_next_module_to_install_dep_version
 {
     my @install_modules = keys %modules_to_install_with_deps_extended;
-    my @no_deps_modules = grep { 0 == ( scalar keys %{ $modules_to_install_with_deps_extended{ $_ } } ) } @install_modules;
+    my @no_deps_modules =
+        grep { 0 == ( scalar keys %{ $modules_to_install_with_deps_extended{ $_ } } ) } @install_modules;
 
     my $remaining = scalar @install_modules;
 
