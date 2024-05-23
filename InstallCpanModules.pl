@@ -945,7 +945,6 @@ sub install_single_module
         return $tried;
     }
 
-    # update needs force
     if ( exists $installed_module_version{ $module } ) {
         _say_ex 'update module - ' . $module;
     }
