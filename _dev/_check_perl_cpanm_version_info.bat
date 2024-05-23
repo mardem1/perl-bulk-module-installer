@@ -38,3 +38,22 @@ rem ==========================================================================
 cmd.exe /c cpanm --no-interactive --verbose Perl::Critic
 echo %ErrorLevel%
 rem ==========================================================================
+
+rem ==========================================================================
+cmd.exe /c cpanm --no-interactive --verbose App::cpanminus
+echo %ErrorLevel%
+rem ==========================================================================
+
+rem ==========================================================================
+cmd.exe /c cpanm --no-interactive --verbose App::cpanoutdated
+echo %ErrorLevel%
+rem ==========================================================================
+
+rem ==========================================================================
+rem # cmd.exe /c cpan-outdated
+rem # cmd.exe /c cpan-outdated --verbose
+rem # cmd.exe /c cpan-outdated -p --verbose
+rem # cmd.exe /c cpan-outdated -p | cpanm
+cmd.exe /c cpan-outdated -p
+echo %ErrorLevel%
+rem ==========================================================================
