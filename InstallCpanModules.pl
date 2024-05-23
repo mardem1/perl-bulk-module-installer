@@ -1111,8 +1111,13 @@ sub search_for_modules_for_available_updates
     _say_ex 'add all update modules to dependency-module-list with no dependency';
     foreach my $module ( keys %modules_need_to_update ) {
         if ( !exists $modules_to_install_with_deps_extended{ $module } ) {
-            _say_ex 'module - ' . $module . ' - not in list add';
+            _say_ex 'module - ' . $module . ' - not in dep-list add';
             $modules_to_install_with_deps_extended{ $module } = {};
+        }
+
+        if ( !exists $modules_need_to_install{ $module } ) {
+            _say_ex 'module - ' . $module . ' - not in to-install-list add';
+            $modules_need_to_install{ $module } = {};
         }
     }
 
