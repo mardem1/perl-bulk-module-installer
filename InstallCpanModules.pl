@@ -88,6 +88,13 @@ sub _is_string_empty
     return $t;
 }
 
+sub _hashify
+{
+    my @args = @_;
+
+    return map { $_ => undef } @args;
+}
+
 sub _read_file
 {
     my ( $filepath ) = @_;
@@ -1033,7 +1040,7 @@ sub import_module_list_from_file
     @file_lines = map  { _trim( $_ ) } @file_lines;
     @file_lines = grep { $EMPTY_STRING ne $_ } @file_lines;
 
-    %modules_to_install = map { $_ => undef } @file_lines; # hashify
+    %modules_to_install = _hashify @file_lines;
     @file_lines         = ();
 
     _say_ex '';
