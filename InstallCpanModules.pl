@@ -810,7 +810,7 @@ sub add_dependency_module_if_needed
     _say_ex 'import module dependencies for - ' . $module;
 
     if ( 10 < $recursion ) {
-        die "deep recursion level $recursion - abort!";
+        croak "deep recursion level $recursion - abort!";
     }
 
     if ( exists $modules_to_install_with_deps_extended{ $module } ) {
