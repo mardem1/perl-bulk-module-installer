@@ -1103,9 +1103,20 @@ sub search_for_modules_for_available_updates
     }
 
     _say_ex '';
-    _say_ex 'modules_need_to_update: ' . scalar( keys %modules_need_to_update ) . "\n"
-         . Dumper( \%modules_need_to_update );
+    _say_ex 'modules_need_to_update: '
+        . scalar( keys %modules_need_to_update ) . "\n"
+        . Dumper( \%modules_need_to_update );
     _say_ex '';
+
+    _say_ex 'add all update modules to dependency-module-list with no dependency';
+    foreach my $module ( keys %modules_need_to_update ) {
+        if ( !exists $modules_to_install_with_deps_extended{ $module } ) {
+            _say_ex 'module - ' . $module . ' - not in list add';
+            $modules_to_install_with_deps_extended{ $module } = {};
+        }
+    }
+
+    print_install_state_summary();
 
     return;
 }
