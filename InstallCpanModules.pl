@@ -28,6 +28,7 @@ my %modules_to_install_with_deps_extended = ();
 my %installed_module_version = ();
 
 my %modules_need_to_install = ();
+my %modules_need_to_update  = ();
 
 my %modules_install_already = ();
 my %modules_install_ok      = ();
@@ -54,6 +55,7 @@ my %modules_install_not_found = (
 );
 
 my $INSTALL_MODULE_TIMEOUT_IN_SECONDS               = 60 * 10;
+my $CHECK_UPDATE_MODULE_TIMEOUT_IN_SECONDS          = 60 * 2;
 my $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS = 60 * 2;
 my $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS = 60 * 2;
 my $EMPTY_STRING                                    = q{};
@@ -327,6 +329,9 @@ sub mark_module_as_ok
     _say_ex 'remove ', $module, ' from modules_need_to_install';
     delete $modules_need_to_install{ $module };
 
+    _say_ex 'remove ', $module, ' from $modules_need_to_update';
+    delete $modules_need_to_update{ $module };
+
     _say_ex 'remove ', $module, ' from modules_to_install_with_deps_extended';
     delete $modules_to_install_with_deps_extended{ $module };
 
@@ -356,6 +361,9 @@ sub mark_module_as_failed
 
     _say_ex 'remove ', $module, ' from modules_need_to_install';
     delete $modules_need_to_install{ $module };    # remove module - don't care if failed - no retry of failed
+
+    _say_ex 'remove ', $module, ' from $modules_need_to_update';
+    delete $modules_need_to_update{ $module };
 
     _say_ex 'remove ', $module, ' from modules_to_install_with_deps_extended';
     delete $modules_to_install_with_deps_extended{ $module };
@@ -387,6 +395,9 @@ sub mark_module_as_not_found
 
     _say_ex 'remove ', $module, ' from modules_need_to_install';
     delete $modules_need_to_install{ $module };    # remove module - don't care if not found - no retry of not found
+
+    _say_ex 'remove ', $module, ' from $modules_need_to_update';
+    delete $modules_need_to_update{ $module };
 
     _say_ex 'remove ', $module, ' from modules_to_install_with_deps_extended';
     delete $modules_to_install_with_deps_extended{ $module };
@@ -443,6 +454,7 @@ sub was_module_already_tried
 
     if ( exists $modules_install_ok{ $module } ) {
         delete $modules_need_to_install{ $module };    # delete if something wrong - should not happen
+        delete $modules_need_to_update{ $module };
 
         _say_ex 'WARN: install module - ' . $module . ' - already ok - abort';
 
@@ -451,6 +463,7 @@ sub was_module_already_tried
 
     if ( exists $modules_install_failed{ $module } ) {
         delete $modules_need_to_install{ $module };    # delete if something wrong - should not happen
+        delete $modules_need_to_update{ $module };
 
         _say_ex 'WARN: install module - ' . $module . ' - already failed - abort';
 
@@ -459,6 +472,7 @@ sub was_module_already_tried
 
     if ( exists $modules_install_not_found{ $module } ) {
         delete $modules_need_to_install{ $module };    # delete if something wrong - should not happen
+        delete $modules_need_to_update{ $module };
 
         _say_ex 'WARN: install module - ' . $module . ' - already mot found - abort';
 
@@ -1078,6 +1092,31 @@ sub install_modules_dep_version
     return;
 }
 
+sub search_for_modules_for_available_updates
+{
+    %modules_need_to_update = ();    # reset module info
+
+    my @cmd = ( 'cmd.exe', '/c', 'cpan-outdated', '--exclude-core', '-p' );
+
+    my ( $child_exit_status, @output ) =
+        _get_output_with_detached_execute( $CHECK_UPDATE_MODULE_TIMEOUT_IN_SECONDS, 0, @cmd );
+
+    if ( !defined $child_exit_status || ( $child_exit_status && !@output ) ) {
+        return;    # error nothing found
+    }
+
+    foreach my $module ( @output ) {
+        $modules_need_to_update{ $module } = undef;
+    }
+
+    _say_ex '';
+    _say_ex 'modules_need_to_update: ' . scalar( keys %modules_need_to_update ) . "\n"
+         . Dumper( \%modules_need_to_update );
+    _say_ex '';
+
+    return;
+}
+
 sub main
 {
     my ( $filepath ) = @_;
@@ -1088,6 +1127,8 @@ sub main
     }
 
     print_perl_detail_info();
+
+    search_for_modules_for_available_updates();
 
     import_module_list_from_file( $filepath );
 
