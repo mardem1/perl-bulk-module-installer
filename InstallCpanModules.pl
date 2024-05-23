@@ -1121,8 +1121,6 @@ sub main
 
     print_perl_detail_info();
 
-    search_for_modules_for_available_updates();
-
     import_module_list_from_file( $filepath );
 
     search_for_installed_modules();
@@ -1130,6 +1128,8 @@ sub main
     reduce_modules_to_install();    # updates should be handled another time ...
 
     add_dependency_modules_for_modules_need_to_install();
+
+    search_for_modules_for_available_updates();
 
     print_install_state_summary();
 
