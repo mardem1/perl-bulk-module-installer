@@ -484,9 +484,6 @@ sub was_module_already_tried
 
 sub reduce_modules_to_install
 {
-    %modules_install_already = ();    # rest info
-    %modules_need_to_install = ();
-
     foreach my $module ( keys %modules_to_install ) {
         if ( exists $installed_module_version{ $module } ) {
             $modules_install_already{ $module } = undef;
@@ -612,8 +609,6 @@ sub print_install_end_summary
 
 sub search_for_installed_modules
 {
-    %installed_module_version = ();    # reset installed module info
-
     my @cmd = ( 'cmd.exe', '/c', 'cpan', '-l' );
 
     my ( $child_exit_status, @output ) =
@@ -1094,8 +1089,6 @@ sub install_modules_dep_version
 
 sub search_for_modules_for_available_updates
 {
-    %modules_need_to_update = ();    # reset module info
-
     my @cmd = ( 'cmd.exe', '/c', 'cpan-outdated', '--exclude-core', '-p' );
 
     my ( $child_exit_status, @output ) =
