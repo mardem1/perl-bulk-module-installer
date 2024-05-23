@@ -21,7 +21,7 @@ BEGIN {
 
 our $VERSION = '0.01';
 
-my @modules_to_install = ();
+my %modules_to_install = ();
 
 my %modules_to_install_with_deps_extended = ();
 
@@ -466,7 +466,7 @@ sub reduce_modules_to_install
     %modules_install_already = ();    # rest info
     %modules_need_to_install = ();
 
-    foreach my $module ( @modules_to_install ) {
+    foreach my $module ( keys %modules_to_install ) {
         if ( exists $installed_module_version{ $module } ) {
             $modules_install_already{ $module } = undef;
         }
@@ -1033,13 +1033,13 @@ sub import_module_list_from_file
     @file_lines = map  { _trim( $_ ) } @file_lines;
     @file_lines = grep { $EMPTY_STRING ne $_ } @file_lines;
 
-    @modules_to_install = @file_lines;
+    %modules_to_install = map { $_ => undef } @file_lines; # hashify
     @file_lines         = ();
 
     _say_ex '';
     _say_ex 'wanted modules to install found: '
-        . ( scalar @modules_to_install ) . "\n"
-        . Dumper( \@modules_to_install );
+        . ( scalar keys %modules_to_install ) . "\n"
+        . Dumper( \%modules_to_install );
     _say_ex '';
 
     return;
