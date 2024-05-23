@@ -632,70 +632,8 @@ sub fetch_dependencies_for_module
         croak 'param module empty!';
     }
 
-    ## old 2022-05-15 ?
-    # --> Working on Perl::Critic
-    # Fetching http://www.cpan.org/authors/id/P/PE/PETDANCE/Perl-Critic-1.140.tar.gz ... OK
-    # Configuring Perl-Critic-1.140 ... OK
-    # Module::Build~0.4204
-    # ExtUtils::Install~1.46
-    # Fatal
-
-    ## 2024-05-18 cpan new style or bug -> fetch all and use exit 1 ?
-# start cmd: cmd.exe /c cpanm --showdeps Perl::Critic 2>&1
-# --> Working on Perl::Critic
-# Fetching http://www.cpan.org/authors/id/P/PE/PETDANCE/Perl-Critic-1.152.tar.gz ... OK
-# ==> Found dependencies: B::Keywords, List::SomeUtils
-# --> Working on B::Keywords
-# Fetching http://www.cpan.org/authors/id/R/RU/RURBAN/B-Keywords-1.26.tar.gz ... OK
-# Configuring B-Keywords-1.26 ... OK
-# ExtUtils::MakeMaker~6.58
-# ExtUtils::MakeMaker
-# B
-# --> Working on List::SomeUtils
-# Fetching http://www.cpan.org/authors/id/D/DR/DROLSKY/List-SomeUtils-0.59.tar.gz ... OK
-# Configuring List-SomeUtils-0.59 ... ! Installing the dependencies failed: Module 'List::SomeUtils' is not installed, Module 'B::Keywords' is not installed
-# ! Bailing out the installation for Perl-Critic-1.152.
-# OK
-# ExtUtils::MakeMaker~6.58
-# Text::ParseWords
-# Test::LeakTrace
-# Storable
-# perl~5.006
-# Test::More~0.96
-# vars
-# lib
-# Tie::Array
-# Module::Implementation~0.04
-# List::Util
-# strict
-# base
-# List::SomeUtils::XS~0.54
-# Scalar::Util
-# overload
-# warnings
-# ExtUtils::MakeMaker
-# Carp
-# File::Spec
-# Exporter
-# Test::Builder::Module
-
     _say_ex 'get module dependencies - ' . $module;
 
-    # - FIXME - TODO - NOTE -
-
-    # straberry perl 5.16 : cpanm --verbose --force MIYAGAWA/App-cpanminus-1.6005.tar.gz
-    # NOT FOUND: cpanm --verbose --force MIYAGAWA/App-cpanminus-1.6906.tar.gz
-    # OK: cpanm --verbose --force MIYAGAWA/App-cpanminus-1.6907.tar.gz
-    # NOT FOUND: cpanm --verbose --force MIYAGAWA/App-cpanminus-1.6908.tar.gz
-    # BROKEN: cpanm --verbose --force MIYAGAWA/App-cpanminus-1.6909.tar.gz
-    # straberry perl 5.18 : cpanm --verbose --force MIYAGAWA/App-cpanminus-1.7012.tar.gz
-
-    # some change in 1.6908 has new behavior - so it end's with exit 1 instead of 0
-    # they try to install the modules an not only shows it.
-    ## - Rather than counting failures, check the requirements once all deps are installed. #237 Tatsuhiko Miyagawa 27.04.2013 02:45
-# now here i wanted to use showdeps to search for missing dependencies - but with the upper change, it exits if 1 because of failed dependencies :)
-
-    # --showdeps - prints the dep-messages an return 1
     my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--no-interactive', '--showdeps', $module, '2>&1' );
 
     my ( $child_exit_status, @output ) =
