@@ -1017,7 +1017,7 @@ sub install_module_dep_version
         croak 'param module empty!';
     }
 
-    _say_ex '';
+    _say_ex '' foreach ( 1 .. 25 );
     _say_ex( '=' x 80 );
     _say_ex '';
 
