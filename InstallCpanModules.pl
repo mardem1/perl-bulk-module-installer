@@ -58,7 +58,10 @@ my $INSTALL_MODULE_TIMEOUT_IN_SECONDS               = 60 * 10;
 my $CHECK_UPDATE_MODULE_TIMEOUT_IN_SECONDS          = 60 * 2;
 my $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS = 60 * 2;
 my $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS = 60 * 2;
-my $EMPTY_STRING                                    = q{};
+
+my $EMPTY_STRING = q{};
+my $FALSE        = !!0;
+my $TRUE         = !0;
 
 sub _trim
 {
@@ -1128,7 +1131,27 @@ sub search_for_modules_for_available_updates
 
 sub main
 {
-    my ( $filepath ) = @_;
+    my ( $arg1, $arg2 ) = @_;
+
+    my $filepath = undef;
+
+    my $only_updates = $FALSE;
+    my $no_updates   = $FALSE;
+
+    if ( $arg1 eq '--only-updates' ) {
+        $only_updates = $TRUE;
+        $filepath     = $arg2;
+    }
+    elsif ( $arg1 eq '--no-updates' ) {
+        $no_updates = $TRUE;
+        $filepath   = $arg2;
+    }
+    elsif ( !_is_string_empty( $arg1 ) && !_is_string_empty( $arg2 ) ) {
+        croak 'wrong parameter set';
+    }
+    else {
+        $filepath = $arg1;
+    }
 
     $filepath = _trim( $filepath );
     if ( _is_string_empty( $filepath ) ) {
@@ -1137,7 +1160,12 @@ sub main
 
     print_perl_detail_info();
 
-    import_module_list_from_file( $filepath );
+    if ( $only_updates ) {
+        _say_ex 'only-updates: skip module list file import';
+    }
+    else {
+        import_module_list_from_file( $filepath );
+    }
 
     search_for_installed_modules();
 
@@ -1145,7 +1173,12 @@ sub main
 
     add_dependency_modules_for_modules_need_to_install();
 
-    search_for_modules_for_available_updates();
+    if ( $no_updates ) {
+        _say_ex 'no-updates: skip update module list import';
+    }
+    else {
+        search_for_modules_for_available_updates();
+    }
 
     print_install_state_summary();
 
@@ -1160,7 +1193,7 @@ $| = 1;
 
 _say_ex "started $0";
 
-main( $ARGV[ 0 ] // '' );
+main( $ARGV[ 0 ] // $EMPTY_STRING, $ARGV[ 1 ] // $EMPTY_STRING );
 
 _say_ex "ended $0";
 
@@ -1174,7 +1207,7 @@ __END__
 
 =head1 NAME
 
-InstallCpanModules.pl filepath
+InstallCpanModules.pl [ --only-updates | --no-updates ] filepath
 
 =head1 DESCRIPTION
 

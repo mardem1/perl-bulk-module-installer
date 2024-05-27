@@ -27,6 +27,7 @@ Vision:
 5. run bulk-installer to add all needed modules
 
    `perl InstallCpanModules.pl test-module-lists/SmallModuleExample.txt`
+   `perl InstallCpanModules.pl [ --only-updates | --no-updates ] filepath`
 
 6. have a portable Windows-Perl with all modules :)
 
