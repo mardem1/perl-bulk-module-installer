@@ -1014,6 +1014,7 @@ sub install_single_module
     # my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '1>NUL', '2>&1' );    # no output
     my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '2>&1' );    # no output
 
+    # TODO logfile
     my $child_exit_status = _detached_execute_with_direct_output( $INSTALL_MODULE_TIMEOUT_IN_SECONDS, @cmd );
 
     if ( !defined $child_exit_status ) {
