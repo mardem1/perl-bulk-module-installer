@@ -63,6 +63,8 @@ my $EMPTY_STRING = q{};
 my $FALSE        = !!0;
 my $TRUE         = !0;
 
+my $module_list_filepath = $EMPTY_STRING;
+
 sub _trim
 {
     my ( $s ) = @_;
@@ -543,7 +545,7 @@ sub print_install_state_summary
 
 sub print_install_end_summary
 {
-    my ( $filepath ) = @_;
+    my $filepath = $module_list_filepath;
 
     if ( _is_string_empty( $filepath ) ) {
         croak 'param filepath empty!';
@@ -980,7 +982,7 @@ sub install_modules
 
 sub import_module_list_from_file
 {
-    my ( $filepath ) = @_;
+    my $filepath = $module_list_filepath;
 
     if ( _is_string_empty( $filepath ) ) {
         croak 'param filepath empty!';
@@ -1159,13 +1161,15 @@ sub main
         croak 'no file arg given';
     }
 
+    $module_list_filepath = $filepath;
+
     print_perl_detail_info();
 
     if ( $only_updates ) {
         _say_ex 'only-updates: skip module list file import';
     }
     else {
-        import_module_list_from_file( $filepath );
+        import_module_list_from_file();
     }
 
     search_for_installed_modules();
@@ -1185,7 +1189,7 @@ sub main
 
     install_modules_dep_version();
 
-    print_install_end_summary( $filepath );
+    print_install_end_summary();
 
     return;
 }
