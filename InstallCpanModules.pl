@@ -119,6 +119,7 @@ sub _read_file
         croak "Couldn't open file $filepath, $!";
     }
 
+    # TODO: local $/; $/ = "\n"; # force linux line ends
     my @raw_file_lines = <$fh>;
     close( $fh );
 
