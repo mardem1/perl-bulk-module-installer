@@ -1,4 +1,5 @@
 
 Log::Log4perl
+Test::Class
 Perl::Critic
 Perl::Tidy
