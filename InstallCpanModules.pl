@@ -657,12 +657,27 @@ sub search_for_installed_modules
 {
     my @cmd = ( 'cmd.exe', '/c', 'cpan', '-l' );
 
+    my $timestamp  = _get_timestamp_for_filename();
+    my $time_start = _get_timestamp_pretty();
+
     my ( $child_exit_status, @output ) =
         _get_output_with_detached_execute( $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS, 0, @cmd );
+
+    my $time_end = _get_timestamp_pretty();
 
     if ( !defined $child_exit_status || ( $child_exit_status && !@output ) ) {
         return;    # error nothing found
     }
+
+    _write_file(
+        $log_dir_path .'/' . $timestamp. '_' . 'installed_modules_found.log',
+        'installed_modules_found',
+        ( join ' ', @cmd ),
+        'started: ' . $time_start,
+        '', @output,
+        '',
+        'ended: ' . $time_end,
+    );
 
     foreach my $line ( @output ) {
         my @t = split /\s+/, $line;
