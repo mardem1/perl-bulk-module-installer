@@ -1211,7 +1211,32 @@ InstallCpanModules.pl [ --only-updates | --no-updates ] filepath
 
 =head1 DESCRIPTION
 
-TODO
+Install multiple perl modules with some logic to make this more efficient,
+details can be found in the C<README.md>
+
+=head1 PARAMETERS
+
+=over 12
+
+=item C<filepath>
+
+Filepath to a text file with Perl-Module-Name (eg. Perl::Critic) to install.
+One Name per Line, Linux-Line-Ends preferred but all work's.
+
+=item C<--only-updates>
+
+Only update installed modules, no modules from a given filelist will be
+installed.
+
+Attention: If a new module version has a additional dependency, this dependency
+will be installed!
+
+=item C<--no-updates>
+
+Do not install updates for modules, exception a new module require a module
+update as dependency.
+
+=back
 
 =head1 BUG REPORTS
 
