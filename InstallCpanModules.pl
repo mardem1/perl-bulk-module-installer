@@ -604,79 +604,90 @@ sub print_install_state_summary
     return;
 }
 
-sub print_install_end_summary
+sub dump_state_to_logfiles
 {
     if ( _is_string_empty( $log_dir_path ) ) {
         croak 'param filepath empty!';
     }
 
+    my $timestamp = _get_timestamp_for_filename();
+
+    _write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_to_install_with_deps_extended.log',
+        'modules_to_install_with_deps_extended: ' . scalar( keys %modules_to_install_with_deps_extended ),
+        Dumper( \%modules_to_install_with_deps_extended ),
+    );
+
+    _write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_already.log',
+        'modules_install_already: ' . scalar( keys %modules_install_already ),
+        Dumper( \%modules_install_already ),
+    );
+
+    _write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_ok.log',
+        'modules_install_ok: ' . scalar( keys %modules_install_ok ),
+        Dumper( \%modules_install_ok ),
+    );
+
+    _write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_not_found.log',
+        'modules_install_not_found: ' . scalar( keys %modules_install_not_found ),
+        Dumper( \%modules_install_not_found ),
+    );
+
+    _write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_failed.log',
+        'modules_install_failed: ' . scalar( keys %modules_install_failed ),
+        Dumper( \%modules_install_failed ),
+    );
+
+    _write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_need_to_install.log',
+        'modules_need_to_install: ' . scalar( keys %modules_need_to_install ),
+        Dumper( \%modules_need_to_install ),
+    );
+
+    return;
+}
+
+sub print_install_end_summary
+{
     foreach ( 1 .. 10 ) {
         _say_ex '';
     }
     _say_ex 'summary';
     _say_ex '';
 
-    my $timestamp = _get_timestamp_for_filename();
-
     _say_ex '';
-    _write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'modules_to_install_with_deps_extended.log',
-        'modules_to_install_with_deps_extended: ' . scalar( keys %modules_to_install_with_deps_extended ),
-        Dumper( \%modules_to_install_with_deps_extended ),
-    );
     _say_ex 'modules_to_install_with_deps_extended: '
         . scalar( keys %modules_to_install_with_deps_extended ) . "\n"
         . Dumper( \%modules_to_install_with_deps_extended );
     _say_ex '';
 
     _say_ex '';
-    _write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_already.log',
-        'modules_install_already: ' . scalar( keys %modules_install_already ),
-        Dumper( \%modules_install_already ),
-    );
     _say_ex 'modules_install_already: '
         . scalar( keys %modules_install_already ) . "\n"
         . Dumper( \%modules_install_already );
     _say_ex '';
 
     _say_ex '';
-    _write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_ok.log',
-        'modules_install_ok: ' . scalar( keys %modules_install_ok ),
-        Dumper( \%modules_install_ok ),
-    );
     _say_ex 'modules_install_ok: ' . scalar( keys %modules_install_ok ) . "\n" . Dumper( \%modules_install_ok );
     _say_ex '';
 
     _say_ex '';
-    _write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_not_found.log',
-        'modules_install_not_found: ' . scalar( keys %modules_install_not_found ),
-        Dumper( \%modules_install_not_found ),
-    );
     _say_ex 'modules_install_not_found: '
         . scalar( keys %modules_install_not_found ) . "\n"
         . Dumper( \%modules_install_not_found );
     _say_ex '';
 
     _say_ex '';
-    _write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_failed.log',
-        'modules_install_failed: ' . scalar( keys %modules_install_failed ),
-        Dumper( \%modules_install_failed ),
-    );
     _say_ex 'modules_install_failed: '
         . scalar( keys %modules_install_failed ) . "\n"
         . Dumper( \%modules_install_failed );
     _say_ex '';
 
     _say_ex '';
-    _write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'modules_need_to_install.log',
-        'modules_need_to_install: ' . scalar( keys %modules_need_to_install ),
-        Dumper( \%modules_need_to_install ),
-    );
     _say_ex 'modules_need_to_install: '
         . scalar( keys %modules_need_to_install ) . "\n"
         . Dumper( \%modules_need_to_install );
@@ -1315,11 +1326,15 @@ sub main
         search_for_modules_for_available_updates();
     }
 
+    dump_state_to_logfiles();
+
     print_install_state_summary();
 
     install_modules_dep_version();
 
     print_install_end_summary();
+
+    dump_state_to_logfiles();
 
     return;
 }
