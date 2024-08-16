@@ -1152,12 +1152,25 @@ sub search_for_modules_for_available_updates
 {
     my @cmd = ( 'cmd.exe', '/c', 'cpan-outdated', '--exclude-core', '-p' );
 
+    my $timestamp  = _get_timestamp_for_filename();
+    my $time_start = _get_timestamp_pretty();
+
     my ( $child_exit_status, @output ) =
         _get_output_with_detached_execute( $CHECK_UPDATE_MODULE_TIMEOUT_IN_SECONDS, 0, @cmd );
+
+    my $time_end = _get_timestamp_pretty();
 
     if ( !defined $child_exit_status || ( $child_exit_status && !@output ) ) {
         return;    # error nothing found
     }
+
+    _write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_with_available_updates.log',
+        'modules_with_available_updates',
+        ( join ' ', @cmd ),
+        'started: ' . $time_start,
+        '', @output, '', 'ended: ' . $time_end,
+    );
 
     foreach my $module ( @output ) {
         $modules_need_to_update{ $module } = undef;
