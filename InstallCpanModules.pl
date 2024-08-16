@@ -12,6 +12,8 @@ use Carp::Always;
 use IPC::Open3;
 use Data::Dumper qw( Dumper );
 use List::Util   qw( shuffle );
+use Cwd qw( abs_path );
+use File::Basename qw( dirname );
 
 BEGIN {
     if ( $^O !~ /win32/io ) {
@@ -64,6 +66,7 @@ my $FALSE        = !!0;
 my $TRUE         = !0;
 
 my $module_list_filepath = $EMPTY_STRING;
+my $log_dir_path         = $EMPTY_STRING;
 
 sub _trim
 {
@@ -1199,6 +1202,17 @@ sub main
     }
 
     $module_list_filepath = $filepath;
+
+    my $logdir =  dirname(__FILE__) . '/log' ;
+    $log_dir_path = abs_path($logdir);
+
+    if( _is_string_empty($log_dir_path)) {
+          croak "logdir '$logdir' not found";
+    }
+
+    if( ! -d $log_dir_path ) {
+          croak "logdir '$log_dir_path' not found";
+    }
 
     print_perl_detail_info();
 
