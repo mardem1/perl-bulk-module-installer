@@ -577,6 +577,12 @@ sub reduce_modules_to_install
 
 sub print_install_state_summary
 {
+    foreach ( 1 .. 10 ) {
+        _say_ex '';
+    }
+
+    _say_ex 'print_install_state_summary';
+    _say_ex '';
     _say_ex '';
 
     _say_ex 'modules_install_not_found: '
