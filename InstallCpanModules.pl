@@ -81,8 +81,7 @@ sub _get_log_line
 
     my $line = $EMPTY_STRING;
 
-    my @local = ( localtime )[ 0 .. 5 ];
-    my $now   = POSIX::strftime( '%Y-%m-%d_%H-%M-%S', @local );
+    my $now = _get_timestamp_for_logline();
 
     $line = '# ' . $now . ' # ' . join( '', @args );
 
@@ -114,6 +113,14 @@ sub _hashify
     my @args = @_;
 
     return map { $_ => undef } @args;
+}
+
+sub _get_timestamp_for_logline
+{
+    my @local = ( localtime )[ 0 .. 5 ];
+    my $now   = POSIX::strftime( '%Y-%m-%d_%H-%M-%S', @local );
+
+    return $now;
 }
 
 sub _get_timestamp_pretty
