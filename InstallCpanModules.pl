@@ -585,9 +585,7 @@ sub print_install_state_summary
 
 sub print_install_end_summary
 {
-    my $filepath = $module_list_filepath;
-
-    if ( _is_string_empty( $filepath ) ) {
+    if ( _is_string_empty( $log_dir_path ) ) {
         croak 'param filepath empty!';
     }
 
@@ -597,9 +595,11 @@ sub print_install_end_summary
     _say_ex 'summary';
     _say_ex '';
 
+    my $timestamp = _get_timestamp_for_filename();
+
     _say_ex '';
     _write_file(
-        $filepath . '_' . 'modules_install_already.log',
+        $log_dir_path .'/' . $timestamp. '_' . 'modules_install_already.log',
         'modules_install_already: ' . scalar( keys %modules_install_already ),
         Dumper( \%modules_install_already ),
     );
@@ -610,7 +610,7 @@ sub print_install_end_summary
 
     _say_ex '';
     _write_file(
-        $filepath . '_' . 'modules_install_ok.log',
+        $log_dir_path .'/' . $timestamp. '_' . 'modules_install_ok.log',
         'modules_install_ok: ' . scalar( keys %modules_install_ok ),
         Dumper( \%modules_install_ok ),
     );
@@ -619,7 +619,7 @@ sub print_install_end_summary
 
     _say_ex '';
     _write_file(
-        $filepath . '_' . 'modules_install_not_found.log',
+        $log_dir_path .'/' . $timestamp. '_' . 'modules_install_not_found.log',
         'modules_install_not_found: ' . scalar( keys %modules_install_not_found ),
         Dumper( \%modules_install_not_found ),
     );
@@ -630,7 +630,7 @@ sub print_install_end_summary
 
     _say_ex '';
     _write_file(
-        $filepath . '_' . 'modules_install_failed.log',
+        $log_dir_path .'/' . $timestamp. '_' . 'modules_install_failed.log',
         'modules_install_failed: ' . scalar( keys %modules_install_failed ),
         Dumper( \%modules_install_failed ),
     );
@@ -641,7 +641,7 @@ sub print_install_end_summary
 
     _say_ex '';
     _write_file(
-        $filepath . '_' . 'modules_need_to_install.log',
+        $log_dir_path .'/' . $timestamp. '_' . 'modules_need_to_install.log',
         'modules_need_to_install: ' . scalar( keys %modules_need_to_install ),
         Dumper( \%modules_need_to_install ),
     );
