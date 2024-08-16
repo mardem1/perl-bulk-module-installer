@@ -78,6 +78,24 @@ sub _trim
     return $s;
 }
 
+sub _str_replace
+{
+    my ( $string, $search, $replace ) = @_;
+
+    $string =~ s/$search/$replace/g;
+
+    return $string;
+}
+
+sub _module_name_for_fs
+{
+    my ( $module ) = @_;
+
+    my $module_n = _str_replace( $module, '::', '_' );
+
+    return $module_n;
+}
+
 sub _get_log_line
 {
     my @args = @_;
