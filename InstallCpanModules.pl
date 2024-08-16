@@ -10,9 +10,9 @@ use POSIX qw( :sys_wait_h );
 use Carp  qw( croak );
 use Carp::Always;
 use IPC::Open3;
-use Data::Dumper qw( Dumper );
-use List::Util   qw( shuffle );
-use Cwd qw( abs_path );
+use Data::Dumper   qw( Dumper );
+use List::Util     qw( shuffle );
+use Cwd            qw( abs_path );
 use File::Basename qw( dirname );
 
 BEGIN {
@@ -95,7 +95,7 @@ sub _say_ex
 {
     my @args = @_;
 
-    my $line = _get_log_line(@args);
+    my $line = _get_log_line( @args );
 
     say $line;
 
@@ -599,7 +599,7 @@ sub print_install_end_summary
 
     _say_ex '';
     _write_file(
-        $log_dir_path .'/' . $timestamp. '_' . 'modules_install_already.log',
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_already.log',
         'modules_install_already: ' . scalar( keys %modules_install_already ),
         Dumper( \%modules_install_already ),
     );
@@ -610,7 +610,7 @@ sub print_install_end_summary
 
     _say_ex '';
     _write_file(
-        $log_dir_path .'/' . $timestamp. '_' . 'modules_install_ok.log',
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_ok.log',
         'modules_install_ok: ' . scalar( keys %modules_install_ok ),
         Dumper( \%modules_install_ok ),
     );
@@ -619,7 +619,7 @@ sub print_install_end_summary
 
     _say_ex '';
     _write_file(
-        $log_dir_path .'/' . $timestamp. '_' . 'modules_install_not_found.log',
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_not_found.log',
         'modules_install_not_found: ' . scalar( keys %modules_install_not_found ),
         Dumper( \%modules_install_not_found ),
     );
@@ -630,7 +630,7 @@ sub print_install_end_summary
 
     _say_ex '';
     _write_file(
-        $log_dir_path .'/' . $timestamp. '_' . 'modules_install_failed.log',
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_failed.log',
         'modules_install_failed: ' . scalar( keys %modules_install_failed ),
         Dumper( \%modules_install_failed ),
     );
@@ -641,7 +641,7 @@ sub print_install_end_summary
 
     _say_ex '';
     _write_file(
-        $log_dir_path .'/' . $timestamp. '_' . 'modules_need_to_install.log',
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_need_to_install.log',
         'modules_need_to_install: ' . scalar( keys %modules_need_to_install ),
         Dumper( \%modules_need_to_install ),
     );
@@ -670,13 +670,11 @@ sub search_for_installed_modules
     }
 
     _write_file(
-        $log_dir_path .'/' . $timestamp. '_' . 'installed_modules_found.log',
+        $log_dir_path . '/' . $timestamp . '_' . 'installed_modules_found.log',
         'installed_modules_found',
         ( join ' ', @cmd ),
         'started: ' . $time_start,
-        '', @output,
-        '',
-        'ended: ' . $time_end,
+        '', @output, '', 'ended: ' . $time_end,
     );
 
     foreach my $line ( @output ) {
@@ -1250,15 +1248,15 @@ sub main
 
     $module_list_filepath = $filepath;
 
-    my $logdir =  dirname(__FILE__) . '/log' ;
-    $log_dir_path = abs_path($logdir);
+    my $logdir = dirname( __FILE__ ) . '/log';
+    $log_dir_path = abs_path( $logdir );
 
-    if( _is_string_empty($log_dir_path)) {
-          croak "logdir '$logdir' not found";
+    if ( _is_string_empty( $log_dir_path ) ) {
+        croak "logdir '$logdir' not found";
     }
 
-    if( ! -d $log_dir_path ) {
-          croak "logdir '$log_dir_path' not found";
+    if ( !-d $log_dir_path ) {
+        croak "logdir '$log_dir_path' not found";
     }
 
     print_perl_detail_info();
