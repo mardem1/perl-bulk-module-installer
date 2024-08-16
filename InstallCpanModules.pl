@@ -1063,9 +1063,28 @@ sub import_module_list_from_file
 sub print_perl_detail_info
 {
     my @cmd = ( 'cmd.exe', '/c', 'perl', '-V' );
-    _say_ex 'start cmd: ' . ( join ' ', @cmd );
-    system( @cmd );
-    _say_ex 'cmd ended';
+
+    my $timestamp  = _get_timestamp_for_filename();
+    my $time_start = _get_timestamp_pretty();
+
+    my ( $child_exit_status, @output ) =
+        _get_output_with_detached_execute( $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS, 0, @cmd );
+
+    my $time_end = _get_timestamp_pretty();
+
+    if ( !defined $child_exit_status || ( $child_exit_status && !@output ) ) {
+        return;    # error nothing found
+    }
+
+    say( join "\n", @output );
+
+    _write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'perl_detail_info.log',
+        'perl_detail_info',
+        ( join ' ', @cmd ),
+        'started: ' . $time_start,
+        '', @output, '', 'ended: ' . $time_end,
+    );
 
     return;
 }
