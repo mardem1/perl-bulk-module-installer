@@ -835,6 +835,7 @@ sub fetch_dependencies_for_module
             && $_ !~ /^overload$/o
             && $_ !~ /^if$/o
             && $_ !~ /^utf8$/o
+            && $_ !~ /Expiring \d+ work directories[.] This might take a while/o
             && $_ !~ /^[a-z\d]+$/o
             && $_ !~ /^[a-z\d]+~\d+$/o
             && $_ !~ /^[a-z\d]+~\d+\..+$/o
