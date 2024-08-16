@@ -75,13 +75,27 @@ sub _trim
     return $s;
 }
 
+sub _get_log_line
+{
+    my @args = @_;
+
+    my $line = $EMPTY_STRING;
+
+    my @local = ( localtime )[ 0 .. 5 ];
+    my $now   = POSIX::strftime( '%Y-%m-%d_%H-%M-%S', @local );
+
+    $line = '# ' . $now . ' # ' . join( '', @args );
+
+    return $line;
+}
+
 sub _say_ex
 {
     my @args = @_;
 
-    my @local = ( localtime )[ 0 .. 5 ];
-    my $now   = POSIX::strftime( '%Y-%m-%d_%H-%M-%S', @local );
-    say '# ' . $now . ' # ' . join( '', @args );
+    my $line = _get_log_line(@args);
+
+    say $line;
 
     return;
 }
