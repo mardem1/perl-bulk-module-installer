@@ -559,7 +559,7 @@ sub print_install_end_summary
 
     _say_ex '';
     _write_file(
-        $filepath . 'modules_install_already.log',
+        $filepath . '_' . 'modules_install_already.log',
         'modules_install_already: ' . scalar( keys %modules_install_already ),
         Dumper( \%modules_install_already ),
     );
@@ -570,7 +570,7 @@ sub print_install_end_summary
 
     _say_ex '';
     _write_file(
-        $filepath . 'modules_install_ok.log',
+        $filepath . '_' . 'modules_install_ok.log',
         'modules_install_ok: ' . scalar( keys %modules_install_ok ),
         Dumper( \%modules_install_ok ),
     );
@@ -579,7 +579,7 @@ sub print_install_end_summary
 
     _say_ex '';
     _write_file(
-        $filepath . '_modules_install_not_found.log',
+        $filepath . '_' . 'modules_install_not_found.log',
         'modules_install_not_found: ' . scalar( keys %modules_install_not_found ),
         Dumper( \%modules_install_not_found ),
     );
@@ -590,7 +590,7 @@ sub print_install_end_summary
 
     _say_ex '';
     _write_file(
-        $filepath . 'modules_install_failed.log',
+        $filepath . '_' . 'modules_install_failed.log',
         'modules_install_failed: ' . scalar( keys %modules_install_failed ),
         Dumper( \%modules_install_failed ),
     );
@@ -601,7 +601,7 @@ sub print_install_end_summary
 
     _say_ex '';
     _write_file(
-        $filepath . 'modules_need_to_install.log',
+        $filepath . '_' . 'modules_need_to_install.log',
         'modules_need_to_install: ' . scalar( keys %modules_need_to_install ),
         Dumper( \%modules_need_to_install ),
     );
