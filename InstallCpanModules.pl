@@ -721,9 +721,15 @@ sub search_for_installed_modules
     _write_file(
         $log_dir_path . '/' . $timestamp . '_' . 'installed_modules_found.log',
         'installed_modules_found',
-        ( join ' ', @cmd ),
-        'started: ' . $time_start,
-        '', @output, '', 'ended: ' . $time_end,
+        'CMD: ' . ( join ' ', @cmd ),
+        'ExitCode: ' . $child_exit_status,
+        'Started: ' . $time_start,
+        'Ended: ' . $time_end,
+        '',
+        '=' x 80,
+        '',
+        @output,
+        '',
     );
 
     foreach my $line ( @output ) {
@@ -775,9 +781,15 @@ sub fetch_dependencies_for_module
     _write_file(
         $log_dir_path . '/' . $timestamp . '_' . 'fetch_dependency__' . $module_n . '.log',
         'fetch_dependency ' . $module,
-        ( join ' ', @cmd ),
-        'started: ' . $time_start,
-        '', @output, '', 'ended: ' . $time_end,
+        'CMD: ' . ( join ' ', @cmd ),
+        'ExitCode: ' . $child_exit_status,
+        'Started: ' . $time_start,
+        'Ended: ' . $time_end,
+        '',
+        '=' x 80,
+        '',
+        @output,
+        ''
     );
 
     if ( ( join '', @output ) =~ /Couldn't find module or a distribution/io ) {
@@ -1045,9 +1057,15 @@ sub install_single_module
     _write_file(
         $log_dir_path . '/' . $timestamp . '_' . 'install_module__' . $module_n . '.log',
         'install_module ' . $module,
-        ( join ' ', @cmd ),
-        'started: ' . $time_start,
-        '', @output, '', 'ended: ' . $time_end,
+        'CMD: ' . ( join ' ', @cmd ),
+        'ExitCode: ' . $child_exit_status,
+        'Started: ' . $time_start,
+        'Ended: ' . $time_end,
+        '',
+        '=' x 80,
+        '',
+        @output,
+        ''
     );
 
     if ( !defined $child_exit_status ) {
@@ -1130,9 +1148,15 @@ sub print_perl_detail_info
     _write_file(
         $log_dir_path . '/' . $timestamp . '_' . 'perl_detail_info.log',
         'perl_detail_info',
-        ( join ' ', @cmd ),
-        'started: ' . $time_start,
-        '', @output, '', 'ended: ' . $time_end,
+        'CMD: ' . ( join ' ', @cmd ),
+        'ExitCode: ' . $child_exit_status,
+        'Started: ' . $time_start,
+        'Ended: ' . $time_end,
+        '',
+        '=' x 80,
+        '',
+        @output,
+        '',
     );
 
     return;
@@ -1235,9 +1259,15 @@ sub search_for_modules_for_available_updates
     _write_file(
         $log_dir_path . '/' . $timestamp . '_' . 'modules_with_available_updates.log',
         'modules_with_available_updates',
-        ( join ' ', @cmd ),
-        'started: ' . $time_start,
-        '', @output, '', 'ended: ' . $time_end,
+        'CMD: ' . ( join ' ', @cmd ),
+        'ExitCode: ' . $child_exit_status,
+        'Started: ' . $time_start,
+        'Ended: ' . $time_end,
+        '',
+        '=' x 80,
+        '',
+        @output,
+        '',
     );
 
     foreach my $module ( @output ) {
