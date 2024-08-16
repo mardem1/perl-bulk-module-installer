@@ -617,6 +617,17 @@ sub print_install_end_summary
 
     _say_ex '';
     _write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_to_install_with_deps_extended.log',
+        'modules_to_install_with_deps_extended: ' . scalar( keys %modules_to_install_with_deps_extended ),
+        Dumper( \%modules_to_install_with_deps_extended ),
+    );
+    _say_ex 'modules_to_install_with_deps_extended: '
+        . scalar( keys %modules_to_install_with_deps_extended ) . "\n"
+        . Dumper( \%modules_to_install_with_deps_extended );
+    _say_ex '';
+
+    _say_ex '';
+    _write_file(
         $log_dir_path . '/' . $timestamp . '_' . 'modules_install_already.log',
         'modules_install_already: ' . scalar( keys %modules_install_already ),
         Dumper( \%modules_install_already ),
