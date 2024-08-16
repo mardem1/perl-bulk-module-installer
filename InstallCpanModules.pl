@@ -1014,11 +1014,24 @@ sub install_single_module
 
     my $action = '';
 
-    # my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '1>NUL', '2>&1' );    # no output
-    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '2>&1' );    # no output
+    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '2>&1' );
 
-    # TODO logfile
-    my $child_exit_status = _detached_execute_with_direct_output( $INSTALL_MODULE_TIMEOUT_IN_SECONDS, @cmd );
+    my $timestamp  = _get_timestamp_for_filename();
+    my $time_start = _get_timestamp_pretty();
+
+    my ( $child_exit_status, @output ) =
+        _get_output_with_detached_execute( $INSTALL_MODULE_TIMEOUT_IN_SECONDS, 1, @cmd );
+
+    my $time_end = _get_timestamp_pretty();
+
+    my $module_n = _module_name_for_fs( $module );
+    _write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'install_module__' . $module_n . '.log',
+        'install_module ' . $module,
+        ( join ' ', @cmd ),
+        'started: ' . $time_start,
+        '', @output, '', 'ended: ' . $time_end,
+    );
 
     if ( !defined $child_exit_status ) {
         $child_exit_status = 1;
