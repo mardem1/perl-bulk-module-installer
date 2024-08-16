@@ -110,6 +110,14 @@ sub _get_timestamp_pretty
     return $now;
 }
 
+sub _get_timestamp_for_filename
+{
+    my @local = ( localtime )[ 0 .. 5 ];
+    my $now   = POSIX::strftime( '%Y%m%d_%H%M%S', @local );
+
+    return $now;
+}
+
 sub _read_file
 {
     my ( $filepath ) = @_;
