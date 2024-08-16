@@ -733,8 +733,13 @@ sub fetch_dependencies_for_module
 
     my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--no-interactive', '--showdeps', $module, '2>&1' );
 
+    my $timestamp  = _get_timestamp_for_filename();
+    my $time_start = _get_timestamp_pretty();
+
     my ( $child_exit_status, @output ) =
         _get_output_with_detached_execute( $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS, 1, @cmd );
+
+    my $time_end = _get_timestamp_pretty();
 
     if ( !defined $child_exit_status ) {
         return undef;    # as not found
@@ -744,6 +749,16 @@ sub fetch_dependencies_for_module
         _say_ex 'ERROR: search failed - exitcode - ' . $child_exit_status;
         return undef;    # as not found
     }
+
+    my $module_n = _module_name_for_fs( $module );
+
+    _write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'fetch_dependency__' . $module_n . '.log',
+        'fetch_dependency ' . $module,
+        ( join ' ', @cmd ),
+        'started: ' . $time_start,
+        '', @output, '', 'ended: ' . $time_end,
+    );
 
     if ( ( join '', @output ) =~ /Couldn't find module or a distribution/io ) {
         _say_ex 'ERROR: module not found - ' . $module;
