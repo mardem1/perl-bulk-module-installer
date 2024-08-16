@@ -1052,31 +1052,6 @@ sub get_next_module_to_install
     return ( shuffle @install_modules )[ 0 ];
 }
 
-sub install_modules
-{
-    my $install_module = get_next_module_to_install();
-    while ( !_is_string_empty( $install_module ) ) {
-        install_module_with_dep( $install_module );
-
-        my $next_module = get_next_module_to_install();
-        if ( _is_string_empty( $next_module ) ) {
-            _say_ex 'no more modules to do';
-
-            $install_module = '';
-        }
-        elsif ( $next_module ne $install_module ) {
-            $install_module = $next_module;
-        }
-        else {
-            _say_ex 'ERROR: next module not changed ' . $next_module . ' - abort !';
-
-            $install_module = '';
-        }
-    }
-
-    return;
-}
-
 sub import_module_list_from_file
 {
     my $filepath = $module_list_filepath;
