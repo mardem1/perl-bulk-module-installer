@@ -54,6 +54,8 @@ my %modules_install_not_found = (
     # 'B::Terse'        => undef,
     # 'B::Xref'         => undef,
     # 'only'            => undef,
+    # 'DBD::Pg'           => undef, # build failed every time?
+    # 'Mojolicious'       => undef, # build failed every time?
 );
 
 my $INSTALL_MODULE_TIMEOUT_IN_SECONDS               = 60 * 10;
