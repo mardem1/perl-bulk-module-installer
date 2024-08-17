@@ -1409,8 +1409,8 @@ details can be found in the C<README.md>
 
 =item C<filepath>
 
-Filepath to a text file with Perl-Module-Name (eg. Perl::Critic) to install.
-One Name per Line, Linux-Line-Ends preferred but all work's.
+Filepath to a text file which contains Perl-Module-Names (eg. Perl::Critic) to
+install. One Name per Line, Linux-Line-Ends preferred but all work's.
 
 =item C<--only-updates>
 

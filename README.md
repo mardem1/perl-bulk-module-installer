@@ -1,10 +1,8 @@
 # Perl Bulk Module Installer
 
-...
-
-## PURPOSE
-
 Install multiple perl modules with some logic to make this more efficient.
+
+## PURPOSE / DESCRIPTION
 
 Vision:
 
@@ -33,8 +31,8 @@ Vision:
 
 One problem with cpanm is that it don't save/cache a failed installation state.
 If a module needs a module which was already tried cpanm will try it again.
-If you install many module, and not all working correctly it will waste much
-time and, the installation of modules is already not fast :(
+If you install many modules, and not all working correctly it will waste much
+time, and the installation of modules is already not fast :(
 
 So the main enhancement of this script should be this cache of failed
 or not-found dependencies to speed up a bootstrap installation of many modules.
@@ -49,20 +47,6 @@ or not-found dependencies to speed up a bootstrap installation of many modules.
 8. install dependent modules if not yet tried - abort if failed - recursion possible !
 9. install module
 10. repeat - restart at 4 with next module.
-
-...
-
-## DESCRIPTION
-
-...
-
-## INSTALLATION
-
-...
-
-## SUPPORT AND DOCUMENTATION
-
-...
 
 ## BUG REPORTS
 
