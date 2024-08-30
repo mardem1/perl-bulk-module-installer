@@ -943,10 +943,10 @@ sub add_dependency_module_if_needed
 
     $modules_to_install_with_deps_extended{ $module } = \%dep;    # mark module needed deps
 
-    foreach my $module ( sort keys %dep ) {
+    foreach my $dep_module ( sort keys %dep ) {
         # only here - not at entry and every return.
         $recursion++;
-        add_dependency_module_if_needed( $module );
+        add_dependency_module_if_needed( $dep_module );
         $recursion--;
     }
 
