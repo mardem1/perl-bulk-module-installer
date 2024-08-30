@@ -949,15 +949,6 @@ sub install_single_module
     return $child_exit_status;
 }
 
-sub get_next_module_to_install
-{
-    my @install_modules = keys %modules_need_to_install;
-    my $remaining       = scalar @install_modules;
-    _say_ex "==> $remaining remaining modules to install";
-
-    return ( shuffle @install_modules )[ 0 ];
-}
-
 sub import_module_list_from_file
 {
     my $filepath = $module_list_filepath;
