@@ -41,16 +41,19 @@ much time, and the installation of modules is already not fast :(
 So the main enhancement of this script should be this cache of failed
 or not-found dependencies to speed up a bootstrap installation of many modules.
 
-1. import module list - if not update only
+1. import module list - if not update-only
 2. check installed modules
 3. search for installed modules
 4. search for missing dependency modules
 5. search for available update of installed modules - if not no-updates
 6. now the installation loop
-7. check dependent modules of current module
-8. install dependent modules if not yet tried - abort if failed - recursion possible !
-9. install module
-10. repeat - restart at 4 with next module.
+    1. get the next module with has no found dependency, or abort of there is none.
+    2. re-check dependencies - but there should be noting.
+    3. try to install module
+    4. if ok remove this module from the dependency list of each module, if listed
+    5. if not ok mark all modules which depend on this als failed, and all which depend on them - and so on - recursion
+    6. mark this module als installed or failed.
+    7. repeat loop
 
 ## BUG REPORTS
 
