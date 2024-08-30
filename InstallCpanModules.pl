@@ -1242,7 +1242,7 @@ InstallCpanModules.pl [ --only-updates | --no-updates ] filepath
 
 =head1 DESCRIPTION
 
-Install multiple perl modules with some logic to make this more efficient,
+Install perl modules in bulk with some logic to make this more efficient,
 details can be found in the C<README.md>
 
 =head1 PARAMETERS
