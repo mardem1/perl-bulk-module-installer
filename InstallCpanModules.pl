@@ -875,56 +875,6 @@ sub add_dependency_modules_for_modules_need_to_install
     return;
 }
 
-sub install_module_with_dep
-{
-    my ( $module ) = @_;
-
-    if ( _is_string_empty( $module ) ) {
-        croak 'param module empty!';
-    }
-
-    _say_ex 'analyze module - ' . $module;
-
-    my $dep_ref = fetch_dependencies_for_module( $module );
-    if ( !defined $dep_ref ) {
-        _say_ex 'ERROR: module - ' . $module . ' - not found - abort !';
-        mark_module_as_not_found( $module, undef );
-
-        print_install_state_summary();
-
-        return 1;
-    }
-
-    my %dep = %{ $dep_ref };
-    if ( %dep ) {
-        _say_ex 'module has dependencies - ' . $module . ' - reduce to not installed';
-        %dep = reduce_dependency_modules_which_are_not_installed( %dep );
-    }
-
-    if ( %dep ) {
-        _say_ex 'module - ' . $module . ' has not installed dependencies ' . "\n" . Dumper( \%dep );
-
-        foreach my $dep_module ( keys %dep ) {
-            my $ret = install_module_with_dep( $dep_module );
-            if ( $ret ) {
-                _say_ex 'ERROR: module - ' . $module . ' - aborted - failed dependencies';
-                mark_module_as_failed( $module, undef );    # delete if something wrong - should not happen
-
-                print_install_state_summary();
-
-                return 1;
-            }
-        }
-    }
-    else {
-        _say_ex 'module - ' . $module . ' - no dependencies to install';
-    }
-
-    my $ret = install_single_module( $module );
-
-    return $ret ? 1 : 0;
-}
-
 sub install_single_module
 {
     my ( $module ) = @_;
