@@ -1,10 +1,8 @@
-# Perl Bulk Module Installer
+# Perl Bulk Modules Installer
 
 Install multiple perl modules with some logic to make this more efficient.
 
-## PURPOSE / DESCRIPTION
-
-Vision:
+## VISION / PURPOSE
 
 1. get a portable Windows-Perl from [Strawberry](https://strawberryperl.com/releases.html)
 
@@ -28,6 +26,8 @@ Vision:
    `perl InstallCpanModules.pl [ --only-updates | --no-updates ] filepath`
 
 6. have a portable Windows-Perl with all modules :)
+
+## DESCRIPTION
 
 One problem with cpanm is that it don't save/cache a failed installation state.
 If a module needs a module which was already tried cpanm will try it again.
