@@ -18,12 +18,16 @@ Install multiple perl modules with some logic to make this more efficient.
 
 4. install needed modules
 
-   `cmd.exe /c cpanm Carp Carp::Always Data::Dumper`
+   ```
+   cmd.exe /c cpanm Carp Carp::Always Data::Dumper
+   ```
 
 5. run bulk-installer to add all needed modules
 
-   `perl InstallCpanModules.pl test-module-lists/SmallModuleExample.txt`
-   `perl InstallCpanModules.pl [ --only-updates | --no-updates ] filepath`
+   ```
+   perl InstallCpanModules.pl [ --only-updates | --no-updates ] filepath
+   perl InstallCpanModules.pl test-module-lists/SmallModuleExample.txt
+   ```
 
 6. have a portable Windows-Perl with all modules :)
 
