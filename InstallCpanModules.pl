@@ -414,38 +414,6 @@ sub mark_module_as_not_found
     return;
 }
 
-sub mark_module_as_to_install
-{
-    my ( $module, $version ) = @_;
-
-    if ( _is_string_empty( $module ) ) {
-        croak 'param module empty!';
-    }
-
-    if ( _is_string_empty( $version ) ) {
-        $version = undef;    # force undef if empty - param optional
-    }
-
-    if ( exists $modules_need_to_install{ $module } ) {
-        return;
-    }
-
-    if ( exists $modules_install_not_found{ $module } ) {
-        _say_ex $module, ' already in modules_install_not_found';
-        return;
-    }
-
-    if ( exists $modules_install_failed{ $module } ) {
-        _say_ex $module, ' already in modules_install_failed';
-        return;
-    }
-
-    _say_ex 'add ', $module, ' (dependency) to modules_need_to_install';
-    $modules_need_to_install{ $module } = $version;
-
-    return;
-}
-
 sub was_module_already_tried
 {
     my ( $module ) = @_;
