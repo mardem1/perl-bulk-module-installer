@@ -888,12 +888,12 @@ sub install_single_module
         return $tried;
     }
 
+    my $type = 'install';
     if ( exists $installed_module_version{ $module } ) {
-        _say_ex 'update module - ' . $module;
+        $type = 'update';
     }
-    else {
-        _say_ex 'install module - ' . $module;
-    }
+
+    _say_ex $type . ' module - ' . $module;
 
     my $action = '';
 
