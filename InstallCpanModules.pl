@@ -895,8 +895,6 @@ sub install_single_module
 
     _say_ex $type . ' module - ' . $module;
 
-    my $action = '';
-
     my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '2>&1' );
 
     my $timestamp  = _get_timestamp_for_filename();
@@ -922,24 +920,23 @@ sub install_single_module
         ''
     );
 
+    my $action = $type;
     if ( !defined $child_exit_status ) {
         $child_exit_status = 1;
 
-        _say_ex 'install module - ' . $module . ' - process start failed';
+        $action .= '-failed-start';
         mark_module_as_failed( $module, undef );
-        print_install_state_summary();
-
     }
     elsif ( $child_exit_status ) {
         $child_exit_status = 1;
 
-        $action = 'failed';
+        $action = '-failed';
         mark_module_as_failed( $module, undef );
     }
     else {
         $child_exit_status = 0;
 
-        $action = 'success';
+        $action = '-success';
         mark_module_as_ok( $module, 999_999 );    # newest version - so real number not relevant.
     }
 
