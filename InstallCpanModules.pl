@@ -888,6 +888,8 @@ sub install_single_module
         return $tried;
     }
 
+    my $module_n = _module_name_for_fs( $module );
+
     my $type = 'install';
     if ( exists $installed_module_version{ $module } ) {
         $type = 'update';
@@ -905,7 +907,7 @@ sub install_single_module
 
     my $time_end = _get_timestamp_pretty();
 
-    my $module_n = _module_name_for_fs( $module );
+
     _write_file(
         $log_dir_path . '/' . $timestamp . '_' . 'install_module__' . $module_n . '.log',
         'install_module ' . $module,
