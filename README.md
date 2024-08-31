@@ -16,30 +16,34 @@ Install perl modules in bulk with some logic to make this more efficient.
    cmd.exe /c cpan-outdated -p | cpanm
    ```
 
-4. install needed modules
+4. install required modules
 
    ```
    cmd.exe /c cpanm Carp Carp::Always Data::Dumper
    ```
 
-5. run bulk-installer to add all needed modules
+5. run bulk-installer to add all wanted modules
 
    ```
    perl InstallCpanModules.pl [ --only-updates | --no-updates ] filepath
    perl InstallCpanModules.pl test-module-lists/SmallModuleExample.txt
    ```
 
-6. have a portable Windows-Perl with all modules :)
+6. have a portable Windows-Perl with all wanted modules :)
 
 ## DESCRIPTION
 
 One problem with cpanm is that it don't save/cache a failed installation state.
-If a module needs a module which was already tried cpanm will try it again.
-If you install many modules, and not all are working correctly it will waste 
+If a module needs a module which was already tried cpanm will try it again
+If you install many modules, and not all are working correctly it will waste
 much time, and the installation of modules is already not fast :(
 
 So the main enhancement of this script should be this cache of failed
 or not-found dependencies to speed up a bootstrap installation of many modules.
+
+For every external process call (perl/cpanm) there will be a logfile in the
+log-subfolder with the call information, start/end time, exitcode and the
+complete output.
 
 1. import module list - if not update-only
 2. check installed modules
