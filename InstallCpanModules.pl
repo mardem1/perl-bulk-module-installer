@@ -907,21 +907,6 @@ sub install_single_module
 
     my $time_end = _get_timestamp_pretty();
 
-
-    _write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'install_module__' . $module_n . '.log',
-        'install_module ' . $module,
-        'CMD: ' . ( join ' ', @cmd ),
-        'ExitCode: ' . $child_exit_status,
-        'Started: ' . $time_start,
-        'Ended: ' . $time_end,
-        '',
-        '=' x 80,
-        '',
-        @output,
-        ''
-    );
-
     my $action = $type;
     if ( !defined $child_exit_status ) {
         $child_exit_status = 1;
@@ -944,6 +929,20 @@ sub install_single_module
 
     _say_ex 'install module - ' . $module . ' - ' . $action;
     print_install_state_summary();
+
+    _write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'install_module__' . $module_n . '__' . $action . '.log',
+        'install_module ' . $module,
+        'CMD: ' . ( join ' ', @cmd ),
+        'ExitCode: ' . $child_exit_status,
+        'Started: ' . $time_start,
+        'Ended: ' . $time_end,
+        '',
+        '=' x 80,
+        '',
+        @output,
+        ''
+    );
 
     return $child_exit_status;
 }
