@@ -97,7 +97,6 @@ CPAN::Reporter
 CPAN::Reporter::PrereqCheck
 CPAN::Uploader
 CPAN::YACSmoke
-cpanm
 CPANPLUS
 CPANPLUS::YACSmoke
 criticism
@@ -127,9 +126,9 @@ Data::Constraint
 Data::Dump
 Data::Dump::Streamer
 Data::Dumper
-Data::DUmper
 Data::MessagePack
 Data::Printer
+Data::Sah::Filter
 DateTime
 DB
 DBD
@@ -253,7 +252,6 @@ IO::All
 IO::Dir
 IO::File
 IO::Handle
-IO::Handler
 IO::InSitu
 IO::Interactive
 IO::Null
@@ -585,7 +583,6 @@ Text::Template
 Text::Template::Simple::IO
 Text::Trim
 Text::Wrap
-TGie::Timely
 Thread
 Thread::Queue
 Thread::Semaphore
@@ -615,6 +612,7 @@ Tie::StdScalar
 Tie::SubstrHash
 Tie::Syslog
 Tie::TextDir
+Tie::Timely
 Tie::TransactHash
 Tie::VecArray
 Tie::Watch
@@ -638,7 +636,6 @@ User::pwent
 Vim::Debug
 WeakRef
 Win32
-Win32:::Registry
 Win32::AbsPath
 Win32::API
 Win32::API::Interface

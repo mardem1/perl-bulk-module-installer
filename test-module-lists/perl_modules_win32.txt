@@ -6,7 +6,6 @@ IPC::Run
 Padre::Util::Win32
 Parse::Win32Registry
 Win32
-Win32:::Registry
 Win32::AbsPath
 Win32::API
 Win32::API::Interface

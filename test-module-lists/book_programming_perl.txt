@@ -20,7 +20,7 @@ Class::Contract
 Class::Multimethods
 Class::Struct
 Cwd
-Data::DUmper
+Data::Dumper
 DBD
 DBI
 DB_File

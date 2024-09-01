@@ -34,6 +34,7 @@ Crypt::OpenSSL::SMIME
 Crypt::OpenSSL::Verify
 Crypt::OpenSSL::VerifyX509
 Crypt::OpenSSL::X509
+Data::Sah::Filter
 Devel::Assert
 Devel::CheckOS
 Devel::Cover

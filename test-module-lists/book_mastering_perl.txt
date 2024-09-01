@@ -1,6 +1,7 @@
 AnyDBM_File
 Apache::Perldoc
 Apache::Pod
+App::cpanminus
 App::Smbxfer
 AutoLoader
 AutoSplit
@@ -25,7 +26,6 @@ ConfigReader::Simple
 Const::Fast
 CPAN
 CPAN::Reporter::PrereqCheck
-cpanm
 CPANPLUS
 criticism
 Data::Constraint
@@ -82,7 +82,7 @@ HTTP::Date
 HTTP::SimpleLinkChecker
 HTTP::Size
 Image::Info
-IO::Handler
+IO::Handle
 IO::Interactive
 IO::Socket::INET
 JSON
@@ -150,7 +150,6 @@ Test::Pod::Coverage
 Test::Taint
 Text::CSV
 Text::Template::Simple::IO
-TGie::Timely
 Tie::Array
 Tie::Array::PackedC
 Tie::BoundedInteger
@@ -160,11 +159,12 @@ Tie::File::Timestamp
 Tie::Handle
 Tie::Hash
 Tie::Scalar
+Tie::Timely
 Try::Tiny
 TryCatch
 Vim::Debug
 Win32
-Win32:::Registry
+Win32::Registry
 YAML
 YAML::LibYAML
 YAML::Syck
