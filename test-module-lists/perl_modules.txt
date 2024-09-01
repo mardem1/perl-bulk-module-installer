@@ -547,7 +547,6 @@ Test::MockObject
 Test::MockObject::Extends
 Test::Mojibake
 Test::More
-Test::more
 Test::Most
 Test::NoWarnings
 Test::Number::Delta
@@ -654,7 +653,8 @@ Win32::Env
 Win32::ErrorMode
 Win32::Event
 Win32::EventLog
-Win32::FileFileSecurity
+Win32::File
+Win32::FileSecurity
 Win32::FileSystem::Watcher
 Win32::Getppid
 Win32::GUI
@@ -677,7 +677,6 @@ Win32::PerfLib
 Win32::PerfMon
 Win32::PingICMP
 Win32::Pipe
-Win32::PipeProcess
 Win32::Printer
 Win32::Process
 Win32::Process::CommandLine
@@ -687,6 +686,7 @@ Win32::Process::User
 Win32::Registry
 Win32::Resources
 Win32::SearchPath
+Win32::Security
 Win32::Semaphore
 Win32::Service
 Win32::ServiceManager

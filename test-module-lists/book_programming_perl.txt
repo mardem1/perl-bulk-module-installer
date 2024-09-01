@@ -146,7 +146,8 @@ Win32::ChangeNotify
 Win32::Console
 Win32::Event
 Win32::EventLog
-Win32::FileFileSecurity
+Win32::File
+Win32::FileSecurity
 Win32::Internet
 Win32::IPC
 Win32::NetAdmin
@@ -158,7 +159,9 @@ Win32::OLE::Enum
 Win32::OLE::NLS
 Win32::OLE::Variant
 Win32::PerfLib
-Win32::PipeProcess
+Win32::Pipe
+Win32::Process
+Win32::Security
 Win32::Semaphore
 Win32::Service
 Win32::Sound
