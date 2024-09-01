@@ -79,7 +79,7 @@ Script process:
 4. search for missing dependency modules
 5. search for available update of installed modules - if not no-updates
 6. now the installation loop
-    1. get the next module with has no found dependency, or abort of there is none.
+    1. get the next module which has no found dependency, or abort of there is none.
     2. re-check dependencies - but there should be noting.
     3. try to install module
     4. if ok remove this module from the dependency list of each module, if listed
