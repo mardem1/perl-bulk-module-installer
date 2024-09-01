@@ -911,13 +911,13 @@ sub install_single_module
     elsif ( $child_exit_status ) {
         $child_exit_status = 1;
 
-        $action = '-failed';
+        $action .= '-failed';
         mark_module_as_failed( $module, undef );
     }
     else {
         $child_exit_status = 0;
 
-        $action = '-success';
+        $action .= '-success';
         mark_module_as_ok( $module, 999_999 );    # newest version - so real number not relevant.
     }
 
