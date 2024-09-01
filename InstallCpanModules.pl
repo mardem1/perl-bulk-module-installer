@@ -960,10 +960,18 @@ sub import_module_list_from_file
     @file_lines         = ();
 
     _say_ex '';
-    _say_ex 'wanted modules to install found: '
+    _say_ex 'wanted modules to install: '
         . ( scalar keys %modules_to_install ) . "\n"
         . Dumper( \%modules_to_install );
     _say_ex '';
+
+    my $timestamp = _get_timestamp_for_filename();
+
+    _write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_to_install_from_file.log',
+        'modules_to_install_from_file: ' . scalar( keys %modules_to_install ),
+        Dumper( \%modules_to_install ),
+    );
 
     return;
 }

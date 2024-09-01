@@ -51,6 +51,8 @@ Logfiles:
     * Perl-System-Information `perl -V`
 * `DATE`_`TIME`_installed_modules_found.log
     * Perl-Modules found via `cpan -l`
+* `DATE`_`TIME`_modules_to_install_from_file.log
+    * Modules listed in the given file to install.
 * `DATE`_`TIME`_modules_to_install_with_deps_extended.log
     * analyze result - modules need to install/update with their direct dependencies.
 * `DATE`_`TIME`_modules_with_available_updates.log
