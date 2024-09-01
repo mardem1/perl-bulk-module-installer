@@ -423,27 +423,21 @@ sub was_module_already_tried
     }
 
     if ( exists $modules_install_ok{ $module } ) {
-        delete $modules_need_to_install{ $module };    # delete if something wrong - should not happen
-        delete $modules_need_to_update{ $module };
-
+        mark_module_as_ok( $module );
         _say_ex 'WARN: install module - ' . $module . ' - already ok - abort';
 
         return 0;
     }
 
     if ( exists $modules_install_failed{ $module } ) {
-        delete $modules_need_to_install{ $module };    # delete if something wrong - should not happen
-        delete $modules_need_to_update{ $module };
-
+        mark_module_as_failed( $module );
         _say_ex 'WARN: install module - ' . $module . ' - already failed - abort';
 
         return 1;
     }
 
     if ( exists $modules_install_not_found{ $module } ) {
-        delete $modules_need_to_install{ $module };    # delete if something wrong - should not happen
-        delete $modules_need_to_update{ $module };
-
+        mark_module_as_not_found( $module );
         _say_ex 'WARN: install module - ' . $module . ' - already mot found - abort';
 
         return 1;
