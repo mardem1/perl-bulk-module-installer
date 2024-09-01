@@ -216,8 +216,10 @@ sub _write_file
     foreach my $line ( @content ) {
         say { $fh } $line;
     }
+    say { $fh } '';
 
     close( $fh );
+    $fh = undef;
 
     return;
 }
