@@ -447,6 +447,7 @@ Pod::Usage
 Pod::Webserver
 POE
 POE::Component::CPAN::YACSmoke
+POE::Wheel::Run::Win32
 POSIX
 PPI
 PPod::Checker
@@ -547,8 +548,8 @@ Test::MockModule
 Test::MockObject
 Test::MockObject::Extends
 Test::Mojibake
-Test::more
 Test::More
+Test::more
 Test::Most
 Test::NoWarnings
 Test::Number::Delta

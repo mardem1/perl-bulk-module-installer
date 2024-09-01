@@ -64,6 +64,7 @@ Perl::Tidy
 Pod::Simple::Subclassing
 Pod::Webserver
 POE::Component::CPAN::YACSmoke
+POE::Wheel::Run::Win32
 PPI
 Readonly
 ReadonlyX
