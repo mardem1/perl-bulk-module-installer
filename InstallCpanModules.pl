@@ -159,7 +159,13 @@ sub _read_file
 
     my $fh = undef;
     if ( !open( $fh, '<', $filepath ) ) {
-        croak "Couldn't open file $filepath, $!";
+        _say_ex "ERROR: Couldn't open file-read '$filepath'";
+        _say_ex 'ERROR: start $! ->';
+        _say_ex '';
+        _say_ex "$!";
+        _say_ex '';
+        _say_ex 'ERROR: <- $! ended';
+        croak "Couldn't open file-read '$filepath'";
     }
 
     local $/;
