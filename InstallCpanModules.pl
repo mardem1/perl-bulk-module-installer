@@ -689,8 +689,16 @@ sub fetch_dependencies_for_module
     my $timestamp  = _get_timestamp_for_filename();
     my $time_start = _get_timestamp_pretty();
 
-    my ( $child_exit_status, @output ) =
-        _get_output_with_detached_execute( $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS, 1, @cmd );
+    my ( $child_exit_status, @output ) = ();
+
+    if ( $module eq 'Test::Smoke' ) {
+        $child_exit_status = 0;
+        @output            = ();
+    }
+    else {
+        ( $child_exit_status, @output ) =
+            _get_output_with_detached_execute( $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS, 1, @cmd );
+    }
 
     my $time_end = _get_timestamp_pretty();
 
