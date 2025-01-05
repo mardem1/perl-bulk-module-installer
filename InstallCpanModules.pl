@@ -279,17 +279,38 @@ sub _get_output_with_detached_execute
 
     if ( $@ ) {
         if ( "timeout_alarm\n" ne $@ ) {
-            _say_ex 'ERROR: unexpected error - ' - 0 + $@ - ' - ' . $@;
+            _say_ex 'ERROR: unexpected error';
+            _say_ex 'ERROR: start $@ ->';
+            _say_ex '';
+            _say_ex '' . 0 + $@;
+            _say_ex '';
+            _say_ex "$@";
+            _say_ex '';
+            _say_ex 'ERROR: <- $@ ended';
             kill -9, $pid;    # kill
         }
         else {
-            _say_ex 'ERROR: timeout - ' - 0 + $@ - ' - ' . $@;
+            _say_ex 'ERROR: timeout';
+            _say_ex 'ERROR: start $@ ->';
+            _say_ex '';
+            _say_ex '' . 0 + $@;
+            _say_ex '';
+            _say_ex "$@";
+            _say_ex '';
+            _say_ex 'ERROR: <- $@ ended';
             kill -9, $pid;    # kill
         }
     }
     elsif ( 'eval_ok' ne $eval_ok ) {
-        _say_ex 'ERROR: eval failed ? - ' - 0 + $@ - ' - ' . $@;
-        kill -9, $pid;        # kill
+        _say_ex 'ERROR: eval failed';
+        _say_ex 'ERROR: start $@ ->';
+        _say_ex '';
+        _say_ex '' . 0 + $@;
+        _say_ex '';
+        _say_ex "$@";
+        _say_ex '';
+        _say_ex 'ERROR: <- $@ ended';
+        kill -9, $pid;    # kill
     }
     else {
         _say_ex 'close chld_out';
