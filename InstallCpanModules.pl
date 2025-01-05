@@ -1680,7 +1680,7 @@ Markus Demml, mardem@cpan.com
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2024, Markus Demml
+Copyright (c) 2025, Markus Demml
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as the Perl 5 programming language system itself.
@@ -1689,7 +1689,7 @@ with this module.
 
 =head1 DISCLAIMER
 
-Copyright (c) 2024, Markus Demml
+Copyright (c) 2025, Markus Demml
 
 This package is distributed in the hope that it will be useful, but WITHOUT
 ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS

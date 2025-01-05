@@ -100,7 +100,7 @@ Markus Demml, mardem@cpan.com
 
 ## LICENSE AND COPYRIGHT
 
-Copyright (c) 2024, Markus Demml
+Copyright (c) 2025, Markus Demml
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as the Perl 5 programming language system itself.
