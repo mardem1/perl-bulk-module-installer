@@ -151,6 +151,7 @@ sub _read_file
     }
 
     if ( !( -e -f -r -s $filepath ) ) {
+        _say_ex "ERROR: filepath '$filepath' - not exists, readable or empty";
         croak "filepath '$filepath' - not exists, readable or empty";
     }
 
