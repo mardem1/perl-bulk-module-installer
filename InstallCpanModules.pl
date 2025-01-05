@@ -774,6 +774,13 @@ sub fetch_dependencies_for_module
             && $_ !~ /^[a-z\d]+$/o
             && $_ !~ /^[a-z\d]+~\d+$/o
             && $_ !~ /^[a-z\d]+~\d+\..+$/o
+# CPAN::Meta::YAML found a duplicate key 'no_index' in line '' at C:\_data\_dev\perl-needed\strawberry-perl-5.32.1.1-64bit-portable\perl\site\bin/cpanm line 194.
+            && $_ !~ /^.+ in line .+ at .+ line .+$/o
+# Finding Couldn't read chunk at offset unknown at C:\_data\_dev\perl-needed\strawberry-perl-5.32.1.1-64bit-portable\perl\site\bin/cpanm line 119. on cpanmetadb failed.
+# Finding Couldn't read chunk at offset unknown at C:\_data\_dev\perl-needed\strawberry-perl-5.32.1.1-64bit-portable\perl\site\bin/cpanm line 119. () on mirror http://www.cpan.org failed.
+            && $_ !~ /^.*Finding Couldn't read chunk at offset unknown at .+ line .+ on .* failed.*$/o
+# Couldn't find module or a distribution Couldn't read chunk at offset unknown at C:\_data\_dev\perl-needed\strawberry-perl-5.32.1.1-64bit-portable\perl\site\bin/cpanm line 119.
+            && $_ !~ /^.*Couldn't find module or a distribution Couldn't read chunk at offset unknown at .+ line.*$/o
         } @output;
 
     %dependencies = map {
