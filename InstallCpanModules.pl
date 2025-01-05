@@ -798,15 +798,28 @@ sub reduce_dependency_modules_which_are_not_installed
             $not_installed{ $module } = $dependencies{ $module };
         }
         elsif ( defined $dependencies{ $module } && defined $installed_module_version{ $module } ) {
-            my $installed_version = version->parse( $installed_module_version{ $module } );
-            my $dependent_version = version->parse( $dependencies{ $module } );
+            local $@;
+            eval {
+                my $installed_version = version->parse( $installed_module_version{ $module } );
+                my $dependent_version = version->parse( $dependencies{ $module } );
 
-            if ( ( $dependent_version cmp $installed_version ) == 1 ) {
-                _say_ex 'dependency old version - update needed: ' . $module;
-                $not_installed{ $module } = $dependencies{ $module };    # to old version
-            }
-            else {
-                _say_ex 'dependency installed and version check done: ' . $module;
+                if ( ( $dependent_version cmp $installed_version ) == 1 ) {
+                    _say_ex 'dependency old version - update needed: ' . $module;
+                    $not_installed{ $module } = $dependencies{ $module };    # to old version
+                }
+                else {
+                    _say_ex 'dependency installed and version check done: ' . $module;
+                }
+            };
+            if ( $@ ) {
+                _say_ex 'ERROR: dependency and version check failed for module: ' . $module;
+                _say_ex 'ERROR: start $@ ->';
+                _say_ex '';
+                _say_ex "$@";
+                _say_ex '';
+                _say_ex 'ERROR: <- $@ ended';
+                _say_ex 'dependency - unknown handle as needed: ' . $module;
+                $not_installed{ $module } = $dependencies{ $module };
             }
         }
         else {
