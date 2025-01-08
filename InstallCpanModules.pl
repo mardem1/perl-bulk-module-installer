@@ -1215,6 +1215,31 @@ sub search_for_modules_for_available_updates
     return;
 }
 
+sub install_modules_sequentially
+{
+    _say_ex 'install all modules sequentially';
+
+    my @needed_modules = keys %modules_need_to_install;
+
+    my $check_max = scalar @needed_modules;
+    my $check_i   = 0;
+
+    foreach my $module ( @needed_modules ) {
+        $check_i++;
+        _say_ex "==> analyze module - ($check_i / $check_max) - $module";
+        add_dependency_module_if_needed( $module );
+
+        dump_state_to_logfiles();
+
+        _say_ex "==> install module with dependencies - ($check_i / $check_max) - $module";
+        install_modules_dep_version();
+    }
+
+    print_install_state_summary();
+
+    return;
+}
+
 sub main
 {
     my ( $arg1, $arg2 ) = @_;
@@ -1277,13 +1302,15 @@ sub main
         search_for_modules_for_available_updates();
     }
 
-    add_dependency_modules_for_modules_need_to_install();
+    # add_dependency_modules_for_modules_need_to_install();
 
     dump_state_to_logfiles();
 
     print_install_state_summary();
 
-    install_modules_dep_version();
+    # install_modules_dep_version();
+
+    install_modules_sequentially();
 
     print_install_end_summary();
 
@@ -1650,47 +1677,47 @@ sub main
     # STDOUT: Configuring Test-Smoke-1.83 ... Where would you like to install Test::Smoke?
     # STDOUT: Fetching http://www.cpan.org/authors/id/C/CO/CONTRA/Test-Smoke-1.83.tar.gz ... OK
     # Test::Smoke require user input ?
-    'Test::Smoke'                                           => undef,
-    'Test::Tutorial'                                        => undef,
-    'Test::WWW::Mechanize'                                  => undef,
-    'Test::WWW::Mechanize::Catalyst'                        => undef,
-    'Test::WWW::Mechanize::PSGI'                            => undef,
-    'Text::CSV'                                             => undef,
-    'Text::CSV_XS'                                          => undef,
-    'Tie::DevNull'                                          => undef,
-    'Tie::DevRandom'                                        => undef,
-    'Tie::SecureHash'                                       => undef,
-    'Tie::TextDir'                                          => undef,
-    'Tie::TransactHash'                                     => undef,
-    'Time::HiRes::usleep'                                   => undef,
-    'Time::ParseDate'                                       => undef,
-    'TRest::Perl::Critic'                                   => undef,
-    'TRest::Perl::Critic::Progresive'                       => undef,
-    'TryCatch'                                              => undef,
-    'Underscore'                                            => undef,
-    'Unicode::CharName'                                     => undef,
-    'Unix::Whereis'                                         => undef,
-    'Vim::Debug'                                            => undef,
-    'Win32::CLR'                                            => undef,
-    'Win32::DirSize'                                        => undef,
-    'Win32::FileSystem::Watcher'                            => undef,
-    'Win32::Hardlink'                                       => undef,
-    'Win32::MMF::Shareable'                                 => undef,
-    'Win32::Mock'                                           => undef,
-    'Win32::Netsh'                                          => undef,
-    'Win32::PerfMon'                                        => undef,
-    'Win32::Printer'                                        => undef,
-    'Win32::Process::CommandLine'                           => undef,
-    'Win32::Process::Info'                                  => undef,
-    'Win32::Resources'                                      => undef,
-    'Win32::Script'                                         => undef,
-    'Win32::Unicode'                                        => undef,
-    'Win32API::Const'                                       => undef,
-    'Win32API::Resources'                                   => undef,
-    'WWW::Curl::Easy'                                       => undef,
-    'WWW::Mechanize::TreeBuilder'                           => undef,
-    'WWW::Selenium'                                         => undef,
-    'XML'                                                   => undef,
+    'Test::Smoke'                     => undef,
+    'Test::Tutorial'                  => undef,
+    'Test::WWW::Mechanize'            => undef,
+    'Test::WWW::Mechanize::Catalyst'  => undef,
+    'Test::WWW::Mechanize::PSGI'      => undef,
+    'Text::CSV'                       => undef,
+    'Text::CSV_XS'                    => undef,
+    'Tie::DevNull'                    => undef,
+    'Tie::DevRandom'                  => undef,
+    'Tie::SecureHash'                 => undef,
+    'Tie::TextDir'                    => undef,
+    'Tie::TransactHash'               => undef,
+    'Time::HiRes::usleep'             => undef,
+    'Time::ParseDate'                 => undef,
+    'TRest::Perl::Critic'             => undef,
+    'TRest::Perl::Critic::Progresive' => undef,
+    'TryCatch'                        => undef,
+    'Underscore'                      => undef,
+    'Unicode::CharName'               => undef,
+    'Unix::Whereis'                   => undef,
+    'Vim::Debug'                      => undef,
+    'Win32::CLR'                      => undef,
+    'Win32::DirSize'                  => undef,
+    'Win32::FileSystem::Watcher'      => undef,
+    'Win32::Hardlink'                 => undef,
+    'Win32::MMF::Shareable'           => undef,
+    'Win32::Mock'                     => undef,
+    'Win32::Netsh'                    => undef,
+    'Win32::PerfMon'                  => undef,
+    'Win32::Printer'                  => undef,
+    'Win32::Process::CommandLine'     => undef,
+    'Win32::Process::Info'            => undef,
+    'Win32::Resources'                => undef,
+    'Win32::Script'                   => undef,
+    'Win32::Unicode'                  => undef,
+    'Win32API::Const'                 => undef,
+    'Win32API::Resources'             => undef,
+    'WWW::Curl::Easy'                 => undef,
+    'WWW::Mechanize::TreeBuilder'     => undef,
+    'WWW::Selenium'                   => undef,
+    'XML'                             => undef,
 );
 
 $| = 1;
