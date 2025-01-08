@@ -1226,6 +1226,18 @@ sub install_modules_sequentially
 
     foreach my $module ( @needed_modules ) {
         $check_i++;
+
+        foreach ( 1 .. 10 ) {
+            _say_ex '';
+        }
+
+        _say_ex "==> handle next install list module - ($check_i / $check_max) - $module";
+
+        if ( was_module_already_tried( $module ) ) {
+            _say_ex "==> module already tried -> IGNORE - ($check_i / $check_max) - $module";
+            next;
+        }
+
         _say_ex "==> analyze module - ($check_i / $check_max) - $module";
         add_dependency_module_if_needed( $module );
 
