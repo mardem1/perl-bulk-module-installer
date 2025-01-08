@@ -574,6 +574,12 @@ sub dump_state_to_logfiles
     );
 
     _write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_dont_try.log',
+        'modules_install_dont_try: ' . scalar( keys %modules_install_dont_try ),
+        Dumper( \%modules_install_dont_try ),
+    );
+
+    _write_file(
         $log_dir_path . '/' . $timestamp . '_' . 'modules_install_already.log',
         'modules_install_already: ' . scalar( keys %modules_install_already ),
         Dumper( \%modules_install_already ),
