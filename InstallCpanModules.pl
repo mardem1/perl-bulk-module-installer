@@ -495,20 +495,6 @@ sub reduce_modules_to_install
         }
     }
 
-    my $timestamp = _get_timestamp_for_filename();
-
-    _write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_already.log',
-        'modules_install_already: ' . scalar( keys %modules_install_already ),
-        Dumper( \%modules_install_already ),
-    );
-
-    _write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'modules_need_to_install.log',
-        'modules_need_to_install: ' . scalar( keys %modules_need_to_install ),
-        Dumper( \%modules_need_to_install ),
-    );
-
     _say_ex '';
     _say_ex 'modules_install_already: '
         . scalar( keys %modules_install_already ) . "\n"
@@ -520,6 +506,8 @@ sub reduce_modules_to_install
         . scalar( keys %modules_need_to_install ) . "\n"
         . Dumper( \%modules_need_to_install );
     _say_ex '';
+
+    dump_state_to_logfiles();
 
     return;
 }
