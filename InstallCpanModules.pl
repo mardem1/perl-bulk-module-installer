@@ -1270,14 +1270,14 @@ sub main
 
     reduce_modules_to_install();    # updates should be handled another time ...
 
-    add_dependency_modules_for_modules_need_to_install();
-
     if ( $no_updates ) {
         _say_ex 'no-updates: skip update module list import';
     }
     else {
         search_for_modules_for_available_updates();
     }
+
+    add_dependency_modules_for_modules_need_to_install();
 
     dump_state_to_logfiles();
 
