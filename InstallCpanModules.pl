@@ -38,6 +38,8 @@ my %modules_install_failed  = ();
 
 my %modules_install_not_found = ();
 
+my %modules_install_dont_try = ();
+
 my $INSTALL_MODULE_TIMEOUT_IN_SECONDS               = 60 * 10;
 my $CHECK_UPDATE_MODULE_TIMEOUT_IN_SECONDS          = 60 * 2;
 my $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS = 60 * 2;
@@ -374,8 +376,13 @@ sub mark_module_as_failed
         $version = undef;    # force undef if empty - param optional
     }
 
-    _say_ex 'add ', $module, ' to modules_install_failed';
-    $modules_install_failed{ $module } = $version;
+    if ( exists $modules_install_dont_try{ $module } ) {
+        _say_ex 'module ', $module, ' marked as dont try - so dont add to failed!';
+    }
+    else {
+        _say_ex 'add ', $module, ' to modules_install_failed';
+        $modules_install_failed{ $module } = $version;
+    }
 
     _say_ex 'remove ', $module, ' from modules_need_to_install';
     delete $modules_need_to_install{ $module };    # remove module - don't care if failed - no retry of failed
@@ -436,6 +443,13 @@ sub was_module_already_tried
 
     if ( _is_string_empty( $module ) ) {
         croak 'param module empty!';
+    }
+
+    if ( exists $modules_install_dont_try{ $module } ) {
+        mark_module_as_failed( $module );
+        _say_ex 'WARN: install module - ' . $module . ' - marked dont try - abort';
+
+        return 1;
     }
 
     if ( exists $modules_install_ok{ $module } ) {
@@ -1277,7 +1291,7 @@ sub main
 }
 
 # mark modules as failed, some to old to build, other not for windows ...
-%modules_install_failed = (
+%modules_install_dont_try = (
     'Acme::Spork'                                           => undef,
     'AnyData'                                               => undef,
     'AnyEvent'                                              => undef,
