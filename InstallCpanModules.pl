@@ -1758,6 +1758,11 @@ sub main
     'WWW::Mechanize::TreeBuilder'     => undef,
     'WWW::Selenium'                   => undef,
     'XML'                             => undef,
+    'Test::TCP'                       => undef,
+    'HTTP::Daemon::Threaded'          => undef,
+    'B::Stackobj'                     => undef,
+    'PAR::Packer'                     => undef,
+    'Test::ParallelSubtest'           => undef,
 );
 
 $| = 1;
