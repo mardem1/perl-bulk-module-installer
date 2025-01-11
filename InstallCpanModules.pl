@@ -1254,6 +1254,8 @@ sub install_modules_sequentially
 
         _say_ex "==> handle next install list module - ($check_i - $remaining) - $module";
 
+        my $current_install_count = scalar( keys %modules_install_ok );
+
         _say_ex "==> analyze module - ($check_i - $remaining) - $module";
         add_dependency_module_if_needed( $module );
 
@@ -1261,6 +1263,13 @@ sub install_modules_sequentially
 
         _say_ex "==> install module with dependencies - ($check_i - $remaining) - $module";
         install_modules_dep_version();
+
+        my $new_install_count = scalar( keys %modules_install_ok );
+        if ( $current_install_count != $new_install_count ) {
+            _say_ex "==> after successful module install - reimport all installed modules from system";
+            search_for_installed_modules();
+            reduce_modules_to_install();
+        }
 
         $remaining = scalar( keys %modules_need_to_install );
         $module    = ( keys %modules_need_to_install )[ 0 ];
