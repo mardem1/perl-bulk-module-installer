@@ -1219,32 +1219,40 @@ sub install_modules_sequentially
 {
     _say_ex 'install all modules sequentially';
 
-    my @needed_modules = keys %modules_need_to_install;
-
-    my $check_max = scalar @needed_modules;
+    my $remaining = scalar( keys %modules_need_to_install );
     my $check_i   = 0;
 
-    foreach my $module ( @needed_modules ) {
+    my $module = q{};
+    $module = ( keys %modules_need_to_install )[ 0 ];
+
+    while ( $module ) {
+        #    foreach my $module ( @needed_modules ) {
         $check_i++;
 
         foreach ( 1 .. 10 ) {
             _say_ex '';
         }
 
-        _say_ex "==> handle next install list module - ($check_i / $check_max) - $module";
-
         if ( was_module_already_tried( $module ) ) {
-            _say_ex "==> module already tried -> IGNORE - ($check_i / $check_max) - $module";
+            _say_ex "==> module already tried -> IGNORE - ($check_i - $remaining) - $module";
+
+            $remaining = scalar( keys %modules_need_to_install );
+            $module    = ( keys %modules_need_to_install )[ 0 ];
             next;
         }
 
-        _say_ex "==> analyze module - ($check_i / $check_max) - $module";
+        _say_ex "==> handle next install list module - ($check_i - $remaining) - $module";
+
+        _say_ex "==> analyze module - ($check_i - $remaining) - $module";
         add_dependency_module_if_needed( $module );
 
         dump_state_to_logfiles();
 
-        _say_ex "==> install module with dependencies - ($check_i / $check_max) - $module";
+        _say_ex "==> install module with dependencies - ($check_i - $remaining) - $module";
         install_modules_dep_version();
+
+        $remaining = scalar( keys %modules_need_to_install );
+        $module    = ( keys %modules_need_to_install )[ 0 ];
     }
 
     print_install_state_summary();
