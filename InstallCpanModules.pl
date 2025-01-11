@@ -1360,6 +1360,7 @@ sub main
 }
 
 # mark modules as failed, some to old to build, other not for windows ...
+# todo - import from file ?
 %modules_install_dont_try = (
     'Acme::Spork'                                           => undef,
     'AnyData'                                               => undef,
