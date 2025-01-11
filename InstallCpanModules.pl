@@ -1243,7 +1243,8 @@ sub install_modules_sequentially
             _say_ex '';
         }
 
-        if ( was_module_already_tried( $module ) ) {
+        my $tried = was_module_already_tried( $module );
+        if ( defined $tried ) {
             _say_ex "==> module already tried -> IGNORE - ($check_i - $remaining) - $module";
 
             $remaining = scalar( keys %modules_need_to_install );
