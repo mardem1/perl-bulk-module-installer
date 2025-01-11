@@ -908,8 +908,18 @@ sub add_dependency_module_if_needed
         return;
     }
 
-    _say_ex 'module - ' . $module . ' has not installed dependencies - add to install list' . "\n" . Dumper( \%dep );
+    foreach my $dep_module ( keys %dep ) {
+        if ( was_module_already_tried( $dep_module ) ) {
+            _say_ex 'module - '
+                . $module
+                . ' has already failed dependency module - add to failed list' . "\n"
+                . Dumper( \%dep );
+            mark_module_as_failed( $module );
+            last;
+        }
+    }
 
+    _say_ex 'module - ' . $module . ' has not installed dependencies - add to install list' . "\n" . Dumper( \%dep );
     $modules_to_install_with_deps_extended{ $module } = \%dep;    # mark module needed deps
 
     foreach my $dep_module ( sort keys %dep ) {
