@@ -669,13 +669,15 @@ sub search_for_installed_modules
         return;    # error nothing found
     }
 
-    my $timestamp  = _get_timestamp_for_filename( $start_date );
-    my $time_start = _get_timestamp_pretty( $start_date );
-    my $time_end   = _get_timestamp_pretty( $end_date );
+    my $timestamp      = _get_timestamp_for_filename( $start_date );
+    my $time_start     = _get_timestamp_pretty( $start_date );
+    my $time_end       = _get_timestamp_pretty( $end_date );
+    my $logfile_suffix = 'installed_modules_found';
+    my $logfile_title  = 'installed_modules_found';
 
     _write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'installed_modules_found.log',
-        'installed_modules_found',
+        $log_dir_path . '/' . $timestamp . '_' . $logfile_suffix . '.log',
+        $logfile_title,
         'CMD: ' . ( join ' ', @cmd ),
         'ExitCode: ' . $child_exit_status,
         'Started: ' . $time_start,
@@ -736,14 +738,16 @@ sub fetch_dependencies_for_module
         return undef;    # as not found
     }
 
-    my $module_n   = _module_name_for_fs( $module );
-    my $timestamp  = _get_timestamp_for_filename( $start_date );
-    my $time_start = _get_timestamp_pretty( $start_date );
-    my $time_end   = _get_timestamp_pretty( $end_date );
+    my $module_n       = _module_name_for_fs( $module );
+    my $timestamp      = _get_timestamp_for_filename( $start_date );
+    my $time_start     = _get_timestamp_pretty( $start_date );
+    my $time_end       = _get_timestamp_pretty( $end_date );
+    my $logfile_suffix = 'fetch_dependency__' . $module_n;
+    my $logfile_title  = 'fetch_dependency ' . $module;
 
     _write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'fetch_dependency__' . $module_n . '.log',
-        'fetch_dependency ' . $module,
+        $log_dir_path . '/' . $timestamp . '_' . $logfile_suffix . '.log',
+        $logfile_title,
         'CMD: ' . ( join ' ', @cmd ),
         'ExitCode: ' . $child_exit_status,
         'Started: ' . $time_start,
@@ -1015,13 +1019,15 @@ sub install_single_module
     _say_ex 'install module - ' . $module . ' - ' . $action;
     print_install_state_summary();
 
-    my $timestamp  = _get_timestamp_for_filename( $start_date );
-    my $time_start = _get_timestamp_pretty( $start_date );
-    my $time_end   = _get_timestamp_pretty( $end_date );
+    my $timestamp      = _get_timestamp_for_filename( $start_date );
+    my $time_start     = _get_timestamp_pretty( $start_date );
+    my $time_end       = _get_timestamp_pretty( $end_date );
+    my $logfile_suffix = 'install_module__' . $module_n . '__' . $action;
+    my $logfile_title  = 'install_module ' . $module;
 
     _write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'install_module__' . $module_n . '__' . $action . '.log',
-        'install_module ' . $module,
+        $log_dir_path . '/' . $timestamp . '_' . $logfile_suffix . '.log',
+        $logfile_title,
         'CMD: ' . ( join ' ', @cmd ),
         'ExitCode: ' . $child_exit_status,
         'Started: ' . $time_start,
@@ -1111,13 +1117,15 @@ sub print_perl_detail_info
         return;    # error nothing found
     }
 
-    my $timestamp  = _get_timestamp_for_filename( $start_date );
-    my $time_start = _get_timestamp_pretty( $start_date );
-    my $time_end   = _get_timestamp_pretty( $end_date );
+    my $timestamp      = _get_timestamp_for_filename( $start_date );
+    my $time_start     = _get_timestamp_pretty( $start_date );
+    my $time_end       = _get_timestamp_pretty( $end_date );
+    my $logfile_suffix = 'perl_detail_info';
+    my $logfile_title  = 'perl_detail_info';
 
     _write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'perl_detail_info.log',
-        'perl_detail_info',
+        $log_dir_path . '/' . $timestamp . '_' . $logfile_suffix . '.log',
+        $logfile_title,
         'CMD: ' . ( join ' ', @cmd ),
         'ExitCode: ' . $child_exit_status,
         'Started: ' . $time_start,
@@ -1221,13 +1229,15 @@ sub search_for_modules_for_available_updates
         return;    # error nothing found
     }
 
-    my $timestamp  = _get_timestamp_for_filename( $start_date );
-    my $time_start = _get_timestamp_pretty( $start_date );
-    my $time_end   = _get_timestamp_pretty( $end_date );
+    my $timestamp      = _get_timestamp_for_filename( $start_date );
+    my $time_start     = _get_timestamp_pretty( $start_date );
+    my $time_end       = _get_timestamp_pretty( $end_date );
+    my $logfile_suffix = 'modules_with_available_updates';
+    my $logfile_title  = 'modules_with_available_updates';
 
     _write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'modules_with_available_updates.log',
-        'modules_with_available_updates',
+        $log_dir_path . '/' . $timestamp . '_' . $$logfile_suffix . '.log',
+        $$logfile_title,
         'CMD: ' . ( join ' ', @cmd ),
         'ExitCode: ' . $child_exit_status,
         'Started: ' . $time_start,
