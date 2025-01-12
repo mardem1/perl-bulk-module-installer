@@ -1356,10 +1356,8 @@ sub handle_main_arguments
     return ( $filepath_install, $filepath_dont_try, $only_updates, $no_updates );
 }
 
-sub main
+sub init_log_dir_path
 {
-    my ( $filepath_install, $filepath_dont_try, $only_updates, $no_updates ) = handle_main_arguments( @_ );
-
     my $logdir = dirname( __FILE__ ) . '/log';
     $log_dir_path = abs_path( $logdir );
 
@@ -1370,6 +1368,15 @@ sub main
     if ( !-d $log_dir_path ) {
         croak "logdir '$log_dir_path' not found";
     }
+
+    return;
+}
+
+sub main
+{
+    my ( $filepath_install, $filepath_dont_try, $only_updates, $no_updates ) = handle_main_arguments( @_ );
+
+    init_log_dir_path();
 
     print_perl_detail_info();
 
