@@ -1283,8 +1283,8 @@ sub install_modules_sequentially
 sub main
 {
     my ( $arg1, $arg2 ) = @_;
-    $arg1 //= $EMPTY_STRING;
-    $arg2 //= $EMPTY_STRING;
+    $arg1 = _trim( $arg1 );
+    $arg2 = _trim( $arg2 );
 
     my $filepath_install = $EMPTY_STRING;
     my $only_updates = $FALSE;
