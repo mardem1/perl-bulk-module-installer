@@ -49,7 +49,7 @@ my $EMPTY_STRING = q{};
 my $FALSE        = !!0;
 my $TRUE         = !0;
 
-my $log_dir_path         = $EMPTY_STRING;
+my $log_dir_path = $EMPTY_STRING;
 
 sub _trim
 {
@@ -1055,6 +1055,39 @@ sub import_module_list_from_file
     return;
 }
 
+sub import_module_dont_try_list_from_file
+{
+    my ( $filepath ) = @_;
+
+    if ( _is_string_empty( $filepath ) ) {
+        croak 'param filepath empty!';
+    }
+
+    my @file_lines = _read_file( $filepath );
+
+    @file_lines = map  { _trim( $_ ) } @file_lines;
+    @file_lines = grep { $EMPTY_STRING ne $_ && $_ !~ /^[#]/o } @file_lines;
+
+    %modules_install_dont_try = _hashify @file_lines;
+    @file_lines               = ();
+
+    _say_ex '';
+    _say_ex 'dont try modules to install: '
+        . ( scalar keys %modules_install_dont_try ) . "\n"
+        . Dumper( \%modules_install_dont_try );
+    _say_ex '';
+
+    my $timestamp = _get_timestamp_for_filename();
+
+    _write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'import_module_dont_try_list_from_file.log',
+        'import_module_dont_try_list_from_file: ' . scalar( keys %modules_install_dont_try ),
+        Dumper( \%modules_install_dont_try ),
+    );
+
+    return;
+}
+
 sub print_perl_detail_info
 {
     my @cmd = ( 'cmd.exe', '/c', 'perl', '-V' );
@@ -1281,13 +1314,15 @@ sub install_modules_sequentially
 
 sub main
 {
-    my ( $arg1, $arg2 ) = @_;
+    my ( $arg1, $arg2, $arg3 ) = @_;
     $arg1 = _trim( $arg1 );
     $arg2 = _trim( $arg2 );
+    $arg2 = _trim( $arg3 );
 
-    my $filepath_install = $EMPTY_STRING;
-    my $only_updates     = $FALSE;
-    my $no_updates       = $FALSE;
+    my $filepath_install  = $EMPTY_STRING;
+    my $filepath_dont_try = $EMPTY_STRING;
+    my $only_updates      = $FALSE;
+    my $no_updates        = $FALSE;
 
     if ( $arg1 eq '--only-updates' ) {
         $only_updates = $TRUE;
@@ -1302,12 +1337,20 @@ sub main
         }
 
         $filepath_install = $arg2;
+
+        if ( !_is_string_empty( $arg3 ) ) {
+            $filepath_dont_try = $arg3;
+        }
     }
     elsif ( _is_string_empty( $arg1 ) ) {
         croak 'wrong parameter set';
     }
     else {
         $filepath_install = $arg1;
+
+        if ( !_is_string_empty( $arg2 ) ) {
+            $filepath_dont_try = $arg2;
+        }
     }
 
     my $logdir = dirname( __FILE__ ) . '/log';
@@ -1333,6 +1376,11 @@ sub main
         }
 
         import_module_list_from_file( $filepath_install );
+    }
+
+    if ( !_is_string_empty( $filepath_dont_try ) ) {
+        # mark modules as failed, some to old to build, other not for windows ...
+        import_module_dont_try_list_from_file( $filepath_dont_try );
     }
 
     search_for_installed_modules();
@@ -1363,419 +1411,11 @@ sub main
     return;
 }
 
-# mark modules as failed, some to old to build, other not for windows ...
-# todo - import from file ?
-%modules_install_dont_try = (
-    'Acme::Spork'                                           => undef,
-    'AnyData'                                               => undef,
-    'AnyEvent'                                              => undef,
-    'AnyEvent::HTTP'                                        => undef,
-    'Apache2::Authen::OdinAuth'                             => undef,
-    'Apache2::AuthzCaps'                                    => undef,
-    'Apache2::CondProxy'                                    => undef,
-    'Apache2::EmbedFLV'                                     => undef,
-    'Apache2::reCaptcha'                                    => undef,
-    'Apache2::UserDirAuthz'                                 => undef,
-    'Apache::Admin::Config'                                 => undef,
-    'Apache::App::Mercury'                                  => undef,
-    'Apache::ASP'                                           => undef,
-    'Apache::AuthLDAP'                                      => undef,
-    'Apache::AuthPerLDAP'                                   => undef,
-    'Apache::AuthPOP3'                                      => undef,
-    'Apache::AuthTkt'                                       => undef,
-    'Apache::AxKit::Provider::RDBMS'                        => undef,
-    'Apache::BabyConnect'                                   => undef,
-    'Apache::BalancerManager'                               => undef,
-    'Apache::Bootstrap'                                     => undef,
-    'Apache::Constants'                                     => undef,
-    'Apache::DB'                                            => undef,
-    'Apache::DBI'                                           => undef,
-    'Apache::DebugLog'                                      => undef,
-    'Apache::Description'                                   => undef,
-    'Apache::Dir'                                           => undef,
-    'Apache::EmbeddedPerl::Lite'                            => undef,
-    'Apache::Emulator'                                      => undef,
-    'Apache::FakeCookie'                                    => undef,
-    'Apache::FakeTable'                                     => undef,
-    'Apache::GDGraph'                                       => undef,
-    'Apache::HeavyCGI'                                      => undef,
-    'Apache::Htgroup'                                       => undef,
-    'Apache::Htpasswd'                                      => undef,
-    'Apache::Htpasswd::Perishable'                          => undef,
-    'Apache::ImageMagick'                                   => undef,
-    'Apache::ImgIndex'                                      => undef,
-    'Apache::Keywords'                                      => undef,
-    'Apache::Log::Parser'                                   => undef,
-    'Apache::LogF'                                          => undef,
-    'Apache::LogFormat::Compiler'                           => undef,
-    'Apache::LogIgnore'                                     => undef,
-    'Apache::Logmonster'                                    => undef,
-    'Apache::LogRegex'                                      => undef,
-    'Apache::MSIISProbes'                                   => undef,
-    'Apache::OWA'                                           => undef,
-    'Apache::Perldoc'                                       => undef,
-    'Apache::PHLogin'                                       => undef,
-    'Apache::Pod'                                           => undef,
-    'Apache::PrettyText'                                    => undef,
-    'Apache::ProxyPass'                                     => undef,
-    'Apache::Request::Redirect'                             => undef,
-    'Apache::Scriptor'                                      => undef,
-    'Apache::Scriptor::Simple'                              => undef,
-    'Apache::Session'                                       => undef,
-    'Apache::Session::Browseable'                           => undef,
-    'Apache::Session::CacheAny'                             => undef,
-    'Apache::Session::Counted'                              => undef,
-    'Apache::Session::Generate::AutoIncrement'              => undef,
-    'Apache::Session::Lazy'                                 => undef,
-    'Apache::Session::LDAP'                                 => undef,
-    'Apache::Session::NoSQL'                                => undef,
-    'Apache::Session::PHP'                                  => undef,
-    'Apache::Session::Serialize::Dumper'                    => undef,
-    'Apache::Session::Serialize::SOAPEnvelope'              => undef,
-    'Apache::Session::Serialize::YAML'                      => undef,
-    'Apache::Session::SQLite'                               => undef,
-    'Apache::Session::SQLite3'                              => undef,
-    'Apache::Session::Wrapper'                              => undef,
-    'Apache::SimpleReplace'                                 => undef,
-    'Apache::SiteConfig'                                    => undef,
-    'Apache::Sling'                                         => undef,
-    'Apache::SMTP'                                          => undef,
-    'Apache::Solr'                                          => undef,
-    'Apache::StrReplace'                                    => undef,
-    'Apache::Sybase::CTlib'                                 => undef,
-    'Apache::Test'                                          => undef,
-    'Apache::TieBucketBrigade'                              => undef,
-    'Apache::TransLDAP'                                     => undef,
-    'Apache::TS::AdminClient'                               => undef,
-    'Apache::WebSNMP'                                       => undef,
-    'ApacheLog::Compressor'                                 => undef,
-    'ApacheMysql'                                           => undef,
-    'App::Kit'                                              => undef,
-    'App::perlbrew'                                         => undef,
-    'App::PerlCriticUtils'                                  => undef,
-    'App::Smbxfer'                                          => undef,
-    'App::Sqitch'                                           => undef,
-    'Archive::Any::Create'                                  => undef,
-    'Archive::Any::Create::Zip'                             => undef,
-    'Attean'                                                => undef,
-    'B'                                                     => undef,
-    'B::Asmdata'                                            => undef,
-    'B::Assembler'                                          => undef,
-    'B::Bblock'                                             => undef,
-    'B::Bytecode'                                           => undef,
-    'B::C'                                                  => undef,
-    'B::CC'                                                 => undef,
-    'B::Debug'                                              => undef,
-    'B::Deobfuscate'                                        => undef,
-    'B::Deparse'                                            => undef,
-    'B::Disassembler'                                       => undef,
-    'B::Lint'                                               => undef,
-    'B::Showlex'                                            => undef,
-    'B::Stash'                                              => undef,
-    'B::Terse'                                              => undef,
-    'B::Xref'                                               => undef,
-    'Benchmark::Forking'                                    => undef,
-    'BerkeleyDB'                                            => undef,
-    'ByteLoader'                                            => undef,
-    'Cache::Mmap'                                           => undef,
-    'Carp::Ensure'                                          => undef,
-    'Carp::POE'                                             => undef,
-    'Carp::REPL'                                            => undef,
-    'Catalyst::Authentication::Credential::HTTP'            => undef,
-    'CatalystX::REPL'                                       => undef,
-    'CGI_Lite'                                              => undef,
-    'CHI'                                                   => undef,
-    'Code::Statistics'                                      => undef,
-    'Code::TidyAll'                                         => undef,
-    'Color::Conversions'                                    => undef,
-    'Config::JSON'                                          => undef,
-    'CPAN::Checksums'                                       => undef,
-    'CPAN::Mini::Inject'                                    => undef,
-    'CPAN::YACSmoke'                                        => undef,
-    'Crypt::CBC'                                            => undef,
-    'Crypt::OpenSSL::CA'                                    => undef,
-    'Crypt::PBKDF2'                                         => undef,
-    'Crypt::Random'                                         => undef,
-    'Curses'                                                => undef,
-    'Data::Fake'                                            => undef,
-    'Data::Fake::Names'                                     => undef,
-    'Data::Sah'                                             => undef,
-    'Data::Sah::Coerce'                                     => undef,
-    'Data::Sah::CoerceCommon'                               => undef,
-    'Data::Sah::Compiler::perl::TH::any'                    => undef,
-    'Data::Sah::Compiler::perl::TH::array'                  => undef,
-    'Data::Sah::Compiler::perl::TH::bool'                   => undef,
-    'Data::Sah::Compiler::perl::TH::hash'                   => undef,
-    'Data::Sah::Compiler::perl::TH::int'                    => undef,
-    'Data::Sah::Compiler::perl::TH::obj'                    => undef,
-    'Data::Sah::Compiler::perl::TH::str'                    => undef,
-    'Data::Sah::DefaultValueCommon'                         => undef,
-    'Data::Sah::Filter'                                     => undef,
-    'Data::Sah::Filter::perl::Perl::normalize_perl_modname' => undef,
-    'Data::Sah::FilterCommon'                               => undef,
-    'Data::Sah::Type::array'                                => undef,
-    'Data::Sah::Type::hash'                                 => undef,
-    'Data::Sah::Type::int'                                  => undef,
-    'DBD'                                                   => undef,
-    'DBD::AnyData'                                          => undef,
-    'DBD::mysql'                                            => undef,
-    'DBD::Oracle'                                           => undef,
-    'DBD::Pg'                                               => undef,
-    'Devel::Cover::Report::Clover'                          => undef,
-    'Devel::DProf'                                          => undef,
-    'Devel::SmallProf'                                      => undef,
-    'Device::SerialPort'                                    => undef,
-    'Dist::Metadata'                                        => undef,
-    'Distribution::Cooker'                                  => undef,
-    'EMail'                                                 => undef,
-    'Email::Send'                                           => undef,
-    'Email::Send::SMTP'                                     => undef,
-    'Email::Send::Test'                                     => undef,
-    'Email::Stuff'                                          => undef,
-    'Env::Sourced'                                          => undef,
-    'Expect'                                                => undef,
-    'Expect::Simple'                                        => undef,
-    'FCGI'                                                  => undef,
-    'File::Finder'                                          => undef,
-    'File::NFSLock'                                         => undef,
-    'Filesys::SmbClient'                                    => undef,
-    'Furl'                                                  => undef,
-    'Furl::HTTP'                                            => undef,
-    'Getopt::Clade'                                         => undef,
-    'Git::CPAN::Patch'                                      => undef,
-    'Git::Repository'                                       => undef,
-    'Git::Repository::Plugin'                               => undef,
-    'Git::Repository::Plugin::AUTOLOAD'                     => undef,
-    'Gtk'                                                   => undef,
-    'HTML::Mason'                                           => undef,
-    'HTML::Tidy'                                            => undef,
-    'HTTP::Proxy'                                           => undef,
-    'HTTP::Recorder'                                        => undef,
-    'Image::Magick'                                         => undef,
-    'Inline::Java'                                          => undef,
-    'IO::Async'                                             => undef,
-    'IO::InSitu'                                            => undef,
-    'IO::Pty'                                               => undef,
-    'IO::Socket::SSL'                                       => undef,
-    'IO::Tty'                                               => undef,
-    'IPC::Msg'                                              => undef,
-    'IPC::Open3::Utils'                                     => undef,
-    'IPC::Open3SelfLoader'                                  => undef,
-    'IPC::Semaphore'                                        => undef,
-    'IPC::Shareable'                                        => undef,
-    'IPC::System::Options'                                  => undef,
-    'IPC::SysV'                                             => undef,
-    'Kavorka'                                               => undef,
-    'Language::Expr'                                        => undef,
-    'Language::Expr::Interpreter::var_enumer'               => undef,
-    'Locale::Maketext::Utils'                               => undef,
-    'Locale::Maketext::Utils::Mock'                         => undef,
-    'Log::Any'                                              => undef,
-    'Log::Any::Test'                                        => undef,
-    'Mac::Speech'                                           => undef,
-    'Mail'                                                  => undef,
-    'Mason'                                                 => undef,
-    'Math::Pari'                                            => undef,
-    'Matrix'                                                => undef,
-    'MIME'                                                  => undef,
-    'MIME::Entity'                                          => undef,
-    'ModPerl::PerlRun'                                      => undef,
-    'Module::Build::TestReporter'                           => undef,
-    'Module::Faker::Dist'                                   => undef,
-    'Module::Install::POE::Test::Loops'                     => undef,
-    'Module::License::Report'                               => undef,
-    'Module::Pluggable'                                     => undef,
-    'Module::Release'                                       => undef,
-    'Module:Starter'                                        => undef,
-    'Mojolicious'                                           => undef,
-    'Moops'                                                 => undef,
-    'MooseX::Param::Validate'                               => undef,
-    'MooseX::POE'                                           => undef,
-    'MooX::Log::Any'                                        => undef,
-    'Net::EmptyPort'                                        => undef,
-    'Net::Nslookup'                                         => undef,
-    'Net::proto'                                            => undef,
-    'Net::Server'                                           => undef,
-    'Net::Server::Daemonize'                                => undef,
-    'Net::Server::Fork'                                     => undef,
-    'Net::Server::HTTP'                                     => undef,
-    'Net::Server::INET'                                     => undef,
-    'Net::Server::Log::Log::Log4perl'                       => undef,
-    'Net::Server::Log::Sys::Syslog'                         => undef,
-    'Net::Server::Multiplex'                                => undef,
-    'Net::Server::MultiType'                                => undef,
-    'Net::Server::PreFork'                                  => undef,
-    'Net::Server::PreForkSimple'                            => undef,
-    'Net::Server::Proto'                                    => undef,
-    'Net::Server::Proto::SSL'                               => undef,
-    'Net::Server::Proto::SSLEAY'                            => undef,
-    'Net::Server::Proto::TCP'                               => undef,
-    'Net::Server::Proto::UDP'                               => undef,
-    'Net::Server::Proto::UNIX'                              => undef,
-    'Net::Server::Proto::UNIXDGRAM'                         => undef,
-    'Net::Server::PSGI'                                     => undef,
-    'Net::Server::SIG'                                      => undef,
-    'Net::Server::Single'                                   => undef,
-    'Net::Server::SSL'                                      => undef,
-    'Nodejs::Util'                                          => undef,
-    'only'                                                  => undef,
-    'Padre::Util::Win32'                                    => undef,
-    'Parallel::Runner'                                      => undef,
-    'Param::Validate'                                       => undef,
-    'Path::Iter'                                            => undef,
-    'Perinci::Access'                                       => undef,
-    'Perinci::Access::Perl'                                 => undef,
-    'Perinci::Access::Schemeless'                           => undef,
-    'Perinci::CmdLine::Any'                                 => undef,
-    'Perinci::CmdLine::Gen'                                 => undef,
-    'Perinci::CmdLine::Help'                                => undef,
-    'Perinci::CmdLine::Lite'                                => undef,
-    'Perinci::Sub::Complete'                                => undef,
-    'Perinci::Sub::DepChecker'                              => undef,
-    'Perinci::Sub::GetArgs::Argv'                           => undef,
-    'Perinci::Sub::To::CLIDocData'                          => undef,
-    'Perinci::Sub::Wrapper'                                 => undef,
-    'Perl6::Builtins'                                       => undef,
-    'Perl6::Rules'                                          => undef,
-    'Perl::Critic::CognitiveComplexity'                     => undef,
-    'Perl::Critic::Dynamic'                                 => undef,
-    'Perl::Critic::DynamicPolicy'                           => undef,
-    'Perl::Critic::Policy::Dynamic::NoIndirect'             => undef,
-    'Perl::Lint'                                            => undef,
-    'Perl::Metrics::Lite'                                   => undef,
-    'Pinto'                                                 => undef,
-    'POD'                                                   => undef,
-    'Pod::InputObject'                                      => undef,
-    'Pod::ManPod::Parser'                                   => undef,
-    'Pod::SelectPod::Text'                                  => undef,
-    'Pod::Simple::Subclassing'                              => undef,
-    'POE'                                                   => undef,
-    'POE::Component::CPAN::YACSmoke'                        => undef,
-    'POE::Component::Server::TCP'                           => undef,
-    'POE::Component::Win32::ChangeNotify'                   => undef,
-    'POE::Component::Win32::EventLog'                       => undef,
-    'POE::Component::Win32::Service'                        => undef,
-    'POE::Filter'                                           => undef,
-    'POE::Filter::Line'                                     => undef,
-    'POE::Filter::Reference'                                => undef,
-    'POE::Kernel'                                           => undef,
-    'POE::Session'                                          => undef,
-    'POE::Test::Helpers'                                    => undef,
-    'POE::Test::Loops'                                      => undef,
-    'POE::Wheel::ReadWrite'                                 => undef,
-    'POE::Wheel::Run'                                       => undef,
-    'POE::Wheel::SocketFactory'                             => undef,
-    'PPod::Checker'                                         => undef,
-    'PRegexp::Assemble'                                     => undef,
-    'Proc::Daemon'                                          => undef,
-    'Proc::Terminator'                                      => undef,
-    'Redis'                                                 => undef,
-    'Regexp::Autoflags'                                     => undef,
-    'Regexp::MatchContext'                                  => undef,
-    'RPerl'                                                 => undef,
-    'Sah::Schema::perl::modname'                            => undef,
-    'SmokeRunner::Multi'                                    => undef,
-    'SpreadSheet::ParseExcel'                               => undef,
-    'Spreadsheet::ParseExecl'                               => undef,
-    'Spredsheet::WriteExcel'                                => undef,
-    'SQL'                                                   => undef,
-    'SQLite'                                                => undef,
-    'Starman'                                               => undef,
-    'Sub::Call::Tail'                                       => undef,
-    'Sx'                                                    => undef,
-    'System::Command'                                       => undef,
-    'Task::Catalyst'                                        => undef,
-    'Task::Kensho'                                          => undef,
-    'Task::Kensho::Async'                                   => undef,
-    'Task::Kensho::Dates'                                   => undef,
-    'Task::Kensho::Hackery'                                 => undef,
-    'Task::Kensho::Logging'                                 => undef,
-    'Task::Kensho::ModuleDev'                               => undef,
-    'Task::Kensho::Scalability'                             => undef,
-    'Task::Kensho::Toolchain'                               => undef,
-    'Task::Kensho::WebCrawling'                             => undef,
-    'Task::Kensho::WebDev'                                  => undef,
-    'Task::Perl::Critic'                                    => undef,
-    'Term::ProgressBar::Quiet'                              => undef,
-    'Term::ProgressBar::Simple'                             => undef,
-    'Term::Rendezvous'                                      => undef,
-    'Test::Between'                                         => undef,
-    'Test::CSV'                                             => undef,
-    'Test::CSV_XS'                                          => undef,
-    'Test::Expect'                                          => undef,
-    'Test::Flatten'                                         => undef,
-    'Test::Git'                                             => undef,
-    'Test::HTML::Lint'                                      => undef,
-    'Test::HTML::Tidy'                                      => undef,
-    'Test::Mock::LWP'                                       => undef,
-    'Test::MockDBI'                                         => undef,
-    'Test::MockObject'                                      => undef,
-    'Test::MockObject::Extends'                             => undef,
-    'Test::MockObject::Extra'                               => undef,
-    'Test::more'                                            => undef,
-    'Test::Output::Tie'                                     => undef,
-    'Test::Perinci::CmdLine'                                => undef,
-    'Test::Perl::Metrics::Lite'                             => undef,
-    'Test::POE::Client::TCP'                                => undef,
-    'Test::POE::Server::TCP'                                => undef,
-    # STDOUT: --> Working on Test::Smoke
-    # STDOUT: Configuring Test-Smoke-1.83 ... Where would you like to install Test::Smoke?
-    # STDOUT: Fetching http://www.cpan.org/authors/id/C/CO/CONTRA/Test-Smoke-1.83.tar.gz ... OK
-    # Test::Smoke require user input ?
-    'Test::Smoke'                     => undef,
-    'Test::Tutorial'                  => undef,
-    'Test::WWW::Mechanize'            => undef,
-    'Test::WWW::Mechanize::Catalyst'  => undef,
-    'Test::WWW::Mechanize::PSGI'      => undef,
-    'Text::CSV'                       => undef,
-    'Text::CSV_XS'                    => undef,
-    'Tie::DevNull'                    => undef,
-    'Tie::DevRandom'                  => undef,
-    'Tie::SecureHash'                 => undef,
-    'Tie::TextDir'                    => undef,
-    'Tie::TransactHash'               => undef,
-    'Time::HiRes::usleep'             => undef,
-    'Time::ParseDate'                 => undef,
-    'TRest::Perl::Critic'             => undef,
-    'TRest::Perl::Critic::Progresive' => undef,
-    'TryCatch'                        => undef,
-    'Underscore'                      => undef,
-    'Unicode::CharName'               => undef,
-    'Unix::Whereis'                   => undef,
-    'Vim::Debug'                      => undef,
-    'Win32::CLR'                      => undef,
-    'Win32::DirSize'                  => undef,
-    'Win32::FileSystem::Watcher'      => undef,
-    'Win32::Hardlink'                 => undef,
-    'Win32::MMF::Shareable'           => undef,
-    'Win32::Mock'                     => undef,
-    'Win32::Netsh'                    => undef,
-    'Win32::PerfMon'                  => undef,
-    'Win32::Printer'                  => undef,
-    'Win32::Process::CommandLine'     => undef,
-    'Win32::Process::Info'            => undef,
-    'Win32::Resources'                => undef,
-    'Win32::Script'                   => undef,
-    'Win32::Unicode'                  => undef,
-    'Win32API::Const'                 => undef,
-    'Win32API::Resources'             => undef,
-    'WWW::Curl::Easy'                 => undef,
-    'WWW::Mechanize::TreeBuilder'     => undef,
-    'WWW::Selenium'                   => undef,
-    'XML'                             => undef,
-    'Test::TCP'                       => undef,
-    'HTTP::Daemon::Threaded'          => undef,
-    'B::Stackobj'                     => undef,
-    'PAR::Packer'                     => undef,
-    'Test::ParallelSubtest'           => undef,
-
-);
-
 $| = 1;
 
 _say_ex "started $0";
 
-main( $ARGV[ 0 ] // $EMPTY_STRING, $ARGV[ 1 ] // $EMPTY_STRING );
+main( $ARGV[ 0 ] // $EMPTY_STRING, $ARGV[ 1 ] // $EMPTY_STRING, $ARGV[ 2 ] // $EMPTY_STRING );
 
 _say_ex "ended $0";
 
@@ -1789,7 +1429,7 @@ __END__
 
 =head1 NAME
 
-InstallCpanModules.pl [ --only-updates | --no-updates ] filepath
+InstallCpanModules.pl [ --only-updates | --no-updates ] filepath_install [ filepath_dont_try ]
 
 =head1 DESCRIPTION
 
