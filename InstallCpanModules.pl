@@ -1312,7 +1312,7 @@ sub install_modules_sequentially
     return;
 }
 
-sub main
+sub handle_main_arguments
 {
     my ( $arg1, $arg2, $arg3 ) = @_;
     $arg1 = _trim( $arg1 );
@@ -1352,6 +1352,13 @@ sub main
             $filepath_dont_try = $arg2;
         }
     }
+
+    return ( $filepath_install, $filepath_dont_try, $only_updates, $no_updates );
+}
+
+sub main
+{
+    my ( $filepath_install, $filepath_dont_try, $only_updates, $no_updates ) = handle_main_arguments( @_ );
 
     my $logdir = dirname( __FILE__ ) . '/log';
     $log_dir_path = abs_path( $logdir );
