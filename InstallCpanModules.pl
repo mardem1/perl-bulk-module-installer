@@ -121,7 +121,10 @@ sub _hashify
 
 sub _get_timestamp_for_logline
 {
-    my @local = ( localtime )[ 0 .. 5 ];
+    my ( $time ) = @_;
+    $time ||= time;
+
+    my @local = ( localtime $time )[ 0 .. 5 ];
     my $now   = POSIX::strftime( '%Y-%m-%d_%H-%M-%S', @local );
 
     return $now;
@@ -129,7 +132,10 @@ sub _get_timestamp_for_logline
 
 sub _get_timestamp_pretty
 {
-    my @local = ( localtime )[ 0 .. 5 ];
+    my ( $time ) = @_;
+    $time ||= time;
+
+    my @local = ( localtime $time )[ 0 .. 5 ];
     my $now   = POSIX::strftime( '%Y-%m-%d - %H-%M-%S', @local );
 
     return $now;
@@ -137,7 +143,10 @@ sub _get_timestamp_pretty
 
 sub _get_timestamp_for_filename
 {
-    my @local = ( localtime )[ 0 .. 5 ];
+    my ( $time ) = @_;
+    $time ||= time;
+
+    my @local = ( localtime $time )[ 0 .. 5 ];
     my $now   = POSIX::strftime( '%Y%m%d_%H%M%S', @local );
 
     return $now;
