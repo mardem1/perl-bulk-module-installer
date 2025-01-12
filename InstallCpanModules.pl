@@ -1035,7 +1035,7 @@ sub import_module_list_from_file
     my @file_lines = _read_file( $filepath );
 
     @file_lines = map  { _trim( $_ ) } @file_lines;
-    @file_lines = grep { $EMPTY_STRING ne $_ } @file_lines;
+    @file_lines = grep { $EMPTY_STRING ne $_ && $_ !~ /^[#]/o } @file_lines;
 
     %modules_to_install = _hashify @file_lines;
     @file_lines         = ();
