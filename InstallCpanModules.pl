@@ -1353,6 +1353,8 @@ sub handle_main_arguments
         }
     }
 
+    $filepath_install = _trim( $filepath_install );
+
     return ( $filepath_install, $filepath_dont_try, $only_updates, $no_updates );
 }
 
@@ -1384,7 +1386,6 @@ sub main
         _say_ex 'only-updates: skip module list file import';
     }
     else {
-        $filepath_install = _trim( $filepath_install );
         if ( _is_string_empty( $filepath_install ) ) {
             croak 'no file arg given';
         }
