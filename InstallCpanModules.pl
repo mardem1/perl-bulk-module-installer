@@ -686,6 +686,8 @@ sub search_for_installed_modules
         . '';
     _say_ex '';
 
+    reduce_modules_to_install();
+
     return;
 }
 
@@ -1300,7 +1302,6 @@ sub install_modules_sequentially
         if ( $current_install_count != $new_install_count ) {
             _say_ex "==> after successful module install - reimport all installed modules from system";
             search_for_installed_modules();
-            reduce_modules_to_install();
         }
 
         $remaining = scalar( keys %modules_need_to_install );
@@ -1400,8 +1401,6 @@ sub main
     }
 
     search_for_installed_modules();
-
-    reduce_modules_to_install();    # updates should be handled another time ...
 
     if ( $no_updates ) {
         _say_ex 'no-updates: skip update module list import';
