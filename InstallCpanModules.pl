@@ -227,9 +227,9 @@ sub _write_file
     return;
 }
 
-sub _get_output_with_detached_execute_and_logfile
+sub _get_output_with_detached_execute
 {
-    my ( $logfile_suffix, $logfile_title, $timeout, $show_live_output, @cmd ) = @_;
+    my ( $timeout, $show_live_output, @cmd ) = @_;
 
     if ( _is_string_empty( $timeout ) ) {
         croak 'param timeout empty!';
@@ -337,6 +337,16 @@ sub _get_output_with_detached_execute_and_logfile
     }
 
     $end_date = time;
+
+    return ( $start_date, $end_date, $child_exit_status, @output );
+}
+
+sub _get_output_with_detached_execute_and_logfile
+{
+    my ( $logfile_suffix, $logfile_title, $timeout, $show_live_output, @cmd ) = @_;
+
+    my ( $start_date, $end_date, $child_exit_status, @output ) =
+        _get_output_with_detached_execute( $timeout, $show_live_output, @cmd );
 
     my $timestamp  = _get_timestamp_for_filename( $start_date );
     my $time_start = _get_timestamp_pretty( $start_date );
@@ -985,7 +995,8 @@ sub install_single_module
     my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '2>&1' );
 
     my ( $start_date, $end_date, $child_exit_status, @output ) =
-        _get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title, $INSTALL_MODULE_TIMEOUT_IN_SECONDS,
+        _get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
+            $INSTALL_MODULE_TIMEOUT_IN_SECONDS,
             1, @cmd );
 
     my $action = $type;
@@ -1183,7 +1194,8 @@ sub search_for_modules_for_available_updates
     my @cmd = ( 'cmd.exe', '/c', 'cpan-outdated', '--exclude-core', '-p' );
 
     my ( $start_date, $end_date, $child_exit_status, @output ) =
-        _get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title, $CHECK_UPDATE_MODULE_TIMEOUT_IN_SECONDS,
+        _get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
+            $CHECK_UPDATE_MODULE_TIMEOUT_IN_SECONDS,
             1, @cmd );
 
     if ( !defined $child_exit_status || ( $child_exit_status && !@output ) ) {
