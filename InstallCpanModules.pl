@@ -657,13 +657,15 @@ sub search_for_installed_modules
 {
     my @cmd = ( 'cmd.exe', '/c', 'cpan', '-l' );
 
-    my $timestamp  = _get_timestamp_for_filename();
-    my $time_start = _get_timestamp_pretty();
+    my $start_date = time;
+    my $timestamp  = _get_timestamp_for_filename( $start_date );
+    my $time_start = _get_timestamp_pretty( $start_date );
 
     my ( $child_exit_status, @output ) =
         _get_output_with_detached_execute( $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS, 1, @cmd );
 
-    my $time_end = _get_timestamp_pretty();
+    my $end_date = time;
+    my $time_end = _get_timestamp_pretty( $end_date );
 
     if ( !defined $child_exit_status || ( $child_exit_status && !@output ) ) {
         return;    # error nothing found
@@ -712,8 +714,9 @@ sub fetch_dependencies_for_module
 
     my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--no-interactive', '--showdeps', $module, '2>&1' );
 
-    my $timestamp  = _get_timestamp_for_filename();
-    my $time_start = _get_timestamp_pretty();
+    my $start_date = time;
+    my $timestamp  = _get_timestamp_for_filename( $start_date );
+    my $time_start = _get_timestamp_pretty( $start_date );
 
     my ( $child_exit_status, @output ) = ();
 
@@ -726,7 +729,8 @@ sub fetch_dependencies_for_module
             _get_output_with_detached_execute( $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS, 1, @cmd );
     }
 
-    my $time_end = _get_timestamp_pretty();
+    my $end_date = time;
+    my $time_end = _get_timestamp_pretty( $end_date );
 
     if ( !defined $child_exit_status ) {
         return undef;    # as not found
@@ -987,13 +991,15 @@ sub install_single_module
 
     my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '2>&1' );
 
-    my $timestamp  = _get_timestamp_for_filename();
-    my $time_start = _get_timestamp_pretty();
+    my $start_date = time;
+    my $timestamp  = _get_timestamp_for_filename( $start_date );
+    my $time_start = _get_timestamp_pretty( $start_date );
 
     my ( $child_exit_status, @output ) =
         _get_output_with_detached_execute( $INSTALL_MODULE_TIMEOUT_IN_SECONDS, 1, @cmd );
 
-    my $time_end = _get_timestamp_pretty();
+    my $end_date = time;
+    my $time_end = _get_timestamp_pretty( $end_date );
 
     my $action = $type;
     if ( !defined $child_exit_status ) {
@@ -1103,13 +1109,15 @@ sub print_perl_detail_info
 {
     my @cmd = ( 'cmd.exe', '/c', 'perl', '-V' );
 
-    my $timestamp  = _get_timestamp_for_filename();
-    my $time_start = _get_timestamp_pretty();
+    my $start_date = time;
+    my $timestamp  = _get_timestamp_for_filename( $start_date );
+    my $time_start = _get_timestamp_pretty( $start_date );
 
     my ( $child_exit_status, @output ) =
         _get_output_with_detached_execute( $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS, 1, @cmd );
 
-    my $time_end = _get_timestamp_pretty();
+    my $end_date = time;
+    my $time_end = _get_timestamp_pretty( $end_date );
 
     if ( !defined $child_exit_status || ( $child_exit_status && !@output ) ) {
         return;    # error nothing found
@@ -1214,13 +1222,15 @@ sub search_for_modules_for_available_updates
 {
     my @cmd = ( 'cmd.exe', '/c', 'cpan-outdated', '--exclude-core', '-p' );
 
-    my $timestamp  = _get_timestamp_for_filename();
-    my $time_start = _get_timestamp_pretty();
+    my $start_date = time;
+    my $timestamp  = _get_timestamp_for_filename( $start_date );
+    my $time_start = _get_timestamp_pretty( $start_date );
 
     my ( $child_exit_status, @output ) =
         _get_output_with_detached_execute( $CHECK_UPDATE_MODULE_TIMEOUT_IN_SECONDS, 1, @cmd );
 
-    my $time_end = _get_timestamp_pretty();
+    my $end_date = time;
+    my $time_end = _get_timestamp_pretty( $end_date );
 
     if ( !defined $child_exit_status || ( $child_exit_status && !@output ) ) {
         return;    # error nothing found
@@ -1411,7 +1421,7 @@ sub main
 
     search_for_installed_modules();
 
-    if ( ! $all_updates ) {
+    if ( !$all_updates ) {
         _say_ex 'no --all-updates: skip update module list import';
     }
     else {
