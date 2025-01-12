@@ -1287,18 +1287,24 @@ sub main
     $arg2 = _trim( $arg2 );
 
     my $filepath_install = $EMPTY_STRING;
-    my $only_updates = $FALSE;
-    my $no_updates   = $FALSE;
+    my $only_updates     = $FALSE;
+    my $no_updates       = $FALSE;
 
     if ( $arg1 eq '--only-updates' ) {
         $only_updates = $TRUE;
-        $filepath_install     = $arg2;
+        if ( !_is_string_empty( $arg2 ) ) {
+            croak 'wrong parameter set';
+        }
     }
     elsif ( $arg1 eq '--no-updates' ) {
         $no_updates = $TRUE;
-        $filepath_install   = $arg2;
+        if ( _is_string_empty( $arg2 ) ) {
+            croak 'wrong parameter set';
+        }
+
+        $filepath_install = $arg2;
     }
-    elsif ( !_is_string_empty( $arg1 ) && !_is_string_empty( $arg2 ) ) {
+    elsif ( _is_string_empty( $arg1 ) ) {
         croak 'wrong parameter set';
     }
     else {
