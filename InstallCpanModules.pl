@@ -249,18 +249,21 @@ sub _get_output_with_detached_execute
 
     my $child_exit_status = undef;
     my @output            = ();
-
-    my $chld_in  = undef;
-    my $chld_out = undef;
+    my $start_date        = time;
+    my $end_date          = time;
+    my $chld_in           = undef;
+    my $chld_out          = undef;
 
     _say_ex 'start cmd: ' . ( join ' ', @cmd );
     my $pid = open3( $chld_in, $chld_out, '>&STDERR', @cmd );
 
     if ( 1 > $pid ) {
         _say_ex 'ERROR: cmd start failed!';
-        return ( $child_exit_status, @output );
+        return ( $start_date, $end_date, $child_exit_status, @output );
     }
 
+    $start_date = time;
+    $end_date   = $start_date;
     _say_ex 'pid: ' . $pid;
 
     _say_ex 'close chld_in';
@@ -333,7 +336,9 @@ sub _get_output_with_detached_execute
         _say_ex '$child_exit_status: ' . $child_exit_status;
     }
 
-    return ( $child_exit_status, @output );
+    $end_date = time;
+
+    return ( $start_date, $end_date, $child_exit_status, @output );
 }
 
 sub mark_module_as_ok
@@ -657,10 +662,8 @@ sub search_for_installed_modules
 {
     my @cmd = ( 'cmd.exe', '/c', 'cpan', '-l' );
 
-    my $start_date = time;
-    my ( $child_exit_status, @output ) =
+    my ( $start_date, $end_date, $child_exit_status, @output ) =
         _get_output_with_detached_execute( $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS, 1, @cmd );
-    my $end_date = time;
 
     if ( !defined $child_exit_status || ( $child_exit_status && !@output ) ) {
         return;    # error nothing found
@@ -713,20 +716,16 @@ sub fetch_dependencies_for_module
 
     my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--no-interactive', '--showdeps', $module, '2>&1' );
 
-    my $start_date = time;
-
-    my ( $child_exit_status, @output ) = ();
+    my ( $start_date, $end_date, $child_exit_status, @output ) = ();
 
     if ( $module eq 'Test::Smoke' ) {
         $child_exit_status = 0;
         @output            = ();
     }
     else {
-        ( $child_exit_status, @output ) =
+        ( $start_date, $end_date, $child_exit_status, @output ) =
             _get_output_with_detached_execute( $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS, 1, @cmd );
     }
-
-    my $end_date = time;
 
     if ( !defined $child_exit_status ) {
         return undef;    # as not found
@@ -990,10 +989,8 @@ sub install_single_module
 
     my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '2>&1' );
 
-    my $start_date = time;
-    my ( $child_exit_status, @output ) =
+    my ( $start_date, $end_date, $child_exit_status, @output ) =
         _get_output_with_detached_execute( $INSTALL_MODULE_TIMEOUT_IN_SECONDS, 1, @cmd );
-    my $end_date = time;
 
     my $action = $type;
     if ( !defined $child_exit_status ) {
@@ -1107,10 +1104,8 @@ sub print_perl_detail_info
 {
     my @cmd = ( 'cmd.exe', '/c', 'perl', '-V' );
 
-    my $start_date = time;
-    my ( $child_exit_status, @output ) =
+    my ( $start_date, $end_date, $child_exit_status, @output ) =
         _get_output_with_detached_execute( $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS, 1, @cmd );
-    my $end_date = time;
 
     if ( !defined $child_exit_status || ( $child_exit_status && !@output ) ) {
         return;    # error nothing found
@@ -1219,10 +1214,8 @@ sub search_for_modules_for_available_updates
 {
     my @cmd = ( 'cmd.exe', '/c', 'cpan-outdated', '--exclude-core', '-p' );
 
-    my $start_date = time;
-    my ( $child_exit_status, @output ) =
+    my ( $start_date, $end_date, $child_exit_status, @output ) =
         _get_output_with_detached_execute( $CHECK_UPDATE_MODULE_TIMEOUT_IN_SECONDS, 1, @cmd );
-    my $end_date = time;
 
     if ( !defined $child_exit_status || ( $child_exit_status && !@output ) ) {
         return;    # error nothing found
