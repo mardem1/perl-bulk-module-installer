@@ -49,7 +49,6 @@ my $EMPTY_STRING = q{};
 my $FALSE        = !!0;
 my $TRUE         = !0;
 
-my $module_list_filepath = $EMPTY_STRING;
 my $log_dir_path         = $EMPTY_STRING;
 
 sub _trim
@@ -1027,7 +1026,7 @@ sub install_single_module
 
 sub import_module_list_from_file
 {
-    my $filepath = $module_list_filepath;
+    my ( $filepath ) = @_;
 
     if ( _is_string_empty( $filepath ) ) {
         croak 'param filepath empty!';
@@ -1311,13 +1310,6 @@ sub main
         $filepath_install = $arg1;
     }
 
-    $filepath_install = _trim( $filepath_install );
-    if ( _is_string_empty( $filepath_install ) ) {
-        croak 'no file arg given';
-    }
-
-    $module_list_filepath = $filepath_install;
-
     my $logdir = dirname( __FILE__ ) . '/log';
     $log_dir_path = abs_path( $logdir );
 
@@ -1335,7 +1327,12 @@ sub main
         _say_ex 'only-updates: skip module list file import';
     }
     else {
-        import_module_list_from_file();
+        $filepath_install = _trim( $filepath_install );
+        if ( _is_string_empty( $filepath_install ) ) {
+            croak 'no file arg given';
+        }
+
+        import_module_list_from_file( $filepath_install );
     }
 
     search_for_installed_modules();
