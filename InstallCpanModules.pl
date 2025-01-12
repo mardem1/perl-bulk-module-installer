@@ -1353,7 +1353,8 @@ sub handle_main_arguments
         }
     }
 
-    $filepath_install = _trim( $filepath_install );
+    $filepath_install  = _trim( $filepath_install );
+    $filepath_dont_try = _trim( $filepath_dont_try );
 
     return ( $filepath_install, $filepath_dont_try, $only_updates, $no_updates );
 }
