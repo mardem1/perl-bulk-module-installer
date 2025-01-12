@@ -1409,7 +1409,7 @@ $| = 1;
 
 _say_ex "started $0";
 
-main( $ARGV[ 0 ] // $EMPTY_STRING, $ARGV[ 1 ] // $EMPTY_STRING, $ARGV[ 2 ] // $EMPTY_STRING );
+main( @ARGV );
 
 _say_ex "ended $0";
 
