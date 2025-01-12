@@ -229,7 +229,7 @@ sub _write_file
 
 sub _get_output_with_detached_execute
 {
-    my ( $timeout, $show_live_output, @cmd ) = @_;
+    my ( $logfile_suffix, $logfile_title, $timeout, $show_live_output, @cmd ) = @_;
 
     if ( _is_string_empty( $timeout ) ) {
         croak 'param timeout empty!';
@@ -337,6 +337,24 @@ sub _get_output_with_detached_execute
     }
 
     $end_date = time;
+
+    my $timestamp  = _get_timestamp_for_filename( $start_date );
+    my $time_start = _get_timestamp_pretty( $start_date );
+    my $time_end   = _get_timestamp_pretty( $end_date );
+
+    _write_file(
+        $log_dir_path . '/' . $timestamp . '_' . $logfile_suffix . '.log',
+        $logfile_title,
+        'CMD: ' . ( join ' ', @cmd ),
+        'ExitCode: ' . $child_exit_status,
+        'Started: ' . $time_start,
+        'Ended: ' . $time_end,
+        '',
+        '=' x 80,
+        '',
+        @output,
+        '',
+    );
 
     return ( $start_date, $end_date, $child_exit_status, @output );
 }
@@ -662,32 +680,17 @@ sub search_for_installed_modules
 {
     my @cmd = ( 'cmd.exe', '/c', 'cpan', '-l' );
 
+    my $logfile_suffix = 'installed_modules_found';
+    my $logfile_title  = 'installed_modules_found';
+
     my ( $start_date, $end_date, $child_exit_status, @output ) =
-        _get_output_with_detached_execute( $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS, 1, @cmd );
+        _get_output_with_detached_execute( $logfile_suffix, $logfile_title,
+            $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS,
+            1, @cmd );
 
     if ( !defined $child_exit_status || ( $child_exit_status && !@output ) ) {
         return;    # error nothing found
     }
-
-    my $timestamp      = _get_timestamp_for_filename( $start_date );
-    my $time_start     = _get_timestamp_pretty( $start_date );
-    my $time_end       = _get_timestamp_pretty( $end_date );
-    my $logfile_suffix = 'installed_modules_found';
-    my $logfile_title  = 'installed_modules_found';
-
-    _write_file(
-        $log_dir_path . '/' . $timestamp . '_' . $logfile_suffix . '.log',
-        $logfile_title,
-        'CMD: ' . ( join ' ', @cmd ),
-        'ExitCode: ' . $child_exit_status,
-        'Started: ' . $time_start,
-        'Ended: ' . $time_end,
-        '',
-        '=' x 80,
-        '',
-        @output,
-        '',
-    );
 
     foreach my $line ( @output ) {
         my @t = split /\s+/, $line;
@@ -716,6 +719,10 @@ sub fetch_dependencies_for_module
 
     _say_ex 'get module dependencies - ' . $module;
 
+    my $module_n       = _module_name_for_fs( $module );
+    my $logfile_suffix = 'fetch_dependency__' . $module_n;
+    my $logfile_title  = 'fetch_dependency ' . $module;
+
     my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--no-interactive', '--showdeps', $module, '2>&1' );
 
     my ( $start_date, $end_date, $child_exit_status, @output ) = ();
@@ -726,7 +733,9 @@ sub fetch_dependencies_for_module
     }
     else {
         ( $start_date, $end_date, $child_exit_status, @output ) =
-            _get_output_with_detached_execute( $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS, 1, @cmd );
+            _get_output_with_detached_execute( $logfile_suffix, $logfile_title,
+                $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS,
+                1, @cmd );
     }
 
     if ( !defined $child_exit_status ) {
@@ -737,27 +746,6 @@ sub fetch_dependencies_for_module
         _say_ex 'ERROR: search failed - exitcode - ' . $child_exit_status;
         return undef;    # as not found
     }
-
-    my $module_n       = _module_name_for_fs( $module );
-    my $timestamp      = _get_timestamp_for_filename( $start_date );
-    my $time_start     = _get_timestamp_pretty( $start_date );
-    my $time_end       = _get_timestamp_pretty( $end_date );
-    my $logfile_suffix = 'fetch_dependency__' . $module_n;
-    my $logfile_title  = 'fetch_dependency ' . $module;
-
-    _write_file(
-        $log_dir_path . '/' . $timestamp . '_' . $logfile_suffix . '.log',
-        $logfile_title,
-        'CMD: ' . ( join ' ', @cmd ),
-        'ExitCode: ' . $child_exit_status,
-        'Started: ' . $time_start,
-        'Ended: ' . $time_end,
-        '',
-        '=' x 80,
-        '',
-        @output,
-        ''
-    );
 
     if ( ( join '', @output ) =~ /Couldn't find module or a distribution/io ) {
         _say_ex 'ERROR: module not found - ' . $module;
@@ -991,10 +979,14 @@ sub install_single_module
 
     _say_ex $type . ' module - ' . $module;
 
+    my $logfile_suffix = 'install_module__' . $module_n . '__' . $type;
+    my $logfile_title  = 'install_module -> ' . $module . ' -> ' . $type;
+
     my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '2>&1' );
 
     my ( $start_date, $end_date, $child_exit_status, @output ) =
-        _get_output_with_detached_execute( $INSTALL_MODULE_TIMEOUT_IN_SECONDS, 1, @cmd );
+        _get_output_with_detached_execute( $logfile_suffix, $logfile_title, $INSTALL_MODULE_TIMEOUT_IN_SECONDS,
+            1, @cmd );
 
     my $action = $type;
     if ( !defined $child_exit_status ) {
@@ -1018,26 +1010,6 @@ sub install_single_module
 
     _say_ex 'install module - ' . $module . ' - ' . $action;
     print_install_state_summary();
-
-    my $timestamp      = _get_timestamp_for_filename( $start_date );
-    my $time_start     = _get_timestamp_pretty( $start_date );
-    my $time_end       = _get_timestamp_pretty( $end_date );
-    my $logfile_suffix = 'install_module__' . $module_n . '__' . $action;
-    my $logfile_title  = 'install_module ' . $module;
-
-    _write_file(
-        $log_dir_path . '/' . $timestamp . '_' . $logfile_suffix . '.log',
-        $logfile_title,
-        'CMD: ' . ( join ' ', @cmd ),
-        'ExitCode: ' . $child_exit_status,
-        'Started: ' . $time_start,
-        'Ended: ' . $time_end,
-        '',
-        '=' x 80,
-        '',
-        @output,
-        ''
-    );
 
     return $child_exit_status;
 }
@@ -1108,34 +1080,19 @@ sub import_module_dont_try_list_from_file
 
 sub print_perl_detail_info
 {
+    my $logfile_suffix = 'perl_detail_info';
+    my $logfile_title  = 'perl_detail_info';
+
     my @cmd = ( 'cmd.exe', '/c', 'perl', '-V' );
 
     my ( $start_date, $end_date, $child_exit_status, @output ) =
-        _get_output_with_detached_execute( $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS, 1, @cmd );
+        _get_output_with_detached_execute( $logfile_suffix, $logfile_title,
+            $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS,
+            1, @cmd );
 
     if ( !defined $child_exit_status || ( $child_exit_status && !@output ) ) {
         return;    # error nothing found
     }
-
-    my $timestamp      = _get_timestamp_for_filename( $start_date );
-    my $time_start     = _get_timestamp_pretty( $start_date );
-    my $time_end       = _get_timestamp_pretty( $end_date );
-    my $logfile_suffix = 'perl_detail_info';
-    my $logfile_title  = 'perl_detail_info';
-
-    _write_file(
-        $log_dir_path . '/' . $timestamp . '_' . $logfile_suffix . '.log',
-        $logfile_title,
-        'CMD: ' . ( join ' ', @cmd ),
-        'ExitCode: ' . $child_exit_status,
-        'Started: ' . $time_start,
-        'Ended: ' . $time_end,
-        '',
-        '=' x 80,
-        '',
-        @output,
-        '',
-    );
 
     return;
 }
@@ -1220,34 +1177,18 @@ sub install_modules_dep_version
 
 sub search_for_modules_for_available_updates
 {
+    my $logfile_suffix = 'modules_with_available_updates';
+    my $logfile_title  = 'modules_with_available_updates';
+
     my @cmd = ( 'cmd.exe', '/c', 'cpan-outdated', '--exclude-core', '-p' );
 
     my ( $start_date, $end_date, $child_exit_status, @output ) =
-        _get_output_with_detached_execute( $CHECK_UPDATE_MODULE_TIMEOUT_IN_SECONDS, 1, @cmd );
+        _get_output_with_detached_execute( $logfile_suffix, $logfile_title, $CHECK_UPDATE_MODULE_TIMEOUT_IN_SECONDS,
+            1, @cmd );
 
     if ( !defined $child_exit_status || ( $child_exit_status && !@output ) ) {
         return;    # error nothing found
     }
-
-    my $timestamp      = _get_timestamp_for_filename( $start_date );
-    my $time_start     = _get_timestamp_pretty( $start_date );
-    my $time_end       = _get_timestamp_pretty( $end_date );
-    my $logfile_suffix = 'modules_with_available_updates';
-    my $logfile_title  = 'modules_with_available_updates';
-
-    _write_file(
-        $log_dir_path . '/' . $timestamp . '_' . $$logfile_suffix . '.log',
-        $$logfile_title,
-        'CMD: ' . ( join ' ', @cmd ),
-        'ExitCode: ' . $child_exit_status,
-        'Started: ' . $time_start,
-        'Ended: ' . $time_end,
-        '',
-        '=' x 80,
-        '',
-        @output,
-        '',
-    );
 
     foreach my $module ( @output ) {
         $modules_need_to_update{ $module } = undef;
