@@ -1284,32 +1284,32 @@ sub main
 {
     my ( $arg1, $arg2 ) = @_;
 
-    my $filepath = undef;
+    my $filepath_install = undef;
 
     my $only_updates = $FALSE;
     my $no_updates   = $FALSE;
 
     if ( $arg1 eq '--only-updates' ) {
         $only_updates = $TRUE;
-        $filepath     = $arg2;
+        $filepath_install     = $arg2;
     }
     elsif ( $arg1 eq '--no-updates' ) {
         $no_updates = $TRUE;
-        $filepath   = $arg2;
+        $filepath_install   = $arg2;
     }
     elsif ( !_is_string_empty( $arg1 ) && !_is_string_empty( $arg2 ) ) {
         croak 'wrong parameter set';
     }
     else {
-        $filepath = $arg1;
+        $filepath_install = $arg1;
     }
 
-    $filepath = _trim( $filepath );
-    if ( _is_string_empty( $filepath ) ) {
+    $filepath_install = _trim( $filepath_install );
+    if ( _is_string_empty( $filepath_install ) ) {
         croak 'no file arg given';
     }
 
-    $module_list_filepath = $filepath;
+    $module_list_filepath = $filepath_install;
 
     my $logdir = dirname( __FILE__ ) . '/log';
     $log_dir_path = abs_path( $logdir );
@@ -1764,6 +1764,7 @@ sub main
     'B::Stackobj'                     => undef,
     'PAR::Packer'                     => undef,
     'Test::ParallelSubtest'           => undef,
+
 );
 
 $| = 1;
