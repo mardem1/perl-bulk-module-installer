@@ -1440,10 +1440,15 @@ details can be found in the C<README.md>
 
 =over 12
 
-=item C<filepath>
+=item C<filepath_dont_try>
+
+Filepath to a text file which contains Perl-Module-Names (eg. Perl::Critic) which will not be installed.
+One Name per Line, # marks a comment line, Linux-Line-Ends preferred but all work's.
+
+=item C<filepath_install>
 
 Filepath to a text file which contains Perl-Module-Names (eg. Perl::Critic) to
-install. One Name per Line, Linux-Line-Ends preferred but all work's.
+install. One Name per Line, # marks a comment line Linux-Line-Ends preferred but all work's.
 
 =item C<--only-updates>
 
