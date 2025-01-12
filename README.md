@@ -25,7 +25,7 @@ Install perl modules in bulk with some logic to make this more efficient.
 5. run bulk-installer to add all wanted modules
 
    ```
-   perl InstallCpanModules.pl [ --only-all-updates | --no-updates ] filepath_install [ filepath_dont_try ]
+   perl InstallCpanModules.pl [ --only-all-updates | --all-updates ] filepath_install [ filepath_dont_try ]
    perl InstallCpanModules.pl test-module-lists/SmallModuleExample.txt test-module-lists/_dont_try_modules.txt
    ```
 

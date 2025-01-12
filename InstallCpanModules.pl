@@ -1323,7 +1323,7 @@ sub handle_main_arguments
     my $filepath_install  = $EMPTY_STRING;
     my $filepath_dont_try = $EMPTY_STRING;
     my $only_all_updates  = $FALSE;
-    my $no_updates        = $FALSE;
+    my $all_updates       = $FALSE;
 
     if ( $arg1 eq '--only-all-updates' ) {
         $only_all_updates = $TRUE;
@@ -1331,8 +1331,8 @@ sub handle_main_arguments
             croak 'wrong parameter set';
         }
     }
-    elsif ( $arg1 eq '--no-updates' ) {
-        $no_updates = $TRUE;
+    elsif ( $arg1 eq '--all-updates' ) {
+        $all_updates = $TRUE;
         if ( _is_string_empty( $arg2 ) ) {
             croak 'wrong parameter set';
         }
@@ -1357,7 +1357,7 @@ sub handle_main_arguments
     $filepath_install  = _trim( $filepath_install );
     $filepath_dont_try = _trim( $filepath_dont_try );
 
-    return ( $filepath_install, $filepath_dont_try, $only_all_updates, $no_updates );
+    return ( $filepath_install, $filepath_dont_try, $only_all_updates, $all_updates );
 }
 
 sub init_log_dir_path
@@ -1378,14 +1378,14 @@ sub init_log_dir_path
 
 sub main
 {
-    my ( $filepath_install, $filepath_dont_try, $only_all_updates, $no_updates ) = handle_main_arguments( @_ );
+    my ( $filepath_install, $filepath_dont_try, $only_all_updates, $all_updates ) = handle_main_arguments( @_ );
 
     init_log_dir_path();
 
     print_perl_detail_info();
 
     if ( $only_all_updates ) {
-        _say_ex 'only-all-updates: skip module list file import';
+        _say_ex '--only-all-updates: skip module list file import';
     }
     else {
         if ( _is_string_empty( $filepath_install ) ) {
@@ -1402,8 +1402,8 @@ sub main
 
     search_for_installed_modules();
 
-    if ( $no_updates ) {
-        _say_ex 'no-updates: skip update module list import';
+    if ( ! $all_updates ) {
+        _say_ex 'no --all-updates: skip update module list import';
     }
     else {
         search_for_modules_for_available_updates();
@@ -1444,7 +1444,7 @@ __END__
 
 =head1 NAME
 
-InstallCpanModules.pl [ --only-all-updates | --no-updates ] filepath_install [ filepath_dont_try ]
+InstallCpanModules.pl [ --only-all-updates | --all-updates ] filepath_install [ filepath_dont_try ]
 
 =head1 DESCRIPTION
 
@@ -1473,7 +1473,7 @@ installed.
 Attention: If a new module version has a additional dependency, this dependency
 will be installed!
 
-=item C<--no-updates>
+=item C<--all-updates>
 
 Do not install updates for modules, exception a new module require a module
 update as dependency.
