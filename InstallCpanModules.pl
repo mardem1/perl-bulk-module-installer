@@ -1322,11 +1322,11 @@ sub handle_main_arguments
 
     my $filepath_install  = $EMPTY_STRING;
     my $filepath_dont_try = $EMPTY_STRING;
-    my $only_updates      = $FALSE;
+    my $only_all_updates  = $FALSE;
     my $no_updates        = $FALSE;
 
-    if ( $arg1 eq '--only-updates' ) {
-        $only_updates = $TRUE;
+    if ( $arg1 eq '--only-all-updates' ) {
+        $only_all_updates = $TRUE;
         if ( !_is_string_empty( $arg2 ) ) {
             croak 'wrong parameter set';
         }
@@ -1357,7 +1357,7 @@ sub handle_main_arguments
     $filepath_install  = _trim( $filepath_install );
     $filepath_dont_try = _trim( $filepath_dont_try );
 
-    return ( $filepath_install, $filepath_dont_try, $only_updates, $no_updates );
+    return ( $filepath_install, $filepath_dont_try, $only_all_updates, $no_updates );
 }
 
 sub init_log_dir_path
@@ -1378,14 +1378,14 @@ sub init_log_dir_path
 
 sub main
 {
-    my ( $filepath_install, $filepath_dont_try, $only_updates, $no_updates ) = handle_main_arguments( @_ );
+    my ( $filepath_install, $filepath_dont_try, $only_all_updates, $no_updates ) = handle_main_arguments( @_ );
 
     init_log_dir_path();
 
     print_perl_detail_info();
 
-    if ( $only_updates ) {
-        _say_ex 'only-updates: skip module list file import';
+    if ( $only_all_updates ) {
+        _say_ex 'only-all-updates: skip module list file import';
     }
     else {
         if ( _is_string_empty( $filepath_install ) ) {
@@ -1444,7 +1444,7 @@ __END__
 
 =head1 NAME
 
-InstallCpanModules.pl [ --only-updates | --no-updates ] filepath_install [ filepath_dont_try ]
+InstallCpanModules.pl [ --only-all-updates | --no-updates ] filepath_install [ filepath_dont_try ]
 
 =head1 DESCRIPTION
 
@@ -1465,7 +1465,7 @@ One Name per Line, # marks a comment line, Linux-Line-Ends preferred but all wor
 Filepath to a text file which contains Perl-Module-Names (eg. Perl::Critic) to
 install. One Name per Line, # marks a comment line Linux-Line-Ends preferred but all work's.
 
-=item C<--only-updates>
+=item C<--only-all-updates>
 
 Only update installed modules, no modules from a given filelist will be
 installed.
