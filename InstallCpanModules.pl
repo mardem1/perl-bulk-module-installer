@@ -345,6 +345,14 @@ sub _get_output_with_detached_execute_and_logfile
 {
     my ( $logfile_suffix, $logfile_title, $timeout, $show_live_output, @cmd ) = @_;
 
+    if ( _is_string_empty( $logfile_suffix ) ) {
+        croak 'param logfile_suffix empty!';
+    }
+
+    if ( _is_string_empty( $logfile_title ) ) {
+        croak 'param logfile_title empty!';
+    }
+
     my ( $start_date, $end_date, $child_exit_status, @output ) =
         _get_output_with_detached_execute( $timeout, $show_live_output, @cmd );
 
