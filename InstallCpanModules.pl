@@ -152,7 +152,7 @@ sub get_timestamp_for_filename
     return $now;
 }
 
-sub _read_file
+sub read_file
 {
     my ( $filepath ) = @_;
 
@@ -1041,7 +1041,7 @@ sub import_module_list_from_file
         croak 'param filepath empty!';
     }
 
-    my @file_lines = _read_file( $filepath );
+    my @file_lines = read_file( $filepath );
 
     @file_lines = map  { trim( $_ ) } @file_lines;
     @file_lines = grep { $EMPTY_STRING ne $_ && $_ !~ /^[#]/o } @file_lines;
@@ -1072,7 +1072,7 @@ sub import_module_dont_try_list_from_file
         croak 'param filepath empty!';
     }
 
-    my @file_lines = _read_file( $filepath );
+    my @file_lines = read_file( $filepath );
 
     @file_lines = map  { trim( $_ ) } @file_lines;
     @file_lines = grep { $EMPTY_STRING ne $_ && $_ !~ /^[#]/o } @file_lines;
