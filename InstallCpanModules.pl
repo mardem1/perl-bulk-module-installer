@@ -51,7 +51,7 @@ my $TRUE         = !0;
 
 my $log_dir_path = $EMPTY_STRING;
 
-sub _trim
+sub trim
 {
     my ( $s ) = @_;
 
@@ -277,7 +277,7 @@ sub _get_output_with_detached_execute
         alarm $timeout;
 
         while ( my $line = <$chld_out> ) {
-            $line = _trim( $line );
+            $line = trim( $line );
             push @output, $line;
 
             if ( $show_live_output ) {
@@ -779,7 +779,7 @@ sub fetch_dependencies_for_module
         if ( $line =~ /Found dependencies: (.+)/o ) {
             my @module_names = split /[,]/io, $1;
             foreach my $module_name ( @module_names ) {
-                $module_name = _trim( $module_name );
+                $module_name = trim( $module_name );
                 $dependencies{ $module_name } = undef;
             }
         }
@@ -1043,7 +1043,7 @@ sub import_module_list_from_file
 
     my @file_lines = _read_file( $filepath );
 
-    @file_lines = map  { _trim( $_ ) } @file_lines;
+    @file_lines = map  { trim( $_ ) } @file_lines;
     @file_lines = grep { $EMPTY_STRING ne $_ && $_ !~ /^[#]/o } @file_lines;
 
     %modules_to_install = _hashify @file_lines;
@@ -1074,7 +1074,7 @@ sub import_module_dont_try_list_from_file
 
     my @file_lines = _read_file( $filepath );
 
-    @file_lines = map  { _trim( $_ ) } @file_lines;
+    @file_lines = map  { trim( $_ ) } @file_lines;
     @file_lines = grep { $EMPTY_STRING ne $_ && $_ !~ /^[#]/o } @file_lines;
 
     %modules_install_dont_try = _hashify @file_lines;
@@ -1295,9 +1295,9 @@ sub install_modules_sequentially
 sub handle_main_arguments
 {
     my ( $arg1, $arg2, $arg3 ) = @_;
-    $arg1 = _trim( $arg1 );
-    $arg2 = _trim( $arg2 );
-    $arg2 = _trim( $arg3 );
+    $arg1 = trim( $arg1 );
+    $arg2 = trim( $arg2 );
+    $arg2 = trim( $arg3 );
 
     my $filepath_install  = $EMPTY_STRING;
     my $filepath_dont_try = $EMPTY_STRING;
@@ -1333,8 +1333,8 @@ sub handle_main_arguments
         }
     }
 
-    $filepath_install  = _trim( $filepath_install );
-    $filepath_dont_try = _trim( $filepath_dont_try );
+    $filepath_install  = trim( $filepath_install );
+    $filepath_dont_try = trim( $filepath_dont_try );
 
     return ( $filepath_install, $filepath_dont_try, $only_all_updates, $all_updates );
 }
