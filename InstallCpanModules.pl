@@ -112,7 +112,7 @@ sub is_string_empty
     return $t;
 }
 
-sub _hashify
+sub hashify
 {
     my @args = @_;
 
@@ -1046,7 +1046,7 @@ sub import_module_list_from_file
     @file_lines = map  { trim( $_ ) } @file_lines;
     @file_lines = grep { $EMPTY_STRING ne $_ && $_ !~ /^[#]/o } @file_lines;
 
-    %modules_to_install = _hashify @file_lines;
+    %modules_to_install = hashify @file_lines;
     @file_lines         = ();
 
     say_ex '';
@@ -1077,7 +1077,7 @@ sub import_module_dont_try_list_from_file
     @file_lines = map  { trim( $_ ) } @file_lines;
     @file_lines = grep { $EMPTY_STRING ne $_ && $_ !~ /^[#]/o } @file_lines;
 
-    %modules_install_dont_try = _hashify @file_lines;
+    %modules_install_dont_try = hashify @file_lines;
     @file_lines               = ();
 
     say_ex '';
