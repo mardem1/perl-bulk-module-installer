@@ -103,7 +103,7 @@ sub say_ex
     return;
 }
 
-sub _is_string_empty
+sub is_string_empty
 {
     my ( $s ) = @_;
 
@@ -156,7 +156,7 @@ sub _read_file
 {
     my ( $filepath ) = @_;
 
-    if ( _is_string_empty( $filepath ) ) {
+    if ( is_string_empty( $filepath ) ) {
         croak 'param filepath empty!';
     }
 
@@ -192,11 +192,11 @@ sub _write_file
 {
     my ( $filepath, $header, @content ) = @_;
 
-    if ( _is_string_empty( $filepath ) ) {
+    if ( is_string_empty( $filepath ) ) {
         croak 'param filepath empty!';
     }
 
-    if ( _is_string_empty( $header ) ) {
+    if ( is_string_empty( $header ) ) {
         croak 'param header empty!';
     }
 
@@ -231,7 +231,7 @@ sub _get_output_with_detached_execute
 {
     my ( $timeout, $show_live_output, @cmd ) = @_;
 
-    if ( _is_string_empty( $timeout ) ) {
+    if ( is_string_empty( $timeout ) ) {
         croak 'param timeout empty!';
     }
 
@@ -239,11 +239,11 @@ sub _get_output_with_detached_execute
         croak 'param timeout greater 0!';
     }
 
-    if ( _is_string_empty( $show_live_output ) ) {
+    if ( is_string_empty( $show_live_output ) ) {
         croak 'param show_live_output empty!';
     }
 
-    if ( ( ( scalar @cmd ) == 0 ) || _is_string_empty( $cmd[ 0 ] ) ) {
+    if ( ( ( scalar @cmd ) == 0 ) || is_string_empty( $cmd[ 0 ] ) ) {
         croak 'param @cmd empty!';
     }
 
@@ -345,11 +345,11 @@ sub _get_output_with_detached_execute_and_logfile
 {
     my ( $logfile_suffix, $logfile_title, $timeout, $show_live_output, @cmd ) = @_;
 
-    if ( _is_string_empty( $logfile_suffix ) ) {
+    if ( is_string_empty( $logfile_suffix ) ) {
         croak 'param logfile_suffix empty!';
     }
 
-    if ( _is_string_empty( $logfile_title ) ) {
+    if ( is_string_empty( $logfile_title ) ) {
         croak 'param logfile_title empty!';
     }
 
@@ -381,11 +381,11 @@ sub mark_module_as_ok
 {
     my ( $module, $version ) = @_;
 
-    if ( _is_string_empty( $module ) ) {
+    if ( is_string_empty( $module ) ) {
         croak 'param module empty!';
     }
 
-    if ( _is_string_empty( $version ) ) {
+    if ( is_string_empty( $version ) ) {
         $version = undef;    # force undef if empty - param optional
     }
 
@@ -417,11 +417,11 @@ sub mark_module_as_failed
 {
     my ( $module, $version ) = @_;
 
-    if ( _is_string_empty( $module ) ) {
+    if ( is_string_empty( $module ) ) {
         croak 'param module empty!';
     }
 
-    if ( _is_string_empty( $version ) ) {
+    if ( is_string_empty( $version ) ) {
         $version = undef;    # force undef if empty - param optional
     }
 
@@ -456,11 +456,11 @@ sub mark_module_as_not_found
 {
     my ( $module, $version ) = @_;
 
-    if ( _is_string_empty( $module ) ) {
+    if ( is_string_empty( $module ) ) {
         croak 'param module empty!';
     }
 
-    if ( _is_string_empty( $version ) ) {
+    if ( is_string_empty( $version ) ) {
         $version = undef;    # force undef if empty - param optional
     }
 
@@ -490,7 +490,7 @@ sub was_module_already_tried
 {
     my ( $module ) = @_;
 
-    if ( _is_string_empty( $module ) ) {
+    if ( is_string_empty( $module ) ) {
         croak 'param module empty!';
     }
 
@@ -598,7 +598,7 @@ sub print_install_state_summary
 
 sub dump_state_to_logfiles
 {
-    if ( _is_string_empty( $log_dir_path ) ) {
+    if ( is_string_empty( $log_dir_path ) ) {
         croak 'param filepath empty!';
     }
 
@@ -731,7 +731,7 @@ sub fetch_dependencies_for_module
 {
     my ( $module ) = @_;
 
-    if ( _is_string_empty( $module ) ) {
+    if ( is_string_empty( $module ) ) {
         croak 'param module empty!';
     }
 
@@ -979,7 +979,7 @@ sub install_single_module
 {
     my ( $module ) = @_;
 
-    if ( _is_string_empty( $module ) ) {
+    if ( is_string_empty( $module ) ) {
         croak 'param module empty!';
     }
 
@@ -1037,7 +1037,7 @@ sub import_module_list_from_file
 {
     my ( $filepath ) = @_;
 
-    if ( _is_string_empty( $filepath ) ) {
+    if ( is_string_empty( $filepath ) ) {
         croak 'param filepath empty!';
     }
 
@@ -1068,7 +1068,7 @@ sub import_module_dont_try_list_from_file
 {
     my ( $filepath ) = @_;
 
-    if ( _is_string_empty( $filepath ) ) {
+    if ( is_string_empty( $filepath ) ) {
         croak 'param filepath empty!';
     }
 
@@ -1120,7 +1120,7 @@ sub install_module_dep_version
 {
     my ( $module ) = @_;
 
-    if ( _is_string_empty( $module ) ) {
+    if ( is_string_empty( $module ) ) {
         croak 'param module empty!';
     }
 
@@ -1172,11 +1172,11 @@ sub get_next_module_to_install_dep_version
 sub install_modules_dep_version
 {
     my $install_module = get_next_module_to_install_dep_version();
-    while ( !_is_string_empty( $install_module ) ) {
+    while ( !is_string_empty( $install_module ) ) {
         install_module_dep_version( $install_module );
 
         my $next_module = get_next_module_to_install_dep_version();
-        if ( _is_string_empty( $next_module ) ) {
+        if ( is_string_empty( $next_module ) ) {
             say_ex 'no more modules to do';
 
             $install_module = '';
@@ -1306,29 +1306,29 @@ sub handle_main_arguments
 
     if ( $arg1 eq '--only-all-updates' ) {
         $only_all_updates = $TRUE;
-        if ( !_is_string_empty( $arg2 ) ) {
+        if ( !is_string_empty( $arg2 ) ) {
             croak 'wrong parameter set';
         }
     }
     elsif ( $arg1 eq '--all-updates' ) {
         $all_updates = $TRUE;
-        if ( _is_string_empty( $arg2 ) ) {
+        if ( is_string_empty( $arg2 ) ) {
             croak 'wrong parameter set';
         }
 
         $filepath_install = $arg2;
 
-        if ( !_is_string_empty( $arg3 ) ) {
+        if ( !is_string_empty( $arg3 ) ) {
             $filepath_dont_try = $arg3;
         }
     }
-    elsif ( _is_string_empty( $arg1 ) ) {
+    elsif ( is_string_empty( $arg1 ) ) {
         croak 'wrong parameter set';
     }
     else {
         $filepath_install = $arg1;
 
-        if ( !_is_string_empty( $arg2 ) ) {
+        if ( !is_string_empty( $arg2 ) ) {
             $filepath_dont_try = $arg2;
         }
     }
@@ -1344,7 +1344,7 @@ sub init_log_dir_path
     my $logdir = dirname( __FILE__ ) . '/log';
     $log_dir_path = abs_path( $logdir );
 
-    if ( _is_string_empty( $log_dir_path ) ) {
+    if ( is_string_empty( $log_dir_path ) ) {
         croak "logdir '$logdir' not found";
     }
 
@@ -1367,14 +1367,14 @@ sub main
         say_ex '--only-all-updates: skip module list file import';
     }
     else {
-        if ( _is_string_empty( $filepath_install ) ) {
+        if ( is_string_empty( $filepath_install ) ) {
             croak 'no file arg given';
         }
 
         import_module_list_from_file( $filepath_install );
     }
 
-    if ( !_is_string_empty( $filepath_dont_try ) ) {
+    if ( !is_string_empty( $filepath_dont_try ) ) {
         # mark modules as failed, some to old to build, other not for windows ...
         import_module_dont_try_list_from_file( $filepath_dont_try );
     }
