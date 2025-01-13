@@ -188,7 +188,7 @@ sub read_file
     return @raw_file_lines;
 }
 
-sub _write_file
+sub write_file
 {
     my ( $filepath, $header, @content ) = @_;
 
@@ -360,7 +360,7 @@ sub _get_output_with_detached_execute_and_logfile
     my $time_start = get_timestamp_pretty( $start_date );
     my $time_end   = get_timestamp_pretty( $end_date );
 
-    _write_file(
+    write_file(
         $log_dir_path . '/' . $timestamp . '_' . $logfile_suffix . '.log',
         $logfile_title,
         'CMD: ' . ( join ' ', @cmd ),
@@ -604,43 +604,43 @@ sub dump_state_to_logfiles
 
     my $timestamp = get_timestamp_for_filename();
 
-    _write_file(
+    write_file(
         $log_dir_path . '/' . $timestamp . '_' . 'modules_to_install_with_deps_extended.log',
         'modules_to_install_with_deps_extended: ' . scalar( keys %modules_to_install_with_deps_extended ),
         Dumper( \%modules_to_install_with_deps_extended ),
     );
 
-    _write_file(
+    write_file(
         $log_dir_path . '/' . $timestamp . '_' . 'modules_install_dont_try.log',
         'modules_install_dont_try: ' . scalar( keys %modules_install_dont_try ),
         Dumper( \%modules_install_dont_try ),
     );
 
-    _write_file(
+    write_file(
         $log_dir_path . '/' . $timestamp . '_' . 'modules_install_already.log',
         'modules_install_already: ' . scalar( keys %modules_install_already ),
         Dumper( \%modules_install_already ),
     );
 
-    _write_file(
+    write_file(
         $log_dir_path . '/' . $timestamp . '_' . 'modules_install_ok.log',
         'modules_install_ok: ' . scalar( keys %modules_install_ok ),
         Dumper( \%modules_install_ok ),
     );
 
-    _write_file(
+    write_file(
         $log_dir_path . '/' . $timestamp . '_' . 'modules_install_not_found.log',
         'modules_install_not_found: ' . scalar( keys %modules_install_not_found ),
         Dumper( \%modules_install_not_found ),
     );
 
-    _write_file(
+    write_file(
         $log_dir_path . '/' . $timestamp . '_' . 'modules_install_failed.log',
         'modules_install_failed: ' . scalar( keys %modules_install_failed ),
         Dumper( \%modules_install_failed ),
     );
 
-    _write_file(
+    write_file(
         $log_dir_path . '/' . $timestamp . '_' . 'modules_need_to_install.log',
         'modules_need_to_install: ' . scalar( keys %modules_need_to_install ),
         Dumper( \%modules_need_to_install ),
@@ -1055,7 +1055,7 @@ sub import_module_list_from_file
 
     my $timestamp = get_timestamp_for_filename();
 
-    _write_file(
+    write_file(
         $log_dir_path . '/' . $timestamp . '_' . 'modules_to_install_from_file.log',
         'modules_to_install_from_file: ' . scalar( keys %modules_to_install ),
         Dumper( \%modules_to_install ),
@@ -1088,7 +1088,7 @@ sub import_module_dont_try_list_from_file
 
     my $timestamp = get_timestamp_for_filename();
 
-    _write_file(
+    write_file(
         $log_dir_path . '/' . $timestamp . '_' . 'import_module_dont_try_list_from_file.log',
         'import_module_dont_try_list_from_file: ' . scalar( keys %modules_install_dont_try ),
         Dumper( \%modules_install_dont_try ),
