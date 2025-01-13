@@ -85,7 +85,7 @@ sub get_log_line
 
     my $line = $EMPTY_STRING;
 
-    my $now = _get_timestamp_for_logline();
+    my $now = get_timestamp_for_logline();
 
     $line = '# ' . $now . ' # ' . join( '', @args );
 
@@ -119,7 +119,7 @@ sub hashify
     return map { $_ => undef } @args;
 }
 
-sub _get_timestamp_for_logline
+sub get_timestamp_for_logline
 {
     my ( $time ) = @_;
     $time ||= time;
