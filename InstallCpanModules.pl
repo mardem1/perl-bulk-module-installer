@@ -341,7 +341,7 @@ sub get_output_with_detached_execute
     return ( $start_date, $end_date, $child_exit_status, @output );
 }
 
-sub _get_output_with_detached_execute_and_logfile
+sub get_output_with_detached_execute_and_logfile
 {
     my ( $logfile_suffix, $logfile_title, $timeout, $show_live_output, @cmd ) = @_;
 
@@ -702,7 +702,7 @@ sub search_for_installed_modules
     my $logfile_title  = 'installed_modules_found';
 
     my ( $start_date, $end_date, $child_exit_status, @output ) =
-        _get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
+        get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
             $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS,
             1, @cmd );
 
@@ -751,7 +751,7 @@ sub fetch_dependencies_for_module
     }
     else {
         ( $start_date, $end_date, $child_exit_status, @output ) =
-            _get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
+            get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
                 $SEARCH_FOR_MODULE_DEPENDENCY_TIMEOUT_IN_SECONDS,
                 1, @cmd );
     }
@@ -1003,7 +1003,7 @@ sub install_single_module
     my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '2>&1' );
 
     my ( $start_date, $end_date, $child_exit_status, @output ) =
-        _get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
+        get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
             $INSTALL_MODULE_TIMEOUT_IN_SECONDS,
             1, @cmd );
 
@@ -1105,7 +1105,7 @@ sub print_perl_detail_info
     my @cmd = ( 'cmd.exe', '/c', 'perl', '-V' );
 
     my ( $start_date, $end_date, $child_exit_status, @output ) =
-        _get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
+        get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
             $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS,
             1, @cmd );
 
@@ -1202,7 +1202,7 @@ sub search_for_modules_for_available_updates
     my @cmd = ( 'cmd.exe', '/c', 'cpan-outdated', '--exclude-core', '-p' );
 
     my ( $start_date, $end_date, $child_exit_status, @output ) =
-        _get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
+        get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
             $CHECK_UPDATE_MODULE_TIMEOUT_IN_SECONDS,
             1, @cmd );
 
