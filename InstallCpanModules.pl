@@ -92,7 +92,7 @@ sub get_log_line
     return $line;
 }
 
-sub _say_ex
+sub say_ex
 {
     my @args = @_;
 
@@ -161,20 +161,20 @@ sub _read_file
     }
 
     if ( !( -e -f -r -s $filepath ) ) {
-        _say_ex "ERROR: filepath '$filepath' - not exists, readable or empty";
+        say_ex "ERROR: filepath '$filepath' - not exists, readable or empty";
         croak "filepath '$filepath' - not exists, readable or empty";
     }
 
-    _say_ex "read modules from file '$filepath'";
+    say_ex "read modules from file '$filepath'";
 
     my $fh = undef;
     if ( !open( $fh, '<', $filepath ) ) {
-        _say_ex "ERROR: Couldn't open file-read '$filepath'";
-        _say_ex 'ERROR: start $! ->';
-        _say_ex '';
-        _say_ex "$!";
-        _say_ex '';
-        _say_ex 'ERROR: <- $! ended';
+        say_ex "ERROR: Couldn't open file-read '$filepath'";
+        say_ex 'ERROR: start $! ->';
+        say_ex '';
+        say_ex "$!";
+        say_ex '';
+        say_ex 'ERROR: <- $! ended';
         croak "Couldn't open file-read '$filepath'";
     }
 
@@ -200,16 +200,16 @@ sub _write_file
         croak 'param header empty!';
     }
 
-    _say_ex "write '$filepath'";
+    say_ex "write '$filepath'";
 
     my $fh = undef;
     if ( !open( $fh, '>', $filepath ) ) {
-        _say_ex "ERROR: Couldn't open file-write '$filepath'";
-        _say_ex 'ERROR: start $! ->';
-        _say_ex '';
-        _say_ex "$!";
-        _say_ex '';
-        _say_ex 'ERROR: <- $! ended';
+        say_ex "ERROR: Couldn't open file-write '$filepath'";
+        say_ex 'ERROR: start $! ->';
+        say_ex '';
+        say_ex "$!";
+        say_ex '';
+        say_ex 'ERROR: <- $! ended';
         croak "Couldn't open file-write '$filepath'";
     }
 
@@ -254,22 +254,22 @@ sub _get_output_with_detached_execute
     my $chld_in           = undef;
     my $chld_out          = undef;
 
-    _say_ex 'start cmd: ' . ( join ' ', @cmd );
+    say_ex 'start cmd: ' . ( join ' ', @cmd );
     my $pid = open3( $chld_in, $chld_out, '>&STDERR', @cmd );
 
     if ( 1 > $pid ) {
-        _say_ex 'ERROR: cmd start failed!';
+        say_ex 'ERROR: cmd start failed!';
         return ( $start_date, $end_date, $child_exit_status, @output );
     }
 
     $start_date = time;
     $end_date   = $start_date;
-    _say_ex 'pid: ' . $pid;
+    say_ex 'pid: ' . $pid;
 
-    _say_ex 'close chld_in';
+    say_ex 'close chld_in';
     close $chld_in;
 
-    _say_ex 'read output ... ';
+    say_ex 'read output ... ';
 
     local $@;
     my $eval_ok = eval {
@@ -281,7 +281,7 @@ sub _get_output_with_detached_execute
             push @output, $line;
 
             if ( $show_live_output ) {
-                _say_ex 'STDOUT: ' . $line;
+                say_ex 'STDOUT: ' . $line;
             }
         }
 
@@ -292,48 +292,48 @@ sub _get_output_with_detached_execute
 
     if ( $@ ) {
         if ( "timeout_alarm\n" ne $@ ) {
-            _say_ex 'ERROR: unexpected error';
-            _say_ex 'ERROR: start $@ ->';
-            _say_ex '';
-            _say_ex '' . 0 + $@;
-            _say_ex '';
-            _say_ex "$@";
-            _say_ex '';
-            _say_ex 'ERROR: <- $@ ended';
+            say_ex 'ERROR: unexpected error';
+            say_ex 'ERROR: start $@ ->';
+            say_ex '';
+            say_ex '' . 0 + $@;
+            say_ex '';
+            say_ex "$@";
+            say_ex '';
+            say_ex 'ERROR: <- $@ ended';
             kill -9, $pid;    # kill
         }
         else {
-            _say_ex 'ERROR: timeout';
-            _say_ex 'ERROR: start $@ ->';
-            _say_ex '';
-            _say_ex '' . 0 + $@;
-            _say_ex '';
-            _say_ex "$@";
-            _say_ex '';
-            _say_ex 'ERROR: <- $@ ended';
+            say_ex 'ERROR: timeout';
+            say_ex 'ERROR: start $@ ->';
+            say_ex '';
+            say_ex '' . 0 + $@;
+            say_ex '';
+            say_ex "$@";
+            say_ex '';
+            say_ex 'ERROR: <- $@ ended';
             kill -9, $pid;    # kill
         }
     }
     elsif ( 'eval_ok' ne $eval_ok ) {
-        _say_ex 'ERROR: eval failed';
-        _say_ex 'ERROR: start $@ ->';
-        _say_ex '';
-        _say_ex '' . 0 + $@;
-        _say_ex '';
-        _say_ex "$@";
-        _say_ex '';
-        _say_ex 'ERROR: <- $@ ended';
+        say_ex 'ERROR: eval failed';
+        say_ex 'ERROR: start $@ ->';
+        say_ex '';
+        say_ex '' . 0 + $@;
+        say_ex '';
+        say_ex "$@";
+        say_ex '';
+        say_ex 'ERROR: <- $@ ended';
         kill -9, $pid;    # kill
     }
     else {
-        _say_ex 'close chld_out';
+        say_ex 'close chld_out';
         close $chld_out;
 
-        _say_ex 'wait for exit...';
+        say_ex 'wait for exit...';
         # reap zombie and retrieve exit status
         waitpid( $pid, 0 );
         $child_exit_status = $? >> 8;
-        _say_ex '$child_exit_status: ' . $child_exit_status;
+        say_ex '$child_exit_status: ' . $child_exit_status;
     }
 
     $end_date = time;
@@ -389,22 +389,22 @@ sub mark_module_as_ok
         $version = undef;    # force undef if empty - param optional
     }
 
-    _say_ex 'add ', $module, ' to modules_install_ok';
+    say_ex 'add ', $module, ' to modules_install_ok';
     $modules_install_ok{ $module } = undef;
 
-    _say_ex 'add ', $module, ' to installed_module_version';
+    say_ex 'add ', $module, ' to installed_module_version';
     $installed_module_version{ $module } = $version;
 
-    _say_ex 'remove ', $module, ' from modules_need_to_install';
+    say_ex 'remove ', $module, ' from modules_need_to_install';
     delete $modules_need_to_install{ $module };
 
-    _say_ex 'remove ', $module, ' from $modules_need_to_update';
+    say_ex 'remove ', $module, ' from $modules_need_to_update';
     delete $modules_need_to_update{ $module };
 
-    _say_ex 'remove ', $module, ' from modules_to_install_with_deps_extended';
+    say_ex 'remove ', $module, ' from modules_to_install_with_deps_extended';
     delete $modules_to_install_with_deps_extended{ $module };
 
-    _say_ex 'remove dependencies ', $module, ' from modules_to_install_with_deps_extended';
+    say_ex 'remove dependencies ', $module, ' from modules_to_install_with_deps_extended';
     foreach my $key ( keys %modules_to_install_with_deps_extended ) {
         if ( exists $modules_to_install_with_deps_extended{ $key }->{ $module } ) {
             delete $modules_to_install_with_deps_extended{ $key }->{ $module };
@@ -426,23 +426,23 @@ sub mark_module_as_failed
     }
 
     if ( exists $modules_install_dont_try{ $module } ) {
-        _say_ex 'module ', $module, ' marked as dont try - so dont add to failed!';
+        say_ex 'module ', $module, ' marked as dont try - so dont add to failed!';
     }
     else {
-        _say_ex 'add ', $module, ' to modules_install_failed';
+        say_ex 'add ', $module, ' to modules_install_failed';
         $modules_install_failed{ $module } = $version;
     }
 
-    _say_ex 'remove ', $module, ' from modules_need_to_install';
+    say_ex 'remove ', $module, ' from modules_need_to_install';
     delete $modules_need_to_install{ $module };    # remove module - don't care if failed - no retry of failed
 
-    _say_ex 'remove ', $module, ' from $modules_need_to_update';
+    say_ex 'remove ', $module, ' from $modules_need_to_update';
     delete $modules_need_to_update{ $module };
 
-    _say_ex 'remove ', $module, ' from modules_to_install_with_deps_extended';
+    say_ex 'remove ', $module, ' from modules_to_install_with_deps_extended';
     delete $modules_to_install_with_deps_extended{ $module };
 
-    _say_ex 'mark modules as failed which depends on ', $module;
+    say_ex 'mark modules as failed which depends on ', $module;
     foreach my $key ( keys %modules_to_install_with_deps_extended ) {
         if ( exists $modules_to_install_with_deps_extended{ $key }->{ $module } ) {
             mark_module_as_failed( $key );
@@ -464,19 +464,19 @@ sub mark_module_as_not_found
         $version = undef;    # force undef if empty - param optional
     }
 
-    _say_ex 'add ', $module, ' to modules_install_not_found';
+    say_ex 'add ', $module, ' to modules_install_not_found';
     $modules_install_not_found{ $module } = $version;
 
-    _say_ex 'remove ', $module, ' from modules_need_to_install';
+    say_ex 'remove ', $module, ' from modules_need_to_install';
     delete $modules_need_to_install{ $module };    # remove module - don't care if not found - no retry of not found
 
-    _say_ex 'remove ', $module, ' from $modules_need_to_update';
+    say_ex 'remove ', $module, ' from $modules_need_to_update';
     delete $modules_need_to_update{ $module };
 
-    _say_ex 'remove ', $module, ' from modules_to_install_with_deps_extended';
+    say_ex 'remove ', $module, ' from modules_to_install_with_deps_extended';
     delete $modules_to_install_with_deps_extended{ $module };
 
-    _say_ex 'mark modules as failed which depends on ', $module;
+    say_ex 'mark modules as failed which depends on ', $module;
     foreach my $key ( keys %modules_to_install_with_deps_extended ) {
         if ( exists $modules_to_install_with_deps_extended{ $key }->{ $module } ) {
             mark_module_as_failed( $key );
@@ -496,28 +496,28 @@ sub was_module_already_tried
 
     if ( exists $modules_install_dont_try{ $module } ) {
         mark_module_as_failed( $module );
-        _say_ex 'WARN: install module - ' . $module . ' - marked dont try - abort';
+        say_ex 'WARN: install module - ' . $module . ' - marked dont try - abort';
 
         return 1;
     }
 
     if ( exists $modules_install_ok{ $module } ) {
         mark_module_as_ok( $module );
-        _say_ex 'WARN: install module - ' . $module . ' - already ok - abort';
+        say_ex 'WARN: install module - ' . $module . ' - already ok - abort';
 
         return 0;
     }
 
     if ( exists $modules_install_failed{ $module } ) {
         mark_module_as_failed( $module );
-        _say_ex 'WARN: install module - ' . $module . ' - already failed - abort';
+        say_ex 'WARN: install module - ' . $module . ' - already failed - abort';
 
         return 1;
     }
 
     if ( exists $modules_install_not_found{ $module } ) {
         mark_module_as_not_found( $module );
-        _say_ex 'WARN: install module - ' . $module . ' - already mot found - abort';
+        say_ex 'WARN: install module - ' . $module . ' - already mot found - abort';
 
         return 1;
     }
@@ -544,17 +544,17 @@ sub reduce_modules_to_install
         }
     }
 
-    _say_ex '';
-    _say_ex 'modules_install_already: '
+    say_ex '';
+    say_ex 'modules_install_already: '
         . scalar( keys %modules_install_already ) . "\n"
         . Dumper( \%modules_install_already );
-    _say_ex '';
+    say_ex '';
 
-    _say_ex '';
-    _say_ex 'modules_need_to_install: '
+    say_ex '';
+    say_ex 'modules_need_to_install: '
         . scalar( keys %modules_need_to_install ) . "\n"
         . Dumper( \%modules_need_to_install );
-    _say_ex '';
+    say_ex '';
 
     dump_state_to_logfiles();
 
@@ -564,34 +564,34 @@ sub reduce_modules_to_install
 sub print_install_state_summary
 {
     foreach ( 1 .. 10 ) {
-        _say_ex '';
+        say_ex '';
     }
 
-    _say_ex 'print_install_state_summary';
-    _say_ex '';
-    _say_ex '';
+    say_ex 'print_install_state_summary';
+    say_ex '';
+    say_ex '';
 
-    _say_ex 'modules_install_not_found: '
+    say_ex 'modules_install_not_found: '
         . scalar( keys %modules_install_not_found ) . "\n"
         . Dumper( \%modules_install_not_found );
 
-    _say_ex 'modules_install_failed: '
+    say_ex 'modules_install_failed: '
         . scalar( keys %modules_install_failed ) . "\n"
         . Dumper( \%modules_install_failed );
 
-    _say_ex 'modules_to_install_with_deps_extended left - '
+    say_ex 'modules_to_install_with_deps_extended left - '
         . scalar( keys %modules_to_install_with_deps_extended ) . "\n"
         . Dumper( \%modules_to_install_with_deps_extended );
 
-    _say_ex 'modules_need_to_install left - '
+    say_ex 'modules_need_to_install left - '
         . scalar( keys %modules_need_to_install ) . "\n"
         . Dumper( \%modules_need_to_install );
 
-    _say_ex 'modules_install_ok - ' . scalar( keys %modules_install_ok );
+    say_ex 'modules_install_ok - ' . scalar( keys %modules_install_ok );
 
     # no dumper with need and ok - not necessary as temporary state.
 
-    _say_ex '';
+    say_ex '';
 
     return;
 }
@@ -652,44 +652,44 @@ sub dump_state_to_logfiles
 sub print_install_end_summary
 {
     foreach ( 1 .. 10 ) {
-        _say_ex '';
+        say_ex '';
     }
-    _say_ex 'summary';
-    _say_ex '';
+    say_ex 'summary';
+    say_ex '';
 
-    _say_ex '';
-    _say_ex 'modules_to_install_with_deps_extended: '
+    say_ex '';
+    say_ex 'modules_to_install_with_deps_extended: '
         . scalar( keys %modules_to_install_with_deps_extended ) . "\n"
         . Dumper( \%modules_to_install_with_deps_extended );
-    _say_ex '';
+    say_ex '';
 
-    _say_ex '';
-    _say_ex 'modules_install_already: '
+    say_ex '';
+    say_ex 'modules_install_already: '
         . scalar( keys %modules_install_already ) . "\n"
         . Dumper( \%modules_install_already );
-    _say_ex '';
+    say_ex '';
 
-    _say_ex '';
-    _say_ex 'modules_install_ok: ' . scalar( keys %modules_install_ok ) . "\n" . Dumper( \%modules_install_ok );
-    _say_ex '';
+    say_ex '';
+    say_ex 'modules_install_ok: ' . scalar( keys %modules_install_ok ) . "\n" . Dumper( \%modules_install_ok );
+    say_ex '';
 
-    _say_ex '';
-    _say_ex 'modules_install_not_found: '
+    say_ex '';
+    say_ex 'modules_install_not_found: '
         . scalar( keys %modules_install_not_found ) . "\n"
         . Dumper( \%modules_install_not_found );
-    _say_ex '';
+    say_ex '';
 
-    _say_ex '';
-    _say_ex 'modules_install_failed: '
+    say_ex '';
+    say_ex 'modules_install_failed: '
         . scalar( keys %modules_install_failed ) . "\n"
         . Dumper( \%modules_install_failed );
-    _say_ex '';
+    say_ex '';
 
-    _say_ex '';
-    _say_ex 'modules_need_to_install: '
+    say_ex '';
+    say_ex 'modules_need_to_install: '
         . scalar( keys %modules_need_to_install ) . "\n"
         . Dumper( \%modules_need_to_install );
-    _say_ex '';
+    say_ex '';
 
     return;
 }
@@ -716,11 +716,11 @@ sub search_for_installed_modules
             ( 'undef' eq $t[ 1 ] ? undef : $t[ 1 ] );
     }
 
-    _say_ex '';
-    _say_ex 'installed_module_version: ' . scalar( keys %installed_module_version ) . "\n"
+    say_ex '';
+    say_ex 'installed_module_version: ' . scalar( keys %installed_module_version ) . "\n"
         # . Dumper( \%installed_module_version );
         . '';
-    _say_ex '';
+    say_ex '';
 
     reduce_modules_to_install();
 
@@ -735,7 +735,7 @@ sub fetch_dependencies_for_module
         croak 'param module empty!';
     }
 
-    _say_ex 'get module dependencies - ' . $module;
+    say_ex 'get module dependencies - ' . $module;
 
     my $module_n       = module_name_for_fs( $module );
     my $logfile_suffix = 'fetch_dependency__' . $module_n;
@@ -761,12 +761,12 @@ sub fetch_dependencies_for_module
     }
 
     if ( $child_exit_status && !@output ) {
-        _say_ex 'ERROR: search failed - exitcode - ' . $child_exit_status;
+        say_ex 'ERROR: search failed - exitcode - ' . $child_exit_status;
         return undef;    # as not found
     }
 
     if ( ( join '', @output ) =~ /Couldn't find module or a distribution/io ) {
-        _say_ex 'ERROR: module not found - ' . $module;
+        say_ex 'ERROR: module not found - ' . $module;
         return undef;    # as not found
     }
 
@@ -785,9 +785,9 @@ sub fetch_dependencies_for_module
         }
     }
 
-    _say_ex '';
-    _say_ex 'deps from Found dependencies: ' . scalar( keys %dependencies ) . "\n" . Dumper( \%dependencies );
-    _say_ex '';
+    say_ex '';
+    say_ex 'deps from Found dependencies: ' . scalar( keys %dependencies ) . "\n" . Dumper( \%dependencies );
+    say_ex '';
 
     @output =
         grep {
@@ -832,9 +832,9 @@ sub fetch_dependencies_for_module
         }
     } @output;
 
-    _say_ex '';
-    _say_ex 'dependencies found: ' . scalar( keys %dependencies ) . "\n" . Dumper( \%dependencies );
-    _say_ex '';
+    say_ex '';
+    say_ex 'dependencies found: ' . scalar( keys %dependencies ) . "\n" . Dumper( \%dependencies );
+    say_ex '';
 
     return \%dependencies;
 }
@@ -847,7 +847,7 @@ sub reduce_dependency_modules_which_are_not_installed
 
     foreach my $module ( keys %dependencies ) {
         if ( !exists $installed_module_version{ $module } ) {
-            _say_ex 'dependency not installed: ' . $module;
+            say_ex 'dependency not installed: ' . $module;
             $not_installed{ $module } = $dependencies{ $module };
         }
         elsif ( defined $dependencies{ $module } && defined $installed_module_version{ $module } ) {
@@ -857,26 +857,26 @@ sub reduce_dependency_modules_which_are_not_installed
                 my $dependent_version = version->parse( $dependencies{ $module } );
 
                 if ( ( $dependent_version cmp $installed_version ) == 1 ) {
-                    _say_ex 'dependency old version - update needed: ' . $module;
+                    say_ex 'dependency old version - update needed: ' . $module;
                     $not_installed{ $module } = $dependencies{ $module };    # to old version
                 }
                 else {
-                    _say_ex 'dependency installed and version check done: ' . $module;
+                    say_ex 'dependency installed and version check done: ' . $module;
                 }
             };
             if ( $@ ) {
-                _say_ex 'ERROR: dependency and version check failed for module: ' . $module;
-                _say_ex 'ERROR: start $@ ->';
-                _say_ex '';
-                _say_ex "$@";
-                _say_ex '';
-                _say_ex 'ERROR: <- $@ ended';
-                _say_ex 'dependency - unknown handle as needed: ' . $module;
+                say_ex 'ERROR: dependency and version check failed for module: ' . $module;
+                say_ex 'ERROR: start $@ ->';
+                say_ex '';
+                say_ex "$@";
+                say_ex '';
+                say_ex 'ERROR: <- $@ ended';
+                say_ex 'dependency - unknown handle as needed: ' . $module;
                 $not_installed{ $module } = $dependencies{ $module };
             }
         }
         else {
-            _say_ex 'dependency installed: ' . $module;
+            say_ex 'dependency installed: ' . $module;
         }
     }
 
@@ -888,23 +888,23 @@ sub add_dependency_module_if_needed
     my ( $module ) = @_;
 
     state $recursion = 1;
-    _say_ex 'add_dependency_module_if_needed - recursion level: ' . $recursion;
+    say_ex 'add_dependency_module_if_needed - recursion level: ' . $recursion;
 
-    _say_ex 'import module dependencies for - ' . $module;
+    say_ex 'import module dependencies for - ' . $module;
 
     if ( 10 < $recursion ) {
         croak "deep recursion level $recursion - abort!";
     }
 
     if ( exists $modules_to_install_with_deps_extended{ $module } ) {
-        _say_ex 'dependencies for module - ' . $module . ' - already checked';
+        say_ex 'dependencies for module - ' . $module . ' - already checked';
 
         return;
     }
 
     my $dep_ref = fetch_dependencies_for_module( $module );
     if ( !defined $dep_ref ) {
-        _say_ex 'module - ' . $module . ' - not found!';
+        say_ex 'module - ' . $module . ' - not found!';
 
         $modules_to_install_with_deps_extended{ $module } = {};    # as no deps
 
@@ -913,17 +913,17 @@ sub add_dependency_module_if_needed
 
     my %dep = %{ $dep_ref };
     if ( !%dep ) {
-        _say_ex 'module - ' . $module . ' - has no dependencies';
+        say_ex 'module - ' . $module . ' - has no dependencies';
 
         $modules_to_install_with_deps_extended{ $module } = {};    # mark module without needed deps
 
         return;
     }
 
-    _say_ex 'module - ' . $module . ' - has dependencies - reduce to not installed';
+    say_ex 'module - ' . $module . ' - has dependencies - reduce to not installed';
     %dep = reduce_dependency_modules_which_are_not_installed( %dep );
     if ( !%dep ) {
-        _say_ex 'module - ' . $module . ' - has no uninstalled dependencies';
+        say_ex 'module - ' . $module . ' - has no uninstalled dependencies';
 
         $modules_to_install_with_deps_extended{ $module } = {};    # mark module without needed deps
 
@@ -932,7 +932,7 @@ sub add_dependency_module_if_needed
 
     foreach my $dep_module ( keys %dep ) {
         if ( was_module_already_tried( $dep_module ) ) {
-            _say_ex 'module - '
+            say_ex 'module - '
                 . $module
                 . ' has already failed dependency module - add to failed list' . "\n"
                 . Dumper( \%dep );
@@ -941,7 +941,7 @@ sub add_dependency_module_if_needed
         }
     }
 
-    _say_ex 'module - ' . $module . ' has not installed dependencies - add to install list' . "\n" . Dumper( \%dep );
+    say_ex 'module - ' . $module . ' has not installed dependencies - add to install list' . "\n" . Dumper( \%dep );
     $modules_to_install_with_deps_extended{ $module } = \%dep;    # mark module needed deps
 
     foreach my $dep_module ( sort keys %dep ) {
@@ -956,7 +956,7 @@ sub add_dependency_module_if_needed
 
 sub add_dependency_modules_for_modules_need_to_install
 {
-    _say_ex 'add all dependent modules to install list';
+    say_ex 'add all dependent modules to install list';
 
     my @needed_modules = keys %modules_need_to_install;
 
@@ -965,7 +965,7 @@ sub add_dependency_modules_for_modules_need_to_install
 
     foreach my $module ( @needed_modules ) {
         $check_i++;
-        _say_ex "==> analyze module - ($check_i / $check_max) - $module";
+        say_ex "==> analyze module - ($check_i / $check_max) - $module";
 
         add_dependency_module_if_needed( $module );
     }
@@ -995,7 +995,7 @@ sub install_single_module
         $type = 'update';
     }
 
-    _say_ex $type . ' module - ' . $module;
+    say_ex $type . ' module - ' . $module;
 
     my $logfile_suffix = 'install_module__' . $module_n . '__' . $type;
     my $logfile_title  = 'install_module -> ' . $module . ' -> ' . $type;
@@ -1027,7 +1027,7 @@ sub install_single_module
         mark_module_as_ok( $module, 999_999 );    # newest version - so real number not relevant.
     }
 
-    _say_ex 'install module - ' . $module . ' - ' . $action;
+    say_ex 'install module - ' . $module . ' - ' . $action;
     print_install_state_summary();
 
     return $child_exit_status;
@@ -1049,9 +1049,9 @@ sub import_module_list_from_file
     %modules_to_install = _hashify @file_lines;
     @file_lines         = ();
 
-    _say_ex '';
-    _say_ex 'wanted modules to install: ' . ( scalar keys %modules_to_install ) . "\n" . Dumper( \%modules_to_install );
-    _say_ex '';
+    say_ex '';
+    say_ex 'wanted modules to install: ' . ( scalar keys %modules_to_install ) . "\n" . Dumper( \%modules_to_install );
+    say_ex '';
 
     my $timestamp = _get_timestamp_for_filename();
 
@@ -1080,11 +1080,11 @@ sub import_module_dont_try_list_from_file
     %modules_install_dont_try = _hashify @file_lines;
     @file_lines               = ();
 
-    _say_ex '';
-    _say_ex 'dont try modules to install: '
+    say_ex '';
+    say_ex 'dont try modules to install: '
         . ( scalar keys %modules_install_dont_try ) . "\n"
         . Dumper( \%modules_install_dont_try );
-    _say_ex '';
+    say_ex '';
 
     my $timestamp = _get_timestamp_for_filename();
 
@@ -1124,15 +1124,15 @@ sub install_module_dep_version
         croak 'param module empty!';
     }
 
-    _say_ex '' foreach ( 1 .. 25 );
-    _say_ex( '=' x 80 );
-    _say_ex '';
+    say_ex '' foreach ( 1 .. 25 );
+    say_ex( '=' x 80 );
+    say_ex '';
 
-    _say_ex 'analyze module - ' . $module;
+    say_ex 'analyze module - ' . $module;
 
     my $dep_ref = fetch_dependencies_for_module( $module );
     if ( !defined $dep_ref ) {
-        _say_ex 'ERROR: module - ' . $module . ' - not found - abort !';
+        say_ex 'ERROR: module - ' . $module . ' - not found - abort !';
         mark_module_as_not_found( $module, undef );
 
         print_install_state_summary();
@@ -1140,7 +1140,7 @@ sub install_module_dep_version
         return 1;
     }
 
-    _say_ex 'module - ' . $module . ' - found try install';
+    say_ex 'module - ' . $module . ' - found try install';
     my $ret = install_single_module( $module );
 
     return $ret ? 1 : 0;
@@ -1154,12 +1154,12 @@ sub get_next_module_to_install_dep_version
 
     my $remaining = scalar @install_modules;
 
-    _say_ex '';
-    _say_ex "==> $remaining remaining modules to install";
-    _say_ex '';
+    say_ex '';
+    say_ex "==> $remaining remaining modules to install";
+    say_ex '';
 
     if ( $remaining && !@no_deps_modules ) {
-        _say_ex 'ERROR: remaining modules but no one without dependencies ?';
+        say_ex 'ERROR: remaining modules but no one without dependencies ?';
     }
 
     if ( !@no_deps_modules ) {
@@ -1177,7 +1177,7 @@ sub install_modules_dep_version
 
         my $next_module = get_next_module_to_install_dep_version();
         if ( _is_string_empty( $next_module ) ) {
-            _say_ex 'no more modules to do';
+            say_ex 'no more modules to do';
 
             $install_module = '';
         }
@@ -1185,7 +1185,7 @@ sub install_modules_dep_version
             $install_module = $next_module;
         }
         else {
-            _say_ex 'ERROR: next module not changed ' . $next_module . ' - abort !';
+            say_ex 'ERROR: next module not changed ' . $next_module . ' - abort !';
 
             $install_module = '';
         }
@@ -1214,21 +1214,21 @@ sub search_for_modules_for_available_updates
         $modules_need_to_update{ $module } = undef;
     }
 
-    _say_ex '';
-    _say_ex 'modules_need_to_update: '
+    say_ex '';
+    say_ex 'modules_need_to_update: '
         . scalar( keys %modules_need_to_update ) . "\n"
         . Dumper( \%modules_need_to_update );
-    _say_ex '';
+    say_ex '';
 
-    _say_ex 'add all update modules to dependency-module-list with no dependency';
+    say_ex 'add all update modules to dependency-module-list with no dependency';
     foreach my $module ( keys %modules_need_to_update ) {
         if ( !exists $modules_to_install_with_deps_extended{ $module } ) {
-            _say_ex 'module - ' . $module . ' - not in dep-list add';
+            say_ex 'module - ' . $module . ' - not in dep-list add';
             $modules_to_install_with_deps_extended{ $module } = {};
         }
 
         if ( !exists $modules_need_to_install{ $module } ) {
-            _say_ex 'module - ' . $module . ' - not in to-install-list add';
+            say_ex 'module - ' . $module . ' - not in to-install-list add';
             $modules_need_to_install{ $module } = {};
         }
     }
@@ -1240,7 +1240,7 @@ sub search_for_modules_for_available_updates
 
 sub install_modules_sequentially
 {
-    _say_ex 'install all modules sequentially';
+    say_ex 'install all modules sequentially';
 
     my $remaining = scalar( keys %modules_need_to_install );
     my $check_i   = 0;
@@ -1253,33 +1253,33 @@ sub install_modules_sequentially
         $check_i++;
 
         foreach ( 1 .. 10 ) {
-            _say_ex '';
+            say_ex '';
         }
 
         my $tried = was_module_already_tried( $module );
         if ( defined $tried ) {
-            _say_ex "==> module already tried -> IGNORE - ($check_i - $remaining) - $module";
+            say_ex "==> module already tried -> IGNORE - ($check_i - $remaining) - $module";
 
             $remaining = scalar( keys %modules_need_to_install );
             $module    = ( keys %modules_need_to_install )[ 0 ];
             next;
         }
 
-        _say_ex "==> handle next install list module - ($check_i - $remaining) - $module";
+        say_ex "==> handle next install list module - ($check_i - $remaining) - $module";
 
         my $current_install_count = scalar( keys %modules_install_ok );
 
-        _say_ex "==> analyze module - ($check_i - $remaining) - $module";
+        say_ex "==> analyze module - ($check_i - $remaining) - $module";
         add_dependency_module_if_needed( $module );
 
         dump_state_to_logfiles();
 
-        _say_ex "==> install module with dependencies - ($check_i - $remaining) - $module";
+        say_ex "==> install module with dependencies - ($check_i - $remaining) - $module";
         install_modules_dep_version();
 
         my $new_install_count = scalar( keys %modules_install_ok );
         if ( $current_install_count != $new_install_count ) {
-            _say_ex "==> after successful module install - reimport all installed modules from system";
+            say_ex "==> after successful module install - reimport all installed modules from system";
             search_for_installed_modules();
         }
 
@@ -1364,7 +1364,7 @@ sub main
     print_perl_detail_info();
 
     if ( $only_all_updates ) {
-        _say_ex '--only-all-updates: skip module list file import';
+        say_ex '--only-all-updates: skip module list file import';
     }
     else {
         if ( _is_string_empty( $filepath_install ) ) {
@@ -1382,7 +1382,7 @@ sub main
     search_for_installed_modules();
 
     if ( !$all_updates ) {
-        _say_ex 'no --all-updates: skip update module list import';
+        say_ex 'no --all-updates: skip update module list import';
     }
     else {
         search_for_modules_for_available_updates();
@@ -1407,11 +1407,11 @@ sub main
 
 $| = 1;
 
-_say_ex "started $0";
+say_ex "started $0";
 
 main( @ARGV );
 
-_say_ex "ended $0";
+say_ex "ended $0";
 
 __END__
 
