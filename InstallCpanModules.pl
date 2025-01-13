@@ -141,7 +141,7 @@ sub get_timestamp_pretty
     return $now;
 }
 
-sub _get_timestamp_for_filename
+sub get_timestamp_for_filename
 {
     my ( $time ) = @_;
     $time ||= time;
@@ -356,7 +356,7 @@ sub _get_output_with_detached_execute_and_logfile
     my ( $start_date, $end_date, $child_exit_status, @output ) =
         _get_output_with_detached_execute( $timeout, $show_live_output, @cmd );
 
-    my $timestamp  = _get_timestamp_for_filename( $start_date );
+    my $timestamp  = get_timestamp_for_filename( $start_date );
     my $time_start = get_timestamp_pretty( $start_date );
     my $time_end   = get_timestamp_pretty( $end_date );
 
@@ -602,7 +602,7 @@ sub dump_state_to_logfiles
         croak 'param filepath empty!';
     }
 
-    my $timestamp = _get_timestamp_for_filename();
+    my $timestamp = get_timestamp_for_filename();
 
     _write_file(
         $log_dir_path . '/' . $timestamp . '_' . 'modules_to_install_with_deps_extended.log',
@@ -1053,7 +1053,7 @@ sub import_module_list_from_file
     say_ex 'wanted modules to install: ' . ( scalar keys %modules_to_install ) . "\n" . Dumper( \%modules_to_install );
     say_ex '';
 
-    my $timestamp = _get_timestamp_for_filename();
+    my $timestamp = get_timestamp_for_filename();
 
     _write_file(
         $log_dir_path . '/' . $timestamp . '_' . 'modules_to_install_from_file.log',
@@ -1086,7 +1086,7 @@ sub import_module_dont_try_list_from_file
         . Dumper( \%modules_install_dont_try );
     say_ex '';
 
-    my $timestamp = _get_timestamp_for_filename();
+    my $timestamp = get_timestamp_for_filename();
 
     _write_file(
         $log_dir_path . '/' . $timestamp . '_' . 'import_module_dont_try_list_from_file.log',
