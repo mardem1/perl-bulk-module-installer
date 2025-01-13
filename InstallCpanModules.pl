@@ -79,7 +79,7 @@ sub module_name_for_fs
     return $module_n;
 }
 
-sub _get_log_line
+sub get_log_line
 {
     my @args = @_;
 
@@ -96,7 +96,7 @@ sub _say_ex
 {
     my @args = @_;
 
-    my $line = _get_log_line( @args );
+    my $line = get_log_line( @args );
 
     say $line;
 
