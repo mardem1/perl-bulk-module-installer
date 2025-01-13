@@ -70,7 +70,7 @@ sub str_replace
     return $string;
 }
 
-sub _module_name_for_fs
+sub module_name_for_fs
 {
     my ( $module ) = @_;
 
@@ -737,7 +737,7 @@ sub fetch_dependencies_for_module
 
     _say_ex 'get module dependencies - ' . $module;
 
-    my $module_n       = _module_name_for_fs( $module );
+    my $module_n       = module_name_for_fs( $module );
     my $logfile_suffix = 'fetch_dependency__' . $module_n;
     my $logfile_title  = 'fetch_dependency ' . $module;
 
@@ -988,7 +988,7 @@ sub install_single_module
         return $tried;
     }
 
-    my $module_n = _module_name_for_fs( $module );
+    my $module_n = module_name_for_fs( $module );
 
     my $type = 'install';
     if ( exists $installed_module_version{ $module } ) {
