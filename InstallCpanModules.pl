@@ -130,7 +130,7 @@ sub get_timestamp_for_logline
     return $now;
 }
 
-sub _get_timestamp_pretty
+sub get_timestamp_pretty
 {
     my ( $time ) = @_;
     $time ||= time;
@@ -357,8 +357,8 @@ sub _get_output_with_detached_execute_and_logfile
         _get_output_with_detached_execute( $timeout, $show_live_output, @cmd );
 
     my $timestamp  = _get_timestamp_for_filename( $start_date );
-    my $time_start = _get_timestamp_pretty( $start_date );
-    my $time_end   = _get_timestamp_pretty( $end_date );
+    my $time_start = get_timestamp_pretty( $start_date );
+    my $time_end   = get_timestamp_pretty( $end_date );
 
     _write_file(
         $log_dir_path . '/' . $timestamp . '_' . $logfile_suffix . '.log',
