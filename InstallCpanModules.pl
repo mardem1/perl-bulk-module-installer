@@ -227,7 +227,7 @@ sub write_file
     return;
 }
 
-sub _get_output_with_detached_execute
+sub get_output_with_detached_execute
 {
     my ( $timeout, $show_live_output, @cmd ) = @_;
 
@@ -354,7 +354,7 @@ sub _get_output_with_detached_execute_and_logfile
     }
 
     my ( $start_date, $end_date, $child_exit_status, @output ) =
-        _get_output_with_detached_execute( $timeout, $show_live_output, @cmd );
+        get_output_with_detached_execute( $timeout, $show_live_output, @cmd );
 
     my $timestamp  = get_timestamp_for_filename( $start_date );
     my $time_start = get_timestamp_pretty( $start_date );
