@@ -36,6 +36,11 @@ sub str_replace : Test(2)
     is( PerlBulkModuleInstaller::str_replace( 's:t', ':', '_'), 's_t');
 }
 
+sub module_name_for_fs : Test(1)
+{
+    is( PerlBulkModuleInstaller::module_name_for_fs( 'My::Test::Module'), 'My_Test_Module');
+}
+
 1;
 
 __END__
