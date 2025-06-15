@@ -54,6 +54,16 @@ sub get_timestamp_for_logline : Test(1)
     restore_time();
 }
 
+sub get_log_line : Test(1)
+{
+    my $offset = strftime("%z", localtime());
+    set_absolute_time('2025-05-14T04:08:16'.$offset, '%Y-%m-%dT%H:%M:%S%z');
+
+    is( PerlBulkModuleInstaller::get_log_line('some text'), '# 2025-05-14_04-08-16 # some text');
+
+    restore_time();
+}
+
 1;
 
 __END__
