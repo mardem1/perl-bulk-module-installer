@@ -17,11 +17,6 @@ sub my_setup : Test(setup)
     diag( 'my_setup' );
 }
 
-sub test_dummy : Test(1)
-{
-    ok( 1 == 1, 'test_dummy' );
-}
-
 sub my_teardown : Test(teardown)
 {
     diag( 'my_teardown' );
