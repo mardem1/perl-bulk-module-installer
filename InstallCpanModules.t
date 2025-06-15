@@ -8,6 +8,8 @@ use warnings;
 use lib './lib';
 use lib './t';
 
+use Test::Class;
+
 use PerlBulkModuleInstallerTest qw();
 
 BEGIN {
