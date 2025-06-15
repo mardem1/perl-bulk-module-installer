@@ -11,8 +11,8 @@ use base qw( Test::Class );
 
 use Test::More;
 use Test::MockTime qw( set_absolute_time restore_time );
-use POSIX qw(strftime);
-use Test::Output qw(stdout_is);
+use POSIX          qw( strftime );
+use Test::Output   qw( stdout_is );
 
 use PerlBulkModuleInstaller qw();
 
@@ -28,60 +28,60 @@ sub my_teardown : Test(teardown)
 
 sub trim : Test(4)
 {
-    is( PerlBulkModuleInstaller::trim( ' t'), 't');
-    is( PerlBulkModuleInstaller::trim( 't '), 't');
-    is( PerlBulkModuleInstaller::trim( ' t '), 't');
-    is( PerlBulkModuleInstaller::trim( 't t t'), 't t t');
+    is( PerlBulkModuleInstaller::trim( ' t' ),    't' );
+    is( PerlBulkModuleInstaller::trim( 't ' ),    't' );
+    is( PerlBulkModuleInstaller::trim( ' t ' ),   't' );
+    is( PerlBulkModuleInstaller::trim( 't t t' ), 't t t' );
 }
 
 sub str_replace : Test(2)
 {
-    is( PerlBulkModuleInstaller::str_replace( 'text', 't', 'a'), 'aexa');
-    is( PerlBulkModuleInstaller::str_replace( 's:t', ':', '_'), 's_t');
+    is( PerlBulkModuleInstaller::str_replace( 'text', 't', 'a' ), 'aexa' );
+    is( PerlBulkModuleInstaller::str_replace( 's:t',  ':', '_' ), 's_t' );
 }
 
 sub module_name_for_fs : Test(1)
 {
-    is( PerlBulkModuleInstaller::module_name_for_fs( 'My::Test::Module'), 'My_Test_Module');
+    is( PerlBulkModuleInstaller::module_name_for_fs( 'My::Test::Module' ), 'My_Test_Module' );
 }
 
 sub get_timestamp_for_logline : Test(1)
 {
-    my $offset = strftime("%z", localtime());
-    set_absolute_time('2025-05-14T04:08:16'.$offset, '%Y-%m-%dT%H:%M:%S%z');
+    my $offset = strftime( "%z", localtime() );
+    set_absolute_time( '2025-05-14T04:08:16' . $offset, '%Y-%m-%dT%H:%M:%S%z' );
 
-    is( PerlBulkModuleInstaller::get_timestamp_for_logline(), '2025-05-14_04-08-16');
+    is( PerlBulkModuleInstaller::get_timestamp_for_logline(), '2025-05-14_04-08-16' );
 
     restore_time();
 }
 
 sub get_log_line : Test(1)
 {
-    my $offset = strftime("%z", localtime());
-    set_absolute_time('2025-05-14T04:08:16'.$offset, '%Y-%m-%dT%H:%M:%S%z');
+    my $offset = strftime( "%z", localtime() );
+    set_absolute_time( '2025-05-14T04:08:16' . $offset, '%Y-%m-%dT%H:%M:%S%z' );
 
-    is( PerlBulkModuleInstaller::get_log_line('some text'), '# 2025-05-14_04-08-16 # some text');
+    is( PerlBulkModuleInstaller::get_log_line( 'some text' ), '# 2025-05-14_04-08-16 # some text' );
 
     restore_time();
 }
 
 sub say_ex : Test(1)
 {
-    my $offset = strftime("%z", localtime());
-    set_absolute_time('2025-05-14T04:08:16'.$offset, '%Y-%m-%dT%H:%M:%S%z');
+    my $offset = strftime( "%z", localtime() );
+    set_absolute_time( '2025-05-14T04:08:16' . $offset, '%Y-%m-%dT%H:%M:%S%z' );
 
-    stdout_is { PerlBulkModuleInstaller::say_ex('some text') } "# 2025-05-14_04-08-16 # some text\n";
+    stdout_is { PerlBulkModuleInstaller::say_ex( 'some text' ) } "# 2025-05-14_04-08-16 # some text\n";
 
     restore_time();
 }
 
-sub is_string_empty :Test(5)
+sub is_string_empty : Test(5)
 {
-    ok( PerlBulkModuleInstaller::is_string_empty( undef ));
-    ok( PerlBulkModuleInstaller::is_string_empty( '' ));
-    ok( !PerlBulkModuleInstaller::is_string_empty( 0 ));
-    ok( !PerlBulkModuleInstaller::is_string_empty( ' ' ));
-    ok( !PerlBulkModuleInstaller::is_string_empty( 'text' ));
+    ok( PerlBulkModuleInstaller::is_string_empty( undef ) );
+    ok( PerlBulkModuleInstaller::is_string_empty( '' ) );
+    ok( !PerlBulkModuleInstaller::is_string_empty( 0 ) );
+    ok( !PerlBulkModuleInstaller::is_string_empty( ' ' ) );
+    ok( !PerlBulkModuleInstaller::is_string_empty( 'text' ) );
 }
 
 1;
