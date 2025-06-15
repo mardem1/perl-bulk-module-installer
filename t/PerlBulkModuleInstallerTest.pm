@@ -8,7 +8,10 @@ use strict;
 use warnings;
 
 use base qw( Test::Class );
+
 use Test::More;
+use Test::MockTime qw( set_absolute_time restore_time );
+use POSIX qw(strftime);
 
 use PerlBulkModuleInstaller qw();
 
@@ -39,6 +42,16 @@ sub str_replace : Test(2)
 sub module_name_for_fs : Test(1)
 {
     is( PerlBulkModuleInstaller::module_name_for_fs( 'My::Test::Module'), 'My_Test_Module');
+}
+
+sub get_timestamp_for_logline : Test(1)
+{
+    my $offset = strftime("%z", localtime());
+    set_absolute_time('2025-05-14T04:08:16'.$offset, '%Y-%m-%dT%H:%M:%S%z');
+
+    is( PerlBulkModuleInstaller::get_timestamp_for_logline(), '2025-05-14_04-08-16');
+
+    restore_time();
 }
 
 1;
