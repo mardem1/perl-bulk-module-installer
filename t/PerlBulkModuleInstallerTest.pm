@@ -75,6 +75,15 @@ sub say_ex : Test(1)
     restore_time();
 }
 
+sub is_string_empty :Test(5)
+{
+    ok( PerlBulkModuleInstaller::is_string_empty( undef ));
+    ok( PerlBulkModuleInstaller::is_string_empty( '' ));
+    ok( !PerlBulkModuleInstaller::is_string_empty( 0 ));
+    ok( !PerlBulkModuleInstaller::is_string_empty( ' ' ));
+    ok( !PerlBulkModuleInstaller::is_string_empty( 'text' ));
+}
+
 1;
 
 __END__
