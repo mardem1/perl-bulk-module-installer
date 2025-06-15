@@ -35,6 +35,12 @@ sub trim : Test(4)
     is( PerlBulkModuleInstaller::trim( 't t t'), 't t t');
 }
 
+sub str_replace : Test(2)
+{
+    is( PerlBulkModuleInstaller::str_replace( 'text', 't', 'a'), 'aexa');
+    is( PerlBulkModuleInstaller::str_replace( 's:t', ':', '_'), 's_t');
+}
+
 1;
 
 __END__
