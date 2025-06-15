@@ -10,6 +10,8 @@ use warnings;
 use base qw( Test::Class );
 use Test::More;
 
+use PerlBulkModuleInstaller qw();
+
 sub my_setup : Test(setup)
 {
     diag( 'my_setup' );
@@ -23,6 +25,14 @@ sub test_dummy : Test(1)
 sub my_teardown : Test(teardown)
 {
     diag( 'my_teardown' );
+}
+
+sub trim : Test(4)
+{
+    is( PerlBulkModuleInstaller::trim( ' t'), 't');
+    is( PerlBulkModuleInstaller::trim( 't '), 't');
+    is( PerlBulkModuleInstaller::trim( ' t '), 't');
+    is( PerlBulkModuleInstaller::trim( 't t t'), 't t t');
 }
 
 1;
