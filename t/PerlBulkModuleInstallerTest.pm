@@ -12,6 +12,7 @@ use base qw( Test::Class );
 use Test::More;
 use Test::MockTime qw( set_absolute_time restore_time );
 use POSIX qw(strftime);
+use Test::Output qw(stdout_is);
 
 use PerlBulkModuleInstaller qw();
 
@@ -60,6 +61,16 @@ sub get_log_line : Test(1)
     set_absolute_time('2025-05-14T04:08:16'.$offset, '%Y-%m-%dT%H:%M:%S%z');
 
     is( PerlBulkModuleInstaller::get_log_line('some text'), '# 2025-05-14_04-08-16 # some text');
+
+    restore_time();
+}
+
+sub say_ex : Test(1)
+{
+    my $offset = strftime("%z", localtime());
+    set_absolute_time('2025-05-14T04:08:16'.$offset, '%Y-%m-%dT%H:%M:%S%z');
+
+    stdout_is { PerlBulkModuleInstaller::say_ex('some text') } "# 2025-05-14_04-08-16 # some text\n";
 
     restore_time();
 }
