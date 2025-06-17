@@ -1287,7 +1287,7 @@ sub install_modules_sequentially
         dump_state_to_logfiles();
 
         say_ex( "==> install module with dependencies - ($check_i - $remaining) - $module" );
-        install_modules_dep_version();
+        install_module_dep_version( $module );
 
         my $new_install_count = scalar( keys %modules_install_ok );
         if ( $current_install_count != $new_install_count ) {
