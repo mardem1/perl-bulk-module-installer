@@ -84,6 +84,13 @@ sub is_string_empty : Test(5)
     ok( !PerlBulkModuleInstaller::is_string_empty( 'text' ) );
 }
 
+sub hashify : Test(5)
+{
+    my %got = PerlBulkModuleInstaller::hashify( 'a', 'b', 1 );
+    my %exp = ( 'a' => undef, 'b' => undef, 1 => undef );
+    is_deeply( \%got, \%exp );
+}
+
 1;
 
 __END__
