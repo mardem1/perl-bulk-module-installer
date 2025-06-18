@@ -196,6 +196,11 @@ sub add_dependency_modules_for_modules_need_to_install : Test(1)  {
     fail();
 }
 
+sub install_single_module : Test(1)  {
+    local $TODO = "test install_single_module currently unimplemented";
+    fail();
+}
+
 1;
 
 __END__
