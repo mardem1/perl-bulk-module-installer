@@ -176,6 +176,11 @@ sub search_for_installed_modules : Test(1)  {
     fail();
 }
 
+sub fetch_dependencies_for_module : Test(1)  {
+    local $TODO = "test fetch_dependencies_for_module currently unimplemented";
+    fail();
+}
+
 1;
 
 __END__
