@@ -181,6 +181,11 @@ sub fetch_dependencies_for_module : Test(1)  {
     fail();
 }
 
+sub reduce_dependency_modules_which_are_not_installed : Test(1)  {
+    local $TODO = "test reduce_dependency_modules_which_are_not_installed currently unimplemented";
+    fail();
+}
+
 1;
 
 __END__
