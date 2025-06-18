@@ -251,6 +251,11 @@ sub init_log_dir_path : Test(1)  {
     fail();
 }
 
+sub main : Test(1)  {
+    local $TODO = "test main currently unimplemented";
+    fail();
+}
+
 1;
 
 __END__
