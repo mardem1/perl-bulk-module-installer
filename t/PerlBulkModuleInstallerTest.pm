@@ -216,6 +216,11 @@ sub print_perl_detail_info : Test(1)  {
     fail();
 }
 
+sub install_module_dep_version : Test(1)  {
+    local $TODO = "test install_module_dep_version currently unimplemented";
+    fail();
+}
+
 1;
 
 __END__
