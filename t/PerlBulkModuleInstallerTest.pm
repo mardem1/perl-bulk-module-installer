@@ -120,6 +120,10 @@ sub write_file : Test(1)  {
     local $TODO = "test write_file currently unimplemented";
     fail();
 }
+sub get_output_with_detached_execute : Test(1)  {
+    local $TODO = "test get_output_with_detached_execute currently unimplemented";
+    fail();
+}
 
 1;
 
