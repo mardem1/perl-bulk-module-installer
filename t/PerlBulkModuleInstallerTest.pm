@@ -236,6 +236,11 @@ sub search_for_modules_for_available_updates : Test(1)  {
     fail();
 }
 
+sub install_modules_sequentially : Test(1)  {
+    local $TODO = "test install_modules_sequentially currently unimplemented";
+    fail();
+}
+
 1;
 
 __END__
