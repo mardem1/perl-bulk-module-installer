@@ -226,6 +226,11 @@ sub get_next_module_to_install_dep_version : Test(1)  {
     fail();
 }
 
+sub install_modules_dep_version : Test(1)  {
+    local $TODO = "test install_modules_dep_version currently unimplemented";
+    fail();
+}
+
 1;
 
 __END__
