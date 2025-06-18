@@ -201,6 +201,11 @@ sub install_single_module : Test(1)  {
     fail();
 }
 
+sub import_module_list_from_file : Test(1)  {
+    local $TODO = "test import_module_list_from_file currently unimplemented";
+    fail();
+}
+
 1;
 
 __END__
