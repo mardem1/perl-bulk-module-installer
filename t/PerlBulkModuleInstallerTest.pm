@@ -146,6 +146,11 @@ sub mark_module_as_not_found : Test(1)  {
     fail();
 }
 
+sub was_module_already_tried : Test(1)  {
+    local $TODO = "test was_module_already_tried currently unimplemented";
+    fail();
+}
+
 1;
 
 __END__
