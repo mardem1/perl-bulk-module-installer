@@ -186,6 +186,11 @@ sub reduce_dependency_modules_which_are_not_installed : Test(1)  {
     fail();
 }
 
+sub add_dependency_module_if_needed : Test(1)  {
+    local $TODO = "test add_dependency_module_if_needed currently unimplemented";
+    fail();
+}
+
 1;
 
 __END__
