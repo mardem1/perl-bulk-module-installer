@@ -136,6 +136,11 @@ sub mark_module_as_ok : Test(1)  {
     fail();
 }
 
+sub mark_module_as_failed : Test(1)  {
+    local $TODO = "test mark_module_as_failed currently unimplemented";
+    fail();
+}
+
 1;
 
 __END__
