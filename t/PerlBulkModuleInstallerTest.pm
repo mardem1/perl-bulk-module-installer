@@ -156,6 +156,11 @@ sub reduce_modules_to_install : Test(1)  {
     fail();
 }
 
+sub print_install_state_summary : Test(1)  {
+    local $TODO = "test print_install_state_summary currently unimplemented";
+    fail();
+}
+
 1;
 
 __END__
