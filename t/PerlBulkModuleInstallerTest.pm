@@ -231,6 +231,11 @@ sub install_modules_dep_version : Test(1)  {
     fail();
 }
 
+sub search_for_modules_for_available_updates : Test(1)  {
+    local $TODO = "test search_for_modules_for_available_updates currently unimplemented";
+    fail();
+}
+
 1;
 
 __END__
