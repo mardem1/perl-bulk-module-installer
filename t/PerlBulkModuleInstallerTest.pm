@@ -241,6 +241,11 @@ sub install_modules_sequentially : Test(1)  {
     fail();
 }
 
+sub handle_main_arguments : Test(1)  {
+    local $TODO = "test handle_main_arguments currently unimplemented";
+    fail();
+}
+
 1;
 
 __END__
