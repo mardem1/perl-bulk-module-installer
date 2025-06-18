@@ -13,6 +13,7 @@ use Test::More;
 use Test::MockTime qw( set_absolute_time restore_time );
 use POSIX          qw( strftime );
 use Test::Output   qw( stdout_is );
+use Test::MockModule;
 
 use PerlBulkModuleInstaller qw();
 
@@ -191,8 +192,39 @@ sub search_for_installed_modules : Test(1)
 
 sub fetch_dependencies_for_module : Test(1)
 {
-    local $TODO = "test fetch_dependencies_for_module currently unimplemented";
-    fail();
+    my $mock = Test::MockModule->new( 'PerlBulkModuleInstaller' );
+    $mock->mock(
+        'get_output_with_detached_execute_and_logfile' => sub
+        {
+            # cmd.exe /c cpanm --no-interactive --showdeps Log::Log4perl
+            return (
+                '--> Working on Log::Log4perl',
+                'Fetching http://www.cpan.org/authors/id/E/ET/ETJ/Log-Log4perl-1.57.tar.gz ... OK',
+                'Configuring Log-Log4perl-1.57 ... OK',
+                'ExtUtils::MakeMaker~6.58',
+                'File::Spec~0.82',
+                'File::Path~2.07',
+                'ExtUtils::MakeMaker',
+                'Test::More~0.88',
+                'perl~5.006',
+            );
+        }
+    );
+
+    my %exp = (
+        'ExtUtils::MakeMaker' => 6.58,
+        'File::Spec'          => 0.82,
+        'File::Path'          => 2.07,
+        'ExtUtils::MakeMaker' => undef,
+        'Test::More'          => 0.88,
+        # perl~5.006
+    );
+
+    my $got_ref = PerlBulkModuleInstaller::fetch_dependencies_for_module( 'Log::Log4perl' );
+
+    is_deeply( $got_ref, \%exp );
+
+    $mock->unmock_all();
 }
 
 sub reduce_dependency_modules_which_are_not_installed : Test(1)
