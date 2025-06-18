@@ -171,6 +171,11 @@ sub print_install_end_summary : Test(1)  {
     fail();
 }
 
+sub search_for_installed_modules : Test(1)  {
+    local $TODO = "test search_for_installed_modules currently unimplemented";
+    fail();
+}
+
 1;
 
 __END__
