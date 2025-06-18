@@ -211,6 +211,11 @@ sub import_module_dont_try_list_from_file : Test(1)  {
     fail();
 }
 
+sub print_perl_detail_info : Test(1)  {
+    local $TODO = "test print_perl_detail_info currently unimplemented";
+    fail();
+}
+
 1;
 
 __END__
