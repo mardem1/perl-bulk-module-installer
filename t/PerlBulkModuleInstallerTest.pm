@@ -116,6 +116,11 @@ sub read_file : Test(1)  {
     fail();
 }
 
+sub write_file : Test(1)  {
+    local $TODO = "test write_file currently unimplemented";
+    fail();
+}
+
 1;
 
 __END__
