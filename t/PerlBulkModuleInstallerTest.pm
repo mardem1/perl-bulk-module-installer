@@ -18,12 +18,12 @@ use PerlBulkModuleInstaller qw();
 
 sub my_setup : Test(setup)
 {
-    diag( 'my_setup' );
+    # diag( 'my_setup' );
 }
 
 sub my_teardown : Test(teardown)
 {
-    diag( 'my_teardown' );
+    # diag( 'my_teardown' );
 }
 
 sub trim : Test(4)
@@ -111,147 +111,176 @@ sub hashify : Test(5)
     is_deeply( \%got, \%exp );
 }
 
-sub read_file : Test(1)  {
+sub read_file : Test(1)
+{
     local $TODO = "test read_file currently unimplemented";
     fail();
 }
 
-sub write_file : Test(1)  {
+sub write_file : Test(1)
+{
     local $TODO = "test write_file currently unimplemented";
     fail();
 }
 
-sub get_output_with_detached_execute : Test(1)  {
+sub get_output_with_detached_execute : Test(1)
+{
     local $TODO = "test get_output_with_detached_execute currently unimplemented";
     fail();
 }
 
-sub get_output_with_detached_execute_and_logfile : Test(1)  {
+sub get_output_with_detached_execute_and_logfile : Test(1)
+{
     local $TODO = "test get_output_with_detached_execute_and_logfile currently unimplemented";
     fail();
 }
 
-sub mark_module_as_ok : Test(1)  {
+sub mark_module_as_ok : Test(1)
+{
     local $TODO = "test mark_module_as_ok currently unimplemented";
     fail();
 }
 
-sub mark_module_as_failed : Test(1)  {
+sub mark_module_as_failed : Test(1)
+{
     local $TODO = "test mark_module_as_failed currently unimplemented";
     fail();
 }
 
-sub mark_module_as_not_found : Test(1)  {
+sub mark_module_as_not_found : Test(1)
+{
     local $TODO = "test mark_module_as_not_found currently unimplemented";
     fail();
 }
 
-sub was_module_already_tried : Test(1)  {
+sub was_module_already_tried : Test(1)
+{
     local $TODO = "test was_module_already_tried currently unimplemented";
     fail();
 }
 
-sub reduce_modules_to_install : Test(1)  {
+sub reduce_modules_to_install : Test(1)
+{
     local $TODO = "test reduce_modules_to_install currently unimplemented";
     fail();
 }
 
-sub print_install_state_summary : Test(1)  {
+sub print_install_state_summary : Test(1)
+{
     local $TODO = "test print_install_state_summary currently unimplemented";
     fail();
 }
 
-sub dump_state_to_logfiles : Test(1)  {
+sub dump_state_to_logfiles : Test(1)
+{
     local $TODO = "test dump_state_to_logfiles currently unimplemented";
     fail();
 }
 
-sub print_install_end_summary : Test(1)  {
+sub print_install_end_summary : Test(1)
+{
     local $TODO = "test print_install_end_summary currently unimplemented";
     fail();
 }
 
-sub search_for_installed_modules : Test(1)  {
+sub search_for_installed_modules : Test(1)
+{
     local $TODO = "test search_for_installed_modules currently unimplemented";
     fail();
 }
 
-sub fetch_dependencies_for_module : Test(1)  {
+sub fetch_dependencies_for_module : Test(1)
+{
     local $TODO = "test fetch_dependencies_for_module currently unimplemented";
     fail();
 }
 
-sub reduce_dependency_modules_which_are_not_installed : Test(1)  {
+sub reduce_dependency_modules_which_are_not_installed : Test(1)
+{
     local $TODO = "test reduce_dependency_modules_which_are_not_installed currently unimplemented";
     fail();
 }
 
-sub add_dependency_module_if_needed : Test(1)  {
+sub add_dependency_module_if_needed : Test(1)
+{
     local $TODO = "test add_dependency_module_if_needed currently unimplemented";
     fail();
 }
 
-sub add_dependency_modules_for_modules_need_to_install : Test(1)  {
+sub add_dependency_modules_for_modules_need_to_install : Test(1)
+{
     local $TODO = "test add_dependency_modules_for_modules_need_to_install currently unimplemented";
     fail();
 }
 
-sub install_single_module : Test(1)  {
+sub install_single_module : Test(1)
+{
     local $TODO = "test install_single_module currently unimplemented";
     fail();
 }
 
-sub import_module_list_from_file : Test(1)  {
+sub import_module_list_from_file : Test(1)
+{
     local $TODO = "test import_module_list_from_file currently unimplemented";
     fail();
 }
 
-sub import_module_dont_try_list_from_file : Test(1)  {
+sub import_module_dont_try_list_from_file : Test(1)
+{
     local $TODO = "test import_module_dont_try_list_from_file currently unimplemented";
     fail();
 }
 
-sub print_perl_detail_info : Test(1)  {
+sub print_perl_detail_info : Test(1)
+{
     local $TODO = "test print_perl_detail_info currently unimplemented";
     fail();
 }
 
-sub install_module_dep_version : Test(1)  {
+sub install_module_dep_version : Test(1)
+{
     local $TODO = "test install_module_dep_version currently unimplemented";
     fail();
 }
 
-sub get_next_module_to_install_dep_version : Test(1)  {
+sub get_next_module_to_install_dep_version : Test(1)
+{
     local $TODO = "test get_next_module_to_install_dep_version currently unimplemented";
     fail();
 }
 
-sub install_modules_dep_version : Test(1)  {
+sub install_modules_dep_version : Test(1)
+{
     local $TODO = "test install_modules_dep_version currently unimplemented";
     fail();
 }
 
-sub search_for_modules_for_available_updates : Test(1)  {
+sub search_for_modules_for_available_updates : Test(1)
+{
     local $TODO = "test search_for_modules_for_available_updates currently unimplemented";
     fail();
 }
 
-sub install_modules_sequentially : Test(1)  {
+sub install_modules_sequentially : Test(1)
+{
     local $TODO = "test install_modules_sequentially currently unimplemented";
     fail();
 }
 
-sub handle_main_arguments : Test(1)  {
+sub handle_main_arguments : Test(1)
+{
     local $TODO = "test handle_main_arguments currently unimplemented";
     fail();
 }
 
-sub init_log_dir_path : Test(1)  {
+sub init_log_dir_path : Test(1)
+{
     local $TODO = "test init_log_dir_path currently unimplemented";
     fail();
 }
 
-sub main : Test(1)  {
+sub main : Test(1)
+{
     local $TODO = "test main currently unimplemented";
     fail();
 }
