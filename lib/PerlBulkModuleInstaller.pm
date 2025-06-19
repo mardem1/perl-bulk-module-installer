@@ -1275,60 +1275,6 @@ sub search_for_modules_for_available_updates
     return;
 }
 
-sub install_modules_sequentially
-{
-    say_ex( 'install all modules sequentially' );
-
-    my $remaining = scalar( keys %modules_need_to_install );
-    my $check_i   = 0;
-
-    my $module = q{};
-    $module = ( keys %modules_need_to_install )[ 0 ];
-
-    while ( $module ) {
-        #    foreach my $module ( @needed_modules ) {
-        $check_i++;
-
-        foreach ( 1 .. 10 ) {
-            say_ex( '' );
-        }
-
-        my $tried = was_module_already_tried( $module );
-        if ( defined $tried ) {
-            say_ex( "==> module already tried -> IGNORE - ($check_i - $remaining) - $module" );
-
-            $remaining = scalar( keys %modules_need_to_install );
-            $module    = ( keys %modules_need_to_install )[ 0 ];
-            next;
-        }
-
-        say_ex( "==> handle next install list module - ($check_i - $remaining) - $module" );
-
-        my $current_install_count = scalar( keys %modules_install_ok );
-
-        say_ex( "==> analyze module - ($check_i - $remaining) - $module" );
-        add_dependency_module_if_needed( $module );
-
-        dump_state_to_logfiles();
-
-        say_ex( "==> install module with dependencies - ($check_i - $remaining) - $module" );
-        install_module_dep_version( $module );
-
-        my $new_install_count = scalar( keys %modules_install_ok );
-        if ( $current_install_count != $new_install_count ) {
-            say_ex( "==> after successful module install - reimport all installed modules from system" );
-            search_for_installed_modules();
-        }
-
-        $remaining = scalar( keys %modules_need_to_install );
-        $module    = ( keys %modules_need_to_install )[ 0 ];
-    }
-
-    print_install_state_summary();
-
-    return;
-}
-
 sub handle_main_arguments
 {
     my ( $arg1, $arg2, $arg3 ) = @_;
@@ -1425,15 +1371,13 @@ sub main
         search_for_modules_for_available_updates();
     }
 
-    # add_dependency_modules_for_modules_need_to_install();
+    add_dependency_modules_for_modules_need_to_install();
 
     dump_state_to_logfiles();
 
     print_install_state_summary();
 
-    # install_modules_dep_version();
-
-    install_modules_sequentially();
+    install_modules_dep_version();
 
     print_install_end_summary();
 

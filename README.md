@@ -71,22 +71,7 @@ Logfiles:
     * output of install/update call. Type and result are in filename. 
     * Installed via `cpanm --verbose --no-interactive MODULENAME`
 
-Script process - new install_modules_sequentially :
-
-1. import module list - if not update-only
-2. search for installed modules
-3. search for available update of installed modules - if not no-updates
-4. now the installation loop
-    1. get the next module from file list
-    2. search for missing dependencies
-       1. if found start new installation module (recursion)
-    3. try to install module
-    4. if ok remove this module from the dependency list of each module, if listed
-    5. if not ok mark all known modules which depend on this als failed, and all which depend on them - and so on - recursion
-    6. mark this module als installed or failed.
-    7. repeat loop
-
-Script process - old see comment add_dependency_modules_for_modules_need_to_install + install_modules_dep_version :
+Script process:
 
 1. import module list - if not update-only
 2. search for installed modules
