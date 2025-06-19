@@ -13,6 +13,8 @@ BEGIN {
     }
 }
 
+use base qw(Exporter);
+
 use version;
 use POSIX qw( :sys_wait_h );
 use Carp  qw( croak );
@@ -22,9 +24,8 @@ use Data::Dumper   qw( Dumper );
 use List::Util     qw( shuffle );
 use Cwd            qw( abs_path );
 use File::Basename qw( dirname );
-use Exporter;
 
-our @EXPORT = qw(
+our @EXPORT_OK = qw(
     say_ex
     main
 );
