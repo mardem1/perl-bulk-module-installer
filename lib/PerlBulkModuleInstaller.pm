@@ -709,7 +709,7 @@ sub print_install_end_summary
 
 sub search_for_installed_modules
 {
-    my @cmd = ( 'cmd.exe', '/c', 'cpan', '-l' );
+    my @cmd = ( 'cmd.exe', '/c', 'cpan', '-l', '2>&1'  );
 
     my $logfile_suffix = 'installed_modules_found';
     my $logfile_title  = 'installed_modules_found';
@@ -756,8 +756,7 @@ sub fetch_dependencies_for_module
     my $logfile_suffix = 'fetch_dependency__' . $module_n;
     my $logfile_title  = 'fetch_dependency ' . $module;
 
-    # showdeps checks also the dependency of the dependency if not already installed
-    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--no-interactive', '--showdeps', $module );
+    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--no-interactive', '--showdeps', $module, '2>&1'  );
 
     my ( $start_date, $end_date, $child_exit_status, @output ) = ();
 
@@ -1022,7 +1021,7 @@ sub install_single_module
     my $logfile_suffix = 'install_module__' . $module_n . '__' . $type;
     my $logfile_title  = 'install_module -> ' . $module . ' -> ' . $type;
 
-    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module );
+    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '2>&1' );
 
     my ( $start_date, $end_date, $child_exit_status, @output ) =
         get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
@@ -1127,7 +1126,7 @@ sub print_perl_detail_info
     my $logfile_suffix = 'perl_detail_info';
     my $logfile_title  = 'perl_detail_info';
 
-    my @cmd = ( 'cmd.exe', '/c', 'perl', '-V' );
+    my @cmd = ( 'cmd.exe', '/c', 'perl', '-V', '2>&1' );
 
     my ( $start_date, $end_date, $child_exit_status, @output ) =
         get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
@@ -1243,7 +1242,7 @@ sub search_for_modules_for_available_updates
     my $logfile_suffix = 'modules_with_available_updates';
     my $logfile_title  = 'modules_with_available_updates';
 
-    my @cmd = ( 'cmd.exe', '/c', 'cpan-outdated', '--exclude-core', '-p' );
+    my @cmd = ( 'cmd.exe', '/c', 'cpan-outdated', '--exclude-core', '-p', , '2>&1' );
 
     my ( $start_date, $end_date, $child_exit_status, @output ) =
         get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
