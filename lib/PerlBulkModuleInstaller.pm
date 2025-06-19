@@ -1325,7 +1325,7 @@ sub handle_main_arguments
 
 sub init_log_dir_path
 {
-    my $logdir = dirname( __FILE__ ) . '/log';
+    my $logdir = dirname( __FILE__ ) . '/../log';
     $log_dir_path = abs_path( $logdir );
 
     if ( is_string_empty( $log_dir_path ) ) {
