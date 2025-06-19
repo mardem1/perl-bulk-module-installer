@@ -1186,7 +1186,11 @@ sub install_module_dep_version
         }
     }
 
-    say_ex( 'module - ' . $module . ' - found try install' );
+    say_ex( '' ) foreach ( 1 .. 25 );
+    say_ex( '=' x 80 );
+    say_ex( '' );
+
+    say_ex( 'module - ' . $module . ' - found (with all known dependencies) try install' );
     my $ret = install_single_module( $module );
 
     return $ret ? 1 : 0;
