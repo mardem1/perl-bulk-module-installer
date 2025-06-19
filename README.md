@@ -26,7 +26,9 @@ Install perl modules in bulk with some logic to make this more efficient.
 
    ```
    perl InstallCpanModules.pl [ --only-all-updates | --all-updates ] filepath_install [ filepath_dont_try ]
-   perl InstallCpanModules.pl test-module-lists/SmallModuleExample.txt test-module-lists/_dont_try_modules.txt
+   ```
+   ```
+   perl InstallCpanModules.pl test-module-lists\SingleModuleExample.txt test-module-lists\_dont_try_modules.txt
    ```
 
 6. have a portable Windows-Perl with all wanted modules :)
