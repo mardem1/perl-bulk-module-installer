@@ -369,6 +369,9 @@ sub get_output_with_detached_execute_and_logfile
     my $time_start = get_timestamp_pretty( $start_date );
     my $time_end   = get_timestamp_pretty( $end_date );
 
+    my $duration_seconds = $end_date - $start_date;
+    my $duration_minutes = ( 0.0 + $duration_seconds ) / 60.0 ;
+
     write_file(
         $log_dir_path . '/' . $timestamp . '_' . $logfile_suffix . '.log',
         $logfile_title,
@@ -376,6 +379,7 @@ sub get_output_with_detached_execute_and_logfile
         'ExitCode: ' . $child_exit_status,
         'Started: ' . $time_start,
         'Ended: ' . $time_end,
+        'Duration: ' . $duration_seconds . ' seconds => ' . $duration_minutes . ' minutes',
         '',
         '=' x 80,
         '',
