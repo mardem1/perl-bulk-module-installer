@@ -1136,6 +1136,11 @@ sub install_module_dep_version
         croak 'param module empty!';
     }
 
+    my $tried = was_module_already_tried( $module );
+    if ( defined $tried ) {
+        return $tried;
+    }
+
     say_ex( '' ) foreach ( 1 .. 25 );
     say_ex( '=' x 80 );
     say_ex( '' );
