@@ -857,8 +857,14 @@ sub reduce_dependency_modules_which_are_not_installed
 
     foreach my $module ( keys %dependencies ) {
         if ( !exists $installed_module_version{ $module } ) {
-            say_ex( 'dependency not installed: ' . $module );
-            $not_installed{ $module } = $dependencies{ $module };
+            if ( exists $modules_install_ok{ $module } ) {
+                # also check if module was installed, and system list currently not renewed
+                say_ex( 'dependency already installed: ' . $module );
+            }
+            else {
+                say_ex( 'dependency not installed: ' . $module );
+                $not_installed{ $module } = $dependencies{ $module };
+            }
         }
         elsif ( defined $dependencies{ $module } && defined $installed_module_version{ $module } ) {
             local $@;
