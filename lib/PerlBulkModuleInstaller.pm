@@ -752,7 +752,7 @@ sub fetch_dependencies_for_module
     my $logfile_suffix = 'fetch_dependency__' . $module_n;
     my $logfile_title  = 'fetch_dependency ' . $module;
 
-    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--no-interactive', '--showdeps', $module, '2>&1' );
+    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--no-interactive', '--showdeps', $module );
 
     my ( $start_date, $end_date, $child_exit_status, @output ) = ();
 
@@ -1017,7 +1017,7 @@ sub install_single_module
     my $logfile_suffix = 'install_module__' . $module_n . '__' . $type;
     my $logfile_title  = 'install_module -> ' . $module . ' -> ' . $type;
 
-    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '2>&1' );
+    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module );
 
     my ( $start_date, $end_date, $child_exit_status, @output ) =
         get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
