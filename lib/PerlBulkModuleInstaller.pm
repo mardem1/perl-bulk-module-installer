@@ -833,7 +833,7 @@ sub fetch_dependencies_for_module
             && $_ !~ /^.+ at .+[\\\/]perl[\\\/]site[\\\/]bin[\\\/]cpanm line \d+.*$/o
         } @output;
 
-    %dependencies = map {
+    my %tmp = map {
         my @t = split /~/io, $_;
 
         if ( ( scalar @t ) <= 1 ) {
@@ -843,6 +843,10 @@ sub fetch_dependencies_for_module
             $t[ 0 ] => $t[ 1 ];
         }
     } @output;
+
+    foreach my $key ( keys %tmp ) {
+        $dependencies{ $key } = $tmp{ $key };
+    }
 
     say_ex( '' );
     say_ex( 'dependencies found: ' . scalar( keys %dependencies ) . "\n" . Dumper( \%dependencies ) );
