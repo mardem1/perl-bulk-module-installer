@@ -1047,6 +1047,7 @@ sub install_single_module
 
     say_ex( 'install module - ' . $module . ' - ' . $action );
     print_install_state_summary();
+    dump_state_to_logfiles(); # too much ?
 
     return $child_exit_status;
 }
