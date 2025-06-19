@@ -797,10 +797,6 @@ sub fetch_dependencies_for_module
         }
     }
 
-    say_ex( '' );
-    say_ex( 'deps from Found dependencies: ' . scalar( keys %dependencies ) . "\n" . Dumper( \%dependencies ) );
-    say_ex( '' );
-
     @output =
         grep {
                $_ !~ /Working on/io
