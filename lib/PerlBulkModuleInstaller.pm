@@ -1147,8 +1147,6 @@ sub install_module_dep_version
         return $tried;
     }
 
-    # TODO already installed check ?
-
     say_ex( '' ) foreach ( 1 .. 25 );
     say_ex( '=' x 80 );
     say_ex( '' );
@@ -1165,12 +1163,17 @@ sub install_module_dep_version
         return 1;
     }
 
-    foreach my $dep_module ( keys %{ $dep_ref } ) {
-        say_ex( 'dependent module found - ' . $dep_module );
-        my $ret = install_module_dep_version( $dep_module );
-        if ( $ret ) {
-            say_ex( 'dependent module - ' . $dep_module . ' - failed - abort - ' . $module );
-            return 1;
+    my %dep = %{ $dep_ref };
+    %dep = reduce_dependency_modules_which_are_not_installed( %dep );
+    if ( %dep ) {
+        # there should be no missing ?
+        foreach my $dep_module ( keys %dep ) {
+            say_ex( 'WARN: not installed dependent module found - ' . $dep_module );
+            my $ret = install_module_dep_version( $dep_module );
+            if ( $ret ) {
+                say_ex( 'dependent module - ' . $dep_module . ' - failed - abort - ' . $module );
+                return 1;
+            }
         }
     }
 
