@@ -756,6 +756,9 @@ sub fetch_dependencies_for_module
     my $logfile_suffix = 'fetch_dependency__' . $module_n;
     my $logfile_title  = 'fetch_dependency ' . $module;
 
+    # showdeps checks also the dependency of the dependency if not already installed.
+    # eg Perl::Critic shows other dependencies if all dependencies are installed.
+    # so the information can change
     my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--no-interactive', '--showdeps', $module, '2>&1'  );
 
     my ( $start_date, $end_date, $child_exit_status, @output ) = ();
