@@ -820,7 +820,7 @@ sub search_for_installed_modules
     my ( $start_date, $end_date, $child_exit_status, @output ) =
         get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
             $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS,
-            1, @cmd );
+            0, @cmd ); # no direct output only log
 
     if ( !defined $child_exit_status || ( $child_exit_status && !@output ) ) {
         return;    # error nothing found
