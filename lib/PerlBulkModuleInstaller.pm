@@ -944,7 +944,14 @@ sub install_single_module
 
     say_ex( 'install module - ' . $module . ' - ' . $action );
     print_install_state_summary();
-    dump_state_to_logfiles();                     # too much ?
+
+    if(!$hasError) {
+        say_ex( "==> after successful module install - reimport all installed modules from system" );
+        search_for_installed_modules();
+    }
+    else {
+       dump_state_to_logfiles();
+    }
 
     return $hasError;
 }
