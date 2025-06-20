@@ -609,16 +609,16 @@ sub was_module_already_tried
 sub generate_modules_need_to_install
 {
     foreach my $module ( keys %modules_to_install ) {
-        if ( exists $installed_module_version{ $module } ) {
-            $modules_install_already{ $module } = undef;
-        }
-        elsif (exists $modules_install_dont_try{ $module }
+        if (exists $modules_install_dont_try{ $module }
             || exists $modules_install_ok{ $module }
             || exists $modules_install_failed{ $module }
             || exists $modules_install_not_found{ $module }
             || exists $modules_need_to_install{ $module } )
         {
             # already marked somewhere - ignore
+        }
+        elsif ( exists $installed_module_version{ $module } ) {
+            $modules_install_already{ $module } = undef;
         }
         else {
             $modules_need_to_install{ $module } = undef;
