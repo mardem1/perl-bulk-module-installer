@@ -761,6 +761,65 @@ sub search_for_installed_modules
     return;
 }
 
+sub install_single_module
+{
+    my ( $module ) = @_;
+
+    if ( is_string_empty( $module ) ) {
+        croak 'param module empty!';
+    }
+
+    my $tried = was_module_already_tried( $module );
+    if ( defined $tried ) {
+        return $tried;
+    }
+
+    my $module_n = module_name_for_fs( $module );
+
+    my $type = 'install';
+    if ( exists $installed_module_version{ $module } ) {
+        $type = 'update';
+    }
+
+    say_ex( $type . ' module - ' . $module );
+
+    my $logfile_suffix = 'install_module__' . $module_n . '__' . $type;
+    my $logfile_title  = 'install_module -> ' . $module . ' -> ' . $type;
+
+    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '2>&1' );
+
+    my ( $start_date, $end_date, $child_exit_status, @output ) =
+        get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
+            $INSTALL_MODULE_TIMEOUT_IN_SECONDS,
+            1, @cmd );
+
+    my $action = $type;
+    if ( !defined $child_exit_status ) {
+        $child_exit_status = 1;
+
+        $action .= '-failed-start';
+        mark_module_as_failed( $module, undef );
+    }
+    elsif ( $child_exit_status ) {
+        $child_exit_status = 1;
+
+        $action .= '-failed';
+        mark_module_as_failed( $module, undef );
+    }
+    else {
+        $child_exit_status = 0;
+
+        $action .= '-success';
+        mark_module_as_ok( $module, 999_999 );    # newest version - so real number not relevant.
+    }
+
+    say_ex( 'install module - ' . $module . ' - ' . $action );
+    print_install_state_summary();
+    dump_state_to_logfiles(); # too much ?
+
+    return $child_exit_status;
+}
+
 sub fetch_dependencies_for_module
 {
     my ( $module ) = @_;
@@ -1016,65 +1075,6 @@ sub add_dependency_modules_for_modules_need_to_install
     print_install_state_summary();
 
     return;
-}
-
-sub install_single_module
-{
-    my ( $module ) = @_;
-
-    if ( is_string_empty( $module ) ) {
-        croak 'param module empty!';
-    }
-
-    my $tried = was_module_already_tried( $module );
-    if ( defined $tried ) {
-        return $tried;
-    }
-
-    my $module_n = module_name_for_fs( $module );
-
-    my $type = 'install';
-    if ( exists $installed_module_version{ $module } ) {
-        $type = 'update';
-    }
-
-    say_ex( $type . ' module - ' . $module );
-
-    my $logfile_suffix = 'install_module__' . $module_n . '__' . $type;
-    my $logfile_title  = 'install_module -> ' . $module . ' -> ' . $type;
-
-    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '2>&1' );
-
-    my ( $start_date, $end_date, $child_exit_status, @output ) =
-        get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
-            $INSTALL_MODULE_TIMEOUT_IN_SECONDS,
-            1, @cmd );
-
-    my $action = $type;
-    if ( !defined $child_exit_status ) {
-        $child_exit_status = 1;
-
-        $action .= '-failed-start';
-        mark_module_as_failed( $module, undef );
-    }
-    elsif ( $child_exit_status ) {
-        $child_exit_status = 1;
-
-        $action .= '-failed';
-        mark_module_as_failed( $module, undef );
-    }
-    else {
-        $child_exit_status = 0;
-
-        $action .= '-success';
-        mark_module_as_ok( $module, 999_999 );    # newest version - so real number not relevant.
-    }
-
-    say_ex( 'install module - ' . $module . ' - ' . $action );
-    print_install_state_summary();
-    dump_state_to_logfiles(); # too much ?
-
-    return $child_exit_status;
 }
 
 sub import_module_list_from_file
