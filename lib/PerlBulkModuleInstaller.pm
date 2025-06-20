@@ -907,12 +907,12 @@ sub reduce_dependency_modules_which_are_not_installed
     return %not_installed;
 }
 
-sub add_dependency_module_if_needed
+sub add_all_dependency_modules_for_module_if_needed_recursive
 {
     my ( $module ) = @_;
 
     state $recursion = 1;
-    say_ex( 'add_dependency_module_if_needed - recursion level: ' . $recursion );
+    say_ex( 'add_all_dependency_modules_for_module_if_needed_recursive - recursion level: ' . $recursion );
 
     say_ex( 'import module dependencies for - ' . $module );
 
@@ -971,7 +971,7 @@ sub add_dependency_module_if_needed
     foreach my $dep_module ( sort keys %dep ) {
         # only here - not at entry and every return.
         $recursion++;
-        add_dependency_module_if_needed( $dep_module );
+        add_all_dependency_modules_for_module_if_needed_recursive( $dep_module );
         $recursion--;
     }
 
@@ -991,7 +991,7 @@ sub add_dependency_modules_for_modules_need_to_install
         $check_i++;
         say_ex( "==> analyze module - ($check_i / $check_max) - $module" );
 
-        add_dependency_module_if_needed( $module );
+        add_all_dependency_modules_for_module_if_needed_recursive( $module );
     }
 
     print_install_state_summary();
