@@ -1098,6 +1098,37 @@ sub reduce_dependency_modules_which_are_not_installed
     return %not_installed;
 }
 
+sub get_not_installed_dependencies_for_module
+{
+    my ( $module ) = @_;
+
+    my $dep_ref = fetch_dependencies_for_module( $module );
+    if ( !defined $dep_ref ) {
+        say_ex( 'module - ' . $module . ' - not found!' );
+
+        return undef;
+    }
+
+    my %dep = %{ $dep_ref };
+    if ( !%dep ) {
+        say_ex( 'module - ' . $module . ' - has no dependencies' );
+
+        return undef;
+    }
+
+    say_ex( 'module - ' . $module . ' - has dependencies - reduce to not installed' );
+    %dep = reduce_dependency_modules_which_are_not_installed( %dep );
+    if ( !%dep ) {
+        say_ex( 'module - ' . $module . ' - has no uninstalled dependencies' );
+
+        return undef;
+    }
+
+    say_ex( 'module - ' . $module . ' has not installed dependencies' . "\n" . Dumper( \%dep ) );
+
+    return \%dep;
+}
+
 sub add_all_dependency_modules_for_module_if_needed_recursive
 {
     my ( $module ) = @_;
