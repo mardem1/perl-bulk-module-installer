@@ -256,6 +256,8 @@ sub get_output_with_detached_execute
         croak 'param @cmd empty!';
     }
 
+    sleep 1;    # wait 1 sec for every command to stretch the logfile timestamps
+
     my $child_exit_status = undef;
     my @output            = ();
     my $start_date        = time;
