@@ -609,7 +609,7 @@ sub was_module_already_tried
 sub generate_modules_need_to_install
 {
     foreach my $module ( keys %modules_to_install ) {
-        if (exists $modules_install_dont_try{ $module }
+        if (   exists $modules_install_dont_try{ $module }
             || exists $modules_install_ok{ $module }
             || exists $modules_install_failed{ $module }
             || exists $modules_install_not_found{ $module }
@@ -664,14 +664,17 @@ sub print_install_state_summary
             . scalar( keys %modules_to_install_with_deps_extended ) . "\n"
             . Dumper( \%modules_to_install_with_deps_extended ) );
 
+    # no dumper with need and ok - not necessary as temporary state.
+
+    say_ex( 'modules_install_ok - '
+            . scalar( keys %modules_install_ok ) . "\n"
+            . Dumper( \%modules_install_ok ) );
+
     say_ex(   'modules_need_to_install left - '
             . scalar( keys %modules_need_to_install ) . "\n"
             . Dumper( \%modules_need_to_install ) );
 
-    say_ex 'modules_install_ok - ' . scalar( keys %modules_install_ok );
-
-    # no dumper with need and ok - not necessary as temporary state.
-
+    say_ex( '' );
     say_ex( '' );
 
     return;
@@ -918,7 +921,7 @@ sub install_single_module
             $INSTALL_MODULE_TIMEOUT_IN_SECONDS,
             1, @cmd );
 
-    my $action = $type;
+    my $action   = $type;
     my $hasError = 0;
     if ( !defined $child_exit_status ) {
         $hasError = 1;
