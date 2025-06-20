@@ -1265,6 +1265,12 @@ sub get_next_module_to_install_dep_version
 
 sub install_modules_dep_version
 {
+    add_dependency_modules_for_modules_need_to_install();
+
+    dump_state_to_logfiles();
+
+    print_install_state_summary();
+
     my $install_module = get_next_module_to_install_dep_version();
     while ( !is_string_empty( $install_module ) ) {
         install_module_dep_version( $install_module );
@@ -1383,12 +1389,6 @@ sub main
     else {
         search_for_modules_for_available_updates();
     }
-
-    add_dependency_modules_for_modules_need_to_install();
-
-    dump_state_to_logfiles();
-
-    print_install_state_summary();
 
     install_modules_dep_version();
 
