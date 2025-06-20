@@ -685,48 +685,61 @@ sub dump_state_to_logfiles
 
     my $timestamp = get_timestamp_for_filename();
 
-    write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'modules_to_install_with_deps_extended.log',
-        'modules_to_install_with_deps_extended: ' . scalar( keys %modules_to_install_with_deps_extended ),
-        Dumper( \%modules_to_install_with_deps_extended ),
-    );
+    if ( %modules_to_install_with_deps_extended ) {
+        write_file(
+            $log_dir_path . '/' . $timestamp . '_' . 'modules_to_install_with_deps_extended.log',
+            'modules_to_install_with_deps_extended: ' . scalar( keys %modules_to_install_with_deps_extended ),
+            Dumper( \%modules_to_install_with_deps_extended ),
+        );
+    }
 
-    write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_dont_try.log',
-        'modules_install_dont_try: ' . scalar( keys %modules_install_dont_try ),
-        Dumper( \%modules_install_dont_try ),
-    );
+    if ( %modules_install_dont_try ) {
+        write_file(
+            $log_dir_path . '/' . $timestamp . '_' . 'modules_install_dont_try.log',
+            'modules_install_dont_try: ' . scalar( keys %modules_install_dont_try ),
+            Dumper( \%modules_install_dont_try ),
+        );
+    }
 
-    write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_already.log',
-        'modules_install_already: ' . scalar( keys %modules_install_already ),
-        Dumper( \%modules_install_already ),
-    );
+    if ( %modules_install_already ) {
+        write_file(
+            $log_dir_path . '/' . $timestamp . '_' . 'modules_install_already.log',
+            'modules_install_already: ' . scalar( keys %modules_install_already ),
+            Dumper( \%modules_install_already ),
+        );
+    }
 
-    write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_ok.log',
-        'modules_install_ok: ' . scalar( keys %modules_install_ok ),
-        Dumper( \%modules_install_ok ),
-    );
+    if ( %modules_install_ok ) {
+        write_file(
+            $log_dir_path . '/' . $timestamp . '_' . 'modules_install_ok.log',
+            'modules_install_ok: ' . scalar( keys %modules_install_ok ),
+            Dumper( \%modules_install_ok ),
+        );
+    }
 
-    write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_not_found.log',
-        'modules_install_not_found: ' . scalar( keys %modules_install_not_found ),
-        Dumper( \%modules_install_not_found ),
-    );
+    if ( %modules_install_not_found ) {
+        write_file(
+            $log_dir_path . '/' . $timestamp . '_' . 'modules_install_not_found.log',
+            'modules_install_not_found: ' . scalar( keys %modules_install_not_found ),
+            Dumper( \%modules_install_not_found ),
+        );
+    }
 
-    write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_failed.log',
-        'modules_install_failed: ' . scalar( keys %modules_install_failed ),
-        Dumper( \%modules_install_failed ),
-    );
+    if ( %modules_install_failed ) {
+        write_file(
+            $log_dir_path . '/' . $timestamp . '_' . 'modules_install_failed.log',
+            'modules_install_failed: ' . scalar( keys %modules_install_failed ),
+            Dumper( \%modules_install_failed ),
+        );
+    }
 
-    write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'modules_need_to_install.log',
-        'modules_need_to_install: ' . scalar( keys %modules_need_to_install ),
-        Dumper( \%modules_need_to_install ),
-    );
-
+    if ( %modules_need_to_install ) {
+        write_file(
+            $log_dir_path . '/' . $timestamp . '_' . 'modules_need_to_install.log',
+            'modules_need_to_install: ' . scalar( keys %modules_need_to_install ),
+            Dumper( \%modules_need_to_install ),
+        );
+    }
     return;
 }
 
