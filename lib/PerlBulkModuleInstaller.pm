@@ -707,6 +707,25 @@ sub print_install_end_summary
     return;
 }
 
+sub print_perl_detail_info
+{
+    my $logfile_suffix = 'perl_detail_info';
+    my $logfile_title  = 'perl_detail_info';
+
+    my @cmd = ( 'cmd.exe', '/c', 'perl', '-V', '2>&1' );
+
+    my ( $start_date, $end_date, $child_exit_status, @output ) =
+        get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
+            $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS,
+            1, @cmd );
+
+    if ( !defined $child_exit_status || ( $child_exit_status && !@output ) ) {
+        return;    # error nothing found
+    }
+
+    return;
+}
+
 sub search_for_installed_modules
 {
     my @cmd = ( 'cmd.exe', '/c', 'cpan', '-l', '2>&1'  );
@@ -1120,25 +1139,6 @@ sub import_module_dont_try_list_from_file
         'import_module_dont_try_list_from_file: ' . scalar( keys %modules_install_dont_try ),
         Dumper( \%modules_install_dont_try ),
     );
-
-    return;
-}
-
-sub print_perl_detail_info
-{
-    my $logfile_suffix = 'perl_detail_info';
-    my $logfile_title  = 'perl_detail_info';
-
-    my @cmd = ( 'cmd.exe', '/c', 'perl', '-V', '2>&1' );
-
-    my ( $start_date, $end_date, $child_exit_status, @output ) =
-        get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
-            $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS,
-            1, @cmd );
-
-    if ( !defined $child_exit_status || ( $child_exit_status && !@output ) ) {
-        return;    # error nothing found
-    }
 
     return;
 }
