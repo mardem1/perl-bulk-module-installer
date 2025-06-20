@@ -370,7 +370,7 @@ sub get_output_with_detached_execute_and_logfile
     my $time_end   = get_timestamp_pretty( $end_date );
 
     my $duration_seconds = $end_date - $start_date;
-    my $duration_minutes = ( 0.0 + $duration_seconds ) / 60.0 ;
+    my $duration_minutes = ( 0.0 + $duration_seconds ) / 60.0;
 
     write_file(
         $log_dir_path . '/' . $timestamp . '_' . $logfile_suffix . '.log',
@@ -794,7 +794,7 @@ sub print_perl_detail_info
 
 sub search_for_installed_modules
 {
-    my @cmd = ( 'cmd.exe', '/c', 'cpan', '-l', '2>&1'  );
+    my @cmd = ( 'cmd.exe', '/c', 'cpan', '-l', '2>&1' );
 
     my $logfile_suffix = 'installed_modules_found';
     my $logfile_title  = 'installed_modules_found';
@@ -832,7 +832,7 @@ sub search_for_modules_for_available_updates
     my $logfile_suffix = 'modules_with_available_updates';
     my $logfile_title  = 'modules_with_available_updates';
 
-    my @cmd = ( 'cmd.exe', '/c', 'cpan-outdated', '--exclude-core', '-p', , '2>&1' );
+    my @cmd = ( 'cmd.exe', '/c', 'cpan-outdated', '--exclude-core', '-p', '2>&1' );
 
     my ( $start_date, $end_date, $child_exit_status, @output ) =
         get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
@@ -926,7 +926,7 @@ sub install_single_module
 
     say_ex( 'install module - ' . $module . ' - ' . $action );
     print_install_state_summary();
-    dump_state_to_logfiles(); # too much ?
+    dump_state_to_logfiles();                     # too much ?
 
     return $hasError;
 }
@@ -948,7 +948,7 @@ sub fetch_dependencies_for_module
     # showdeps checks also the dependency of the dependency if not already installed.
     # eg Perl::Critic shows other dependencies if all dependencies are installed.
     # so the information can change
-    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--no-interactive', '--showdeps', $module, '2>&1'  );
+    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--no-interactive', '--showdeps', $module, '2>&1' );
 
     my ( $start_date, $end_date, $child_exit_status, @output ) = ();
 
