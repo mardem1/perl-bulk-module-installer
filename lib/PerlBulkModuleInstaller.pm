@@ -538,7 +538,7 @@ sub was_module_already_tried
     return undef;
 }
 
-sub reduce_modules_to_install
+sub generate_modules_need_to_install
 {
     foreach my $module ( keys %modules_to_install ) {
         if ( exists $installed_module_version{ $module } ) {
@@ -737,7 +737,7 @@ sub search_for_installed_modules
     );
     say_ex( '' );
 
-    reduce_modules_to_install();
+    generate_modules_need_to_install();
 
     return;
 }
