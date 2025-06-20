@@ -423,6 +423,39 @@ sub import_module_list_from_file
     return;
 }
 
+sub import_module_dont_try_list_from_file
+{
+    my ( $filepath ) = @_;
+
+    if ( is_string_empty( $filepath ) ) {
+        croak 'param filepath empty!';
+    }
+
+    my @file_lines = read_file( $filepath );
+
+    @file_lines = map  { trim( $_ ) } @file_lines;
+    @file_lines = grep { $EMPTY_STRING ne $_ && $_ !~ /^[#]/o } @file_lines;
+
+    %modules_install_dont_try = hashify( @file_lines );
+    @file_lines               = ();
+
+    say_ex( '' );
+    say_ex(   'dont try modules to install: '
+            . ( scalar keys %modules_install_dont_try ) . "\n"
+            . Dumper( \%modules_install_dont_try ) );
+    say_ex( '' );
+
+    my $timestamp = get_timestamp_for_filename();
+
+    write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'import_module_dont_try_list_from_file.log',
+        'import_module_dont_try_list_from_file: ' . scalar( keys %modules_install_dont_try ),
+        Dumper( \%modules_install_dont_try ),
+    );
+
+    return;
+}
+
 sub mark_module_as_ok
 {
     my ( $module, $version ) = @_;
@@ -1106,39 +1139,6 @@ sub add_dependency_modules_for_modules_need_to_install
     }
 
     print_install_state_summary();
-
-    return;
-}
-
-sub import_module_dont_try_list_from_file
-{
-    my ( $filepath ) = @_;
-
-    if ( is_string_empty( $filepath ) ) {
-        croak 'param filepath empty!';
-    }
-
-    my @file_lines = read_file( $filepath );
-
-    @file_lines = map  { trim( $_ ) } @file_lines;
-    @file_lines = grep { $EMPTY_STRING ne $_ && $_ !~ /^[#]/o } @file_lines;
-
-    %modules_install_dont_try = hashify( @file_lines );
-    @file_lines               = ();
-
-    say_ex( '' );
-    say_ex(   'dont try modules to install: '
-            . ( scalar keys %modules_install_dont_try ) . "\n"
-            . Dumper( \%modules_install_dont_try ) );
-    say_ex( '' );
-
-    my $timestamp = get_timestamp_for_filename();
-
-    write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'import_module_dont_try_list_from_file.log',
-        'import_module_dont_try_list_from_file: ' . scalar( keys %modules_install_dont_try ),
-        Dumper( \%modules_install_dont_try ),
-    );
 
     return;
 }
