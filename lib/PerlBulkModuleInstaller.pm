@@ -827,6 +827,50 @@ sub search_for_installed_modules
     return;
 }
 
+sub search_for_modules_for_available_updates
+{
+    my $logfile_suffix = 'modules_with_available_updates';
+    my $logfile_title  = 'modules_with_available_updates';
+
+    my @cmd = ( 'cmd.exe', '/c', 'cpan-outdated', '--exclude-core', '-p', , '2>&1' );
+
+    my ( $start_date, $end_date, $child_exit_status, @output ) =
+        get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
+            $CHECK_UPDATE_MODULE_TIMEOUT_IN_SECONDS,
+            1, @cmd );
+
+    if ( !defined $child_exit_status || ( $child_exit_status && !@output ) ) {
+        return;    # error nothing found
+    }
+
+    foreach my $module ( @output ) {
+        $modules_need_to_update{ $module } = undef;
+    }
+
+    say_ex( '' );
+    say_ex 'modules_need_to_update: '
+        . scalar( keys %modules_need_to_update ) . "\n"
+        . Dumper( \%modules_need_to_update );
+    say_ex( '' );
+
+    say_ex( 'add all update modules to dependency-module-list with no dependency' );
+    foreach my $module ( keys %modules_need_to_update ) {
+        if ( !exists $modules_to_install_with_deps_extended{ $module } ) {
+            say_ex( 'module - ' . $module . ' - not in dep-list add' );
+            $modules_to_install_with_deps_extended{ $module } = {};
+        }
+
+        if ( !exists $modules_need_to_install{ $module } ) {
+            say_ex( 'module - ' . $module . ' - not in to-install-list add' );
+            $modules_need_to_install{ $module } = {};
+        }
+    }
+
+    print_install_state_summary();
+
+    return;
+}
+
 sub install_single_module
 {
     my ( $module ) = @_;
@@ -1240,50 +1284,6 @@ sub install_modules_dep_version
             $install_module = '';
         }
     }
-
-    return;
-}
-
-sub search_for_modules_for_available_updates
-{
-    my $logfile_suffix = 'modules_with_available_updates';
-    my $logfile_title  = 'modules_with_available_updates';
-
-    my @cmd = ( 'cmd.exe', '/c', 'cpan-outdated', '--exclude-core', '-p', , '2>&1' );
-
-    my ( $start_date, $end_date, $child_exit_status, @output ) =
-        get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
-            $CHECK_UPDATE_MODULE_TIMEOUT_IN_SECONDS,
-            1, @cmd );
-
-    if ( !defined $child_exit_status || ( $child_exit_status && !@output ) ) {
-        return;    # error nothing found
-    }
-
-    foreach my $module ( @output ) {
-        $modules_need_to_update{ $module } = undef;
-    }
-
-    say_ex( '' );
-    say_ex 'modules_need_to_update: '
-        . scalar( keys %modules_need_to_update ) . "\n"
-        . Dumper( \%modules_need_to_update );
-    say_ex( '' );
-
-    say_ex( 'add all update modules to dependency-module-list with no dependency' );
-    foreach my $module ( keys %modules_need_to_update ) {
-        if ( !exists $modules_to_install_with_deps_extended{ $module } ) {
-            say_ex( 'module - ' . $module . ' - not in dep-list add' );
-            $modules_to_install_with_deps_extended{ $module } = {};
-        }
-
-        if ( !exists $modules_need_to_install{ $module } ) {
-            say_ex( 'module - ' . $module . ' - not in to-install-list add' );
-            $modules_need_to_install{ $module } = {};
-        }
-    }
-
-    print_install_state_summary();
 
     return;
 }
