@@ -904,20 +904,21 @@ sub install_single_module
             1, @cmd );
 
     my $action = $type;
+    my $hasError = 0;
     if ( !defined $child_exit_status ) {
-        $child_exit_status = 1;
+        $hasError = 1;
 
         $action .= '-failed-start';
         mark_module_as_failed( $module, undef );
     }
     elsif ( $child_exit_status ) {
-        $child_exit_status = 1;
+        $hasError = 1;
 
         $action .= '-failed';
         mark_module_as_failed( $module, undef );
     }
     else {
-        $child_exit_status = 0;
+        $hasError = 0;
 
         $action .= '-success';
         mark_module_as_ok( $module, 999_999 );    # newest version - so real number not relevant.
@@ -927,7 +928,7 @@ sub install_single_module
     print_install_state_summary();
     dump_state_to_logfiles(); # too much ?
 
-    return $child_exit_status;
+    return $hasError;
 }
 
 sub fetch_dependencies_for_module
@@ -1222,10 +1223,11 @@ sub install_module_dep_version
         # there should be no missing ?
         foreach my $dep_module ( keys %dep ) {
             say_ex( 'WARN: not installed dependent module found - ' . $dep_module );
-            my $ret = install_module_dep_version( $dep_module );
-            if ( $ret ) {
+            my $hasError = install_module_dep_version( $dep_module );
+            if ( $hasError ) {
                 say_ex( 'dependent module - ' . $dep_module . ' - failed - abort - ' . $module );
-                return 1;
+                mark_module_as_failed( $module );
+                return $hasError;
             }
         }
     }
@@ -1235,9 +1237,9 @@ sub install_module_dep_version
     say_ex( '' );
 
     say_ex( 'module - ' . $module . ' - found (with all known dependencies) try install' );
-    my $ret = install_single_module( $module );
+    my $hasError = install_single_module( $module );
 
-    return $ret ? 1 : 0;
+    return $hasError;
 }
 
 sub get_next_module_to_install_dep_version
