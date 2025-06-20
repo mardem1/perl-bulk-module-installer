@@ -390,6 +390,39 @@ sub get_output_with_detached_execute_and_logfile
     return ( $start_date, $end_date, $child_exit_status, @output );
 }
 
+sub import_module_list_from_file
+{
+    my ( $filepath ) = @_;
+
+    if ( is_string_empty( $filepath ) ) {
+        croak 'param filepath empty!';
+    }
+
+    my @file_lines = read_file( $filepath );
+
+    @file_lines = map  { trim( $_ ) } @file_lines;
+    @file_lines = grep { $EMPTY_STRING ne $_ && $_ !~ /^[#]/o } @file_lines;
+
+    %modules_to_install = hashify( @file_lines );
+    @file_lines         = ();
+
+    say_ex( '' );
+    say_ex(   'wanted modules to install: '
+            . ( scalar keys %modules_to_install ) . "\n"
+            . Dumper( \%modules_to_install ) );
+    say_ex( '' );
+
+    my $timestamp = get_timestamp_for_filename();
+
+    write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_to_install_from_file.log',
+        'modules_to_install_from_file: ' . scalar( keys %modules_to_install ),
+        Dumper( \%modules_to_install ),
+    );
+
+    return;
+}
+
 sub mark_module_as_ok
 {
     my ( $module, $version ) = @_;
@@ -1073,39 +1106,6 @@ sub add_dependency_modules_for_modules_need_to_install
     }
 
     print_install_state_summary();
-
-    return;
-}
-
-sub import_module_list_from_file
-{
-    my ( $filepath ) = @_;
-
-    if ( is_string_empty( $filepath ) ) {
-        croak 'param filepath empty!';
-    }
-
-    my @file_lines = read_file( $filepath );
-
-    @file_lines = map  { trim( $_ ) } @file_lines;
-    @file_lines = grep { $EMPTY_STRING ne $_ && $_ !~ /^[#]/o } @file_lines;
-
-    %modules_to_install = hashify( @file_lines );
-    @file_lines         = ();
-
-    say_ex( '' );
-    say_ex(   'wanted modules to install: '
-            . ( scalar keys %modules_to_install ) . "\n"
-            . Dumper( \%modules_to_install ) );
-    say_ex( '' );
-
-    my $timestamp = get_timestamp_for_filename();
-
-    write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'modules_to_install_from_file.log',
-        'modules_to_install_from_file: ' . scalar( keys %modules_to_install ),
-        Dumper( \%modules_to_install ),
-    );
 
     return;
 }
