@@ -463,11 +463,13 @@ sub import_module_dont_try_list_from_file
 
     my $timestamp = get_timestamp_for_filename();
 
-    write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'import_module_dont_try_list_from_file.log',
-        'import_module_dont_try_list_from_file: ' . scalar( keys %modules_install_dont_try ),
-        Dumper( \%modules_install_dont_try ),
-    );
+    if ( %modules_install_dont_try ) {
+        write_file(
+            $log_dir_path . '/' . $timestamp . '_' . 'import_module_dont_try_list_from_file.log',
+            'import_module_dont_try_list_from_file: ' . scalar( keys %modules_install_dont_try ),
+            Dumper( \%modules_install_dont_try ),
+        );
+    }
 
     return;
 }
