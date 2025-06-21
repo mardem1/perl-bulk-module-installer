@@ -1361,6 +1361,123 @@ sub install_modules_dep_version
     return;
 }
 
+sub install_module_with_dependencies_first_recursive
+{
+    my ( $module ) = @_;
+
+    if ( is_string_empty( $module ) ) {
+        croak 'param module empty!';
+    }
+
+    state $recursion = 1;
+    say_ex( '==> ' . 'install_module_with_dependencies_first_recursive - recursion level: ' . $recursion );
+
+    if ( 10 < $recursion ) {
+        croak "deep recursion level $recursion - abort!";
+    }
+
+    my $tried = was_module_already_tried( $module );
+    if ( defined $tried ) {
+        say_ex( '==> ' . "module already tried -> IGNORE - $module" );
+
+        return $tried;
+    }
+
+    my $current_install_count = 0;
+    my $new_install_count     = 0;
+
+    my $analyze_run = 1;
+    do {
+        $current_install_count = scalar( keys %modules_install_ok );
+        $new_install_count     = $current_install_count;
+
+        # some modules change dependencies if all dependencies are installed, so recheck after install of dependencies
+        say_ex( '==> ' . "analyze module (run #$analyze_run) - $module" );
+        my $dep_ref = get_not_installed_dependencies_for_module( $module );
+        if ( defined $dep_ref ) {
+            my %dep = %{ $dep_ref };
+            if ( %dep ) {
+                foreach my $dep_module ( keys %dep ) {
+                    say_ex( '==> ' . "install required dependency - '$dep_module' - for - '$module'" );
+                    # only here - not at entry and every return.
+                    $recursion++;
+                    my $hasError = install_module_with_dependencies_first_recursive( $dep_module );
+                    $recursion--;
+
+                    if ( $hasError ) {
+                        mark_module_as_failed( $module );
+                        return $hasError;
+                    }
+                }
+            }
+        }
+
+        $new_install_count = scalar( keys %modules_install_ok );
+        $analyze_run++;
+    } while ( $current_install_count != $new_install_count );
+
+    $current_install_count = scalar( keys %modules_install_ok );
+    $new_install_count     = $current_install_count;
+
+    my $hasError = install_single_module( $module );    # retval ignored - install count !
+
+    if ( $hasError ) {
+        mark_module_as_failed( $module );
+        return $hasError;
+    }
+
+    $new_install_count = scalar( keys %modules_install_ok );
+    if ( $current_install_count != $new_install_count ) {
+        return 0;
+    }
+    else {
+        return 1;    # hasError
+    }
+}
+
+sub install_modules_sequentially
+{
+    say_ex( '==> ' . 'install all modules sequentially' );
+
+    dump_state_to_logfiles();
+    print_install_state_summary();
+
+    my $remaining = scalar( keys %modules_need_to_install );
+    my $check_i   = 0;
+
+    my $module = q{};
+    $module = ( keys %modules_need_to_install )[ 0 ];
+
+    while ( $module ) {
+        $check_i++;
+
+        foreach ( 1 .. 10 ) {
+            say_ex( '' );
+        }
+
+        my $tried = was_module_already_tried( $module );
+        if ( defined $tried ) {
+            say_ex( '==> ' . "module already tried -> IGNORE - ($check_i - $remaining) - $module" );
+
+            $remaining = scalar( keys %modules_need_to_install );
+            $module    = ( keys %modules_need_to_install )[ 0 ];
+            next;
+        }
+
+        say_ex( '==> ' . "handle next install list module - ($check_i - $remaining) - $module" );
+
+        install_module_with_dependencies_first_recursive( $module );
+
+        $remaining = scalar( keys %modules_need_to_install );
+        $module    = ( keys %modules_need_to_install )[ 0 ];
+    }
+
+    dump_state_to_logfiles();
+    print_install_state_summary();
+
+    return;
+}
+
 sub handle_main_arguments
 {
     my ( $arg1, $arg2, $arg3 ) = @_;
@@ -1457,7 +1574,9 @@ sub main
         search_for_modules_for_available_updates();
     }
 
-    install_modules_dep_version();
+    # install_modules_dep_version();
+
+    install_modules_sequentially();
 
     print_install_end_summary();
 
