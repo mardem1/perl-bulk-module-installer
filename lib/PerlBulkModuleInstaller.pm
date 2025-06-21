@@ -174,7 +174,7 @@ sub read_file
         croak "filepath '$filepath' - not exists, readable or empty";
     }
 
-    say_ex( "read modules from file '$filepath'" );
+    say_ex( '==> ' . "read '$filepath'" );
 
     my $fh = undef;
     if ( !open( $fh, '<', $filepath ) ) {
@@ -209,7 +209,7 @@ sub write_file
         croak 'param header empty!';
     }
 
-    say_ex( "write '$filepath'" );
+    say_ex( '==> ' . "write '$filepath'" );
 
     my $fh = undef;
     if ( !open( $fh, '>', $filepath ) ) {
@@ -265,7 +265,7 @@ sub get_output_with_detached_execute
     my $chld_in           = undef;
     my $chld_out          = undef;
 
-    say_ex( 'start cmd: ' . ( join ' ', @cmd ) );
+    say_ex( '==> ' . 'start cmd: ' . ( join ' ', @cmd ) );
     my $pid = open3( $chld_in, $chld_out, '>&STDERR', @cmd );
 
     if ( 1 > $pid ) {
@@ -648,7 +648,7 @@ sub print_install_state_summary
         say_ex( '' );
     }
 
-    say_ex( 'print_install_state_summary' );
+    say_ex( '==> ' . 'print_install_state_summary' );
     say_ex( '' );
     say_ex( '' );
 
@@ -751,7 +751,7 @@ sub print_install_end_summary
     foreach ( 1 .. 10 ) {
         say_ex( '' );
     }
-    say_ex 'summary';
+    say_ex( '==> ' . 'summary' );
     say_ex( '' );
 
     say_ex( '' );
@@ -798,6 +798,8 @@ sub print_perl_detail_info
 
     my @cmd = ( 'cmd.exe', '/c', 'perl', '-V', '2>&1' );
 
+    say_ex( '==> ' . 'perl information' );
+
     my ( $start_date, $end_date, $child_exit_status, @output ) =
         get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
             $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS,
@@ -817,13 +819,15 @@ sub search_for_installed_modules
     my $logfile_suffix = 'installed_modules_found';
     my $logfile_title  = 'installed_modules_found';
 
+    say_ex( '==> ' . 'search for installed modules' );
+
     my ( $start_date, $end_date, $child_exit_status, @output ) =
         get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
             $SEARCH_FOR_INSTALLED_MODULES_TIMEOUT_IN_SECONDS,
-            0, @cmd ); # no direct output only log
+            0, @cmd );    # no direct output only log
 
     if ( !defined $child_exit_status || ( $child_exit_status && !@output ) ) {
-        return;    # error nothing found
+        return;           # error nothing found
     }
 
     foreach my $line ( @output ) {
@@ -851,6 +855,8 @@ sub search_for_modules_for_available_updates
     my $logfile_title  = 'modules_with_available_updates';
 
     my @cmd = ( 'cmd.exe', '/c', 'cpan-outdated', '--exclude-core', '-p', '2>&1' );
+
+    say_ex( '==> ' . 'search for available updates' );
 
     my ( $start_date, $end_date, $child_exit_status, @output ) =
         get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
@@ -909,7 +915,10 @@ sub install_single_module
         $type = 'update';
     }
 
-    say_ex( $type . ' module - ' . $module );
+    say_ex( '' ) foreach ( 1 .. 25 );
+    say_ex( '=' x 80 );
+    say_ex( '' );
+    say_ex( '==> ' . $type . ' module - ' . $module );
 
     my $logfile_suffix = 'install_module__' . $module_n . '__' . $type;
     my $logfile_title  = 'install_module -> ' . $module . ' -> ' . $type;
@@ -942,15 +951,15 @@ sub install_single_module
         mark_module_as_ok( $module, 999_999 );    # newest version - so real number not relevant.
     }
 
-    say_ex( 'install module - ' . $module . ' - ' . $action );
+    say_ex( '==> ' . $type . ' module - ' . $module . ' ' . $action );
     print_install_state_summary();
 
-    if(!$hasError) {
-        say_ex( "==> after successful module install - reimport all installed modules from system" );
+    if ( !$hasError ) {
+        say_ex( '==> ' . 'after successful module install - reimport all installed modules from system' );
         search_for_installed_modules();
     }
     else {
-       dump_state_to_logfiles();
+        dump_state_to_logfiles();
     }
 
     return $hasError;
@@ -964,7 +973,7 @@ sub fetch_dependencies_for_module
         croak 'param module empty!';
     }
 
-    say_ex( 'get module dependencies - ' . $module );
+    say_ex( '==> ' . 'get module dependencies - ' . $module );
 
     my $module_n       = module_name_for_fs( $module );
     my $logfile_suffix = 'fetch_dependency__' . $module_n;
@@ -1157,9 +1166,9 @@ sub add_all_dependency_modules_for_module_if_needed_recursive
     my ( $module ) = @_;
 
     state $recursion = 1;
-    say_ex( 'add_all_dependency_modules_for_module_if_needed_recursive - recursion level: ' . $recursion );
+    say_ex( '==> ' . 'add_all_dependency_modules_for_module_if_needed_recursive - recursion level: ' . $recursion );
 
-    say_ex( 'import module dependencies for - ' . $module );
+    say_ex( '==> ' . 'import module dependencies for - ' . $module );
 
     if ( 10 < $recursion ) {
         croak "deep recursion level $recursion - abort!";
@@ -1234,7 +1243,7 @@ sub add_dependency_modules_for_modules_need_to_install
 
     foreach my $module ( @needed_modules ) {
         $check_i++;
-        say_ex( "==> analyze module - ($check_i / $check_max) - $module" );
+        say_ex( '==> ' . "analyze module - ($check_i / $check_max) - $module" );
 
         add_all_dependency_modules_for_module_if_needed_recursive( $module );
     }

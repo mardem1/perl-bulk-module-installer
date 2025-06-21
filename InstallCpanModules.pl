@@ -17,11 +17,11 @@ BEGIN {
 
 $| = 1;
 
-say_ex( "started $0" );
+say_ex( '==> ' . "started $0" );
 
 main( @ARGV );
 
-say_ex( "ended $0" );
+say_ex( '==> ' . "ended $0" );
 
 __END__
 
