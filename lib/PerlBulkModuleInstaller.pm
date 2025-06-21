@@ -256,6 +256,14 @@ sub get_output_with_detached_execute
 
     sleep 1;    # wait 1 sec for every command to stretch the logfile timestamps
 
+    if ( $show_live_output ) {
+        say_ex( '' ) foreach ( 1 .. 25 );
+        say_ex( '=' x 80 );
+        say_ex( '' );
+    }
+
+    say_ex( '==> ' . 'start cmd: ' . ( join ' ', @cmd ) );
+
     my $child_exit_status = undef;
     my @output            = ();
     my $start_date        = time;
@@ -263,7 +271,6 @@ sub get_output_with_detached_execute
     my $chld_in           = undef;
     my $chld_out          = undef;
 
-    say_ex( '==> ' . 'start cmd: ' . ( join ' ', @cmd ) );
     my $pid = open3( $chld_in, $chld_out, '>&STDERR', @cmd );
 
     if ( 1 > $pid ) {
@@ -346,6 +353,14 @@ sub get_output_with_detached_execute
     }
 
     $end_date = time;
+
+    say_ex( '==> ' . 'cmd ended: ' . ( join ' ', @cmd ) );
+
+    if ( $show_live_output ) {
+        say_ex( '' );
+        say_ex( '=' x 80 );
+        say_ex( '' ) foreach ( 1 .. 25 );
+    }
 
     return ( $start_date, $end_date, $child_exit_status, @output );
 }
@@ -853,9 +868,6 @@ sub install_single_module
         $type = 'update';
     }
 
-    say_ex( '' ) foreach ( 1 .. 25 );
-    say_ex( '=' x 80 );
-    say_ex( '' );
     say_ex( '==> ' . $type . ' module - ' . $module );
 
     my $logfile_suffix = 'install_module__' . $module_n . '__' . $type;
