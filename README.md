@@ -59,8 +59,6 @@ Logfiles:
     * Modules from file already installed.
 * `DATE`_`TIME`_modules_need_to_install.log
     * Modules from files needs to be installed.
-* `DATE`_`TIME`_modules_to_install_with_deps_extended.log
-    * analyze result - modules need to install/update with their direct dependencies.
 * `DATE`_`TIME`_modules_with_available_updates.log
     * list of modules with an update available, analyzed by `cpan-outdated --exclude-core -p`
 * `DATE`_`TIME`_modules_install_not_found.log
@@ -77,16 +75,15 @@ Script process:
 
 1. import module list - if not update-only
 2. search for installed modules
-3. search for missing dependency modules
-4. search for available update of installed modules - if not no-updates
-5. now the installation loop
-    1. get the next module which has no found dependency, or abort of there is none.
-    2. re-check dependencies - but there should be noting.
+3. search for available update of installed modules - if not no-updates
+4. now the installation loop foreach module in the list
+    1. search dependency modules
+    2. foreach missing dependency module
+       1. check if dependency module failed - than mark module as failed as well and continue loop 
+       2. reenter with missing dependency module 
     3. try to install module
-    4. if ok remove this module from the dependency list of each module, if listed
-    5. if not ok mark all modules which depend on this als failed, and all which depend on them - and so on - recursion
-    6. mark this module als installed or failed.
-    7. repeat loop
+    4. mark this module als installed or failed.
+    5. repeat loop
 
 ## BUG REPORTS
 
