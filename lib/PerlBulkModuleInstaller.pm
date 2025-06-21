@@ -429,12 +429,13 @@ sub import_module_list_from_file
 
     my $timestamp = get_timestamp_for_filename();
 
-    write_file(
-        $log_dir_path . '/' . $timestamp . '_' . 'modules_to_install_from_file.log',
-        'modules_to_install_from_file: ' . scalar( keys %modules_to_install ),
-        Dumper( \%modules_to_install ),
-    );
-
+    if ( %modules_to_install ) {
+        write_file(
+            $log_dir_path . '/' . $timestamp . '_' . 'modules_to_install_from_file.log',
+            'modules_to_install_from_file: ' . scalar( keys %modules_to_install ),
+            Dumper( \%modules_to_install ),
+        );
+    }
     return;
 }
 
