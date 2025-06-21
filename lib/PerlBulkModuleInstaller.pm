@@ -413,6 +413,8 @@ sub import_module_list_from_file
         croak 'param filepath empty!';
     }
 
+    say_ex( '==> ' . 'import module list from file: ' . $filepath );
+
     my @file_lines = read_file( $filepath );
 
     @file_lines = map  { trim( $_ ) } @file_lines;
@@ -446,6 +448,8 @@ sub import_module_dont_try_list_from_file
     if ( is_string_empty( $filepath ) ) {
         croak 'param filepath empty!';
     }
+
+    say_ex( '==> ' . 'import module dont try list file: ' . $filepath );
 
     my @file_lines = read_file( $filepath );
 
@@ -1274,6 +1278,11 @@ sub handle_main_arguments
 
     $filepath_install  = trim( $filepath_install );
     $filepath_dont_try = trim( $filepath_dont_try );
+
+    say_ex( '==> ' . 'filepath_install: ' . $filepath_install );
+    say_ex( '==> ' . 'filepath_dont_try: ' . $filepath_dont_try );
+    say_ex( '==> ' . 'only_all_updates: ' . ( $only_all_updates ? '1' : '0' ) );
+    say_ex( '==> ' . 'all_updates: ' . ( $all_updates           ? '1' : '0' ) );
 
     return ( $filepath_install, $filepath_dont_try, $only_all_updates, $all_updates );
 }
