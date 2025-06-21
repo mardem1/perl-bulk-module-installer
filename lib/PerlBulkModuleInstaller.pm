@@ -1233,7 +1233,7 @@ sub handle_main_arguments
     my ( $arg1, $arg2, $arg3 ) = @_;
     $arg1 = trim( $arg1 );
     $arg2 = trim( $arg2 );
-    $arg2 = trim( $arg3 );
+    $arg3 = trim( $arg3 );
 
     my $filepath_install  = $EMPTY_STRING;
     my $filepath_dont_try = $EMPTY_STRING;
