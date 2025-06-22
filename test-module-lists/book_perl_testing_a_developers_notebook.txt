@@ -31,7 +31,7 @@ Test::Harness
 Test::Harness::Straps
 Test::HTML::Lint
 Test::HTML::Tidy
-Test::HTML::TidyTest::Kwalitee
+Test::Kwalitee
 Test::LongString
 Test::MockDBI
 Test::MockModule

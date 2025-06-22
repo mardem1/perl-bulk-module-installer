@@ -327,7 +327,7 @@ Moose::Role
 Moose::Util::TypeConstaints
 Moose::Util::TypeConstraints
 MooseX::Declare
-MooseX::DeclareMooseX::MultiMethods
+MooseX::MultiMethods
 MooseX::Param::Validate
 MooseX::Params::Validate
 MooseX::Types
@@ -536,7 +536,7 @@ Test::Harness
 Test::Harness::Straps
 Test::HTML::Lint
 Test::HTML::Tidy
-Test::HTML::TidyTest::Kwalitee
+Test::Kwalitee
 Test::Inline
 Test::LongString
 Test::Manifest

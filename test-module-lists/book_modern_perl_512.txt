@@ -32,7 +32,8 @@ Modern::Perl
 Module::Build
 Moose
 Moose::Util::TypeConstaints
-MooseX::DeclareMooseX::MultiMethods
+MooseX::Declare
+MooseX::MultiMethods
 MooseX::Params::Validate
 MooseX::Types
 PadWalker
