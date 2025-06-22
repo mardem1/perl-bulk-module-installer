@@ -126,6 +126,21 @@ sub hashify
     return map { $_ => undef } @args;
 }
 
+sub sleep_if_called_within_a_second
+{
+    state $last_call = 0;
+
+    my $now = time;
+    if ( $last_call == $now ) {
+        sleep 1;
+        $now = time;
+    }
+
+    $last_call = $now;
+
+    return;
+}
+
 sub get_timestamp_for_logline
 {
     my ( $time ) = @_;
@@ -254,7 +269,7 @@ sub get_output_with_detached_execute
         croak 'param @cmd empty!';
     }
 
-    sleep 1;    # wait 1 sec for every command to stretch the logfile timestamps
+    sleep_if_called_within_a_second();
 
     if ( $show_live_output ) {
         say_ex( '' ) foreach ( 1 .. 25 );
