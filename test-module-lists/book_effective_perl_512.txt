@@ -40,7 +40,6 @@ Math::BigFloat
 Math::BigInt
 Module::Build
 Module::Starter
-Module:Starter
 Moose
 Path::Class
 Perl::Critic
