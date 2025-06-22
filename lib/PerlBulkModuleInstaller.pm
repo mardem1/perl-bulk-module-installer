@@ -820,8 +820,13 @@ sub search_for_installed_modules
 
     foreach my $line ( @output ) {
         my @t = split /\s+/, $line;
+
+        if ( !defined $t[ 0 ] || $EMPTY_STRING eq $t[ 0 ] ) {
+            next;
+        }
+
         $installed_module_version{ $t[ 0 ] } =
-            ( 'undef' eq $t[ 1 ] ? undef : $t[ 1 ] );
+            ( !defined $t[ 1 ] || $EMPTY_STRING eq $t[ 1 ] || 'undef' eq $t[ 1 ] ? undef : $t[ 1 ] );
     }
 
     say_ex( '' );
