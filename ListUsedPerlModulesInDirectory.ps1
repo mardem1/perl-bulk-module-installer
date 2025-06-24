@@ -1,6 +1,16 @@
 ﻿
 <#
 
+.SYNOPSIS
+
+Browse a directory for perl files and search for used perl modules.
+
+.PARAMETER LiteralPath
+
+Directory to search in.
+
+.NOTES
+
 BUG REPORTS
 
 Please report bugs on GitHub.
@@ -31,6 +41,7 @@ FOR A PARTICULAR PURPOSE.
 
 [CmdletBinding()]
 param (
+    [Parameter(Mandatory = $true, Position = 0)]
     [ValidateNotNullOrEmpty()]
     [ValidateScript({
             Test-Path -LiteralPath $_ -PathType Container
@@ -47,7 +58,7 @@ Write-Host "=> Search for modules in '$LiteralPath'"
 Get-ChildItem -Recurse -File -Force -LiteralPath $LiteralPath | Where-Object {
     # BAT files for perl in batch wrapper
     $_.Name -match '\.(pl|pm|t|bat)$'
-} | ForEach-Object  {
+} | ForEach-Object {
     1..2 | ForEach-Object { Write-Host '' }
     Write-Host "=> check file '$($_.FullName)'"
     
@@ -55,7 +66,7 @@ Get-ChildItem -Recurse -File -Force -LiteralPath $LiteralPath | Where-Object {
 } | Get-Content | ForEach-Object {
     # Upper-Case defined as first character for none core / standard modules
     # should match => 'use XYZ...ABC;' 'use XYZ...ABC (..);'  'use XYZ...ABC qw(..);' 'use XYZ...ABC qw(' 'use XYZ...ABC'
-    if ( $_ -cmatch "\buse\b\s+([A-Z][A-Za-z0-9:_]+)") {
+    if ( $_ -cmatch '\buse\b\s+([A-Z][A-Za-z0-9:_]+)') {
         $text = $Matches[1]
 
         # add custom filter here - exclude own modules ?
@@ -67,9 +78,9 @@ Get-ChildItem -Recurse -File -Force -LiteralPath $LiteralPath | Where-Object {
 }
 
 1..10 | ForEach-Object { Write-Host '' }
-Write-Host "=> filter unique"
+Write-Host '=> filter unique'
 $modules2 = $($modules.Keys | Select-Object -Unique | Sort-Object )
 
 1..10 | ForEach-Object { Write-Host '' }
-Write-Host "=> found modules"
+Write-Host '=> found modules'
 $modules2 | ForEach-Object { "$_" }
