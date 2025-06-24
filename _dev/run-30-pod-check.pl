@@ -151,10 +151,6 @@ run-30-pod-check.pl
 
 Helper script to run a pod on all files.
 
-=head1 AFFILIATION
-
-This policy is part of L<Perl::Critic::Mardem>.
-
 =head1 AUTHOR
 
 Markus Demml, mardem@cpan.com
@@ -167,5 +163,11 @@ This library is free software; you can redistribute it and/or modify it
 under the same terms as the Perl 5 programming language system itself.
 The full text of this license can be found in the LICENSE file included
 with this module.
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.
 
 =cut
