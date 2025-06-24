@@ -46,7 +46,14 @@ param (
     [ValidateScript({
             Test-Path -LiteralPath $_ -PathType Container
         })]
-    [string] $LiteralPath
+    [string] $LiteralPath,
+
+    [Parameter(Mandatory = $false, Position = 1)]
+    [ValidateNotNullOrEmpty()]
+    [ValidateScript({
+            Test-Path -LiteralPath $_ -PathType Leaf -IsValid
+        })]
+    [string] $ModuleListFile   
 )
 
 [hashtable] $modules = @{}
@@ -84,3 +91,12 @@ $modules2 = $($modules.Keys | Select-Object -Unique | Sort-Object )
 1..10 | ForEach-Object { Write-Host '' }
 Write-Host '=> found modules'
 $modules2 | ForEach-Object { "$_" }
+
+if ( ! [string]::IsNullOrWhiteSpace($ModuleListFile) ) {
+    $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' 
+    $LiteralPath
+    $modules2
+    
+    Write-Host "=> generate module list file '$ModuleListFile'"
+    '#', "# perl modules searched in '$LiteralPath'", "# search done at '$now'", '# modules found:', '#', $modules2, '#', '# list ended', '#' | Out-File -LiteralPath $ModuleListFile
+}
