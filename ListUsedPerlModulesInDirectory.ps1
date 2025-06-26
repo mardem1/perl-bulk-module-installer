@@ -73,7 +73,7 @@ Get-ChildItem -Recurse -File -Force -LiteralPath $LiteralPath | Where-Object {
 } | Get-Content | ForEach-Object {
     # Upper-Case defined as first character for none core / standard modules
     # should match => 'use XYZ...ABC;' 'use XYZ...ABC (..);'  'use XYZ...ABC qw(..);' 'use XYZ...ABC qw(' 'use XYZ...ABC'
-    if ( $_ -cmatch '\buse\b\s+([A-Z][A-Za-z0-9:_]+)') {
+    if ( $_ -cmatch '\buse\b\s+(([A-Z][a-zA-Z0-9_]*)([:][:][a-zA-Z0-9_]+)*)' ) {
         $text = $Matches[1]
 
         # add custom filter here - exclude own modules ?
