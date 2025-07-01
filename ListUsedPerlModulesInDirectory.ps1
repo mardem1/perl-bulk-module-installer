@@ -78,6 +78,9 @@ Write-Host ''
 Write-Host -ForegroundColor Green "started '$($MyInvocation.InvocationName)' ..."
 Write-Host ''
 
+# BAT files for perl in batch wrapper
+$extensions = ( '.pl', '.pm', '.bat', '.t' )
+
 [hashtable] $modules = @{}
 
 $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
@@ -91,8 +94,7 @@ $SearchPath | ForEach-Object { "  - '$_'" }
 
 Write-Host -ForegroundColor Green '=> search ...'
 Get-ChildItem -Recurse -File -Force -LiteralPath $SearchPath | Where-Object {
-    # BAT files for perl in batch wrapper
-    $_.Name -match '\.(pl|pm|t|bat)$'
+    $_.Extension -in $extensions
 } | ForEach-Object {
     Write-Host -ForegroundColor DarkGray "=> check found file: '$($_.FullName)'"
 
@@ -134,6 +136,12 @@ $fileHeaders = (
 $fileHeaders += $SearchPath | ForEach-Object {
     "# - $_"
 }
+
+$fileHeaders += (
+    '#',
+    '# perl file extensions:'
+)
+$fileHeaders += $extensions | ForEach-Object { "# - $_" }
 
 $fileHeaders += (
     '#',
