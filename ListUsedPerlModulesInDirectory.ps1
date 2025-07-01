@@ -72,6 +72,10 @@ param (
     [string] $ModuleListFileTxt   
 )
 
+Write-Host ''
+Write-Host -ForegroundColor Green "started '$($MyInvocation.InvocationName)' ..."
+Write-Host ''
+
 [hashtable] $modules = @{}
 
 $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
@@ -79,18 +83,16 @@ $winUser = $env:USERNAME
 $winHostName = $env:COMPUTERNAME
 $winOs = ( Get-CimInstance Win32_OperatingSystem ).Caption
 
-1..10 | ForEach-Object { Write-Host '' }
-Write-Host '=> Search for modules in'
+Write-Host -ForegroundColor Green '=> Search for modules in'
 $SearchPath | ForEach-Object { "  - '$_'" }
 
-1..10 | ForEach-Object { Write-Host '' }
+Write-Host -ForegroundColor Green '=> search ...'
 Get-ChildItem -Recurse -File -Force -LiteralPath $SearchPath | Where-Object {
     # BAT files for perl in batch wrapper
     $_.Name -match '\.(pl|pm|t|bat)$'
 } | ForEach-Object {
-    1..2 | ForEach-Object { Write-Host '' }
-    Write-Host "=> check file '$($_.FullName)'"
-    
+    Write-Host -ForegroundColor DarkGray "=> check found file: '$($_.FullName)'"
+
     $_
 } | Get-Content | ForEach-Object {
     # Upper-Case defined as first character for none core / standard modules
@@ -101,7 +103,7 @@ Get-ChildItem -Recurse -File -Force -LiteralPath $SearchPath | Where-Object {
 
         # add custom filter here - exclude own modules ?
         if ( $true ) {
-            Write-Host "=> $text"
+            Write-Host -ForegroundColor Yellow "  => found module: '$text'"
             $modules[$text] = $true
         }
     }
@@ -109,15 +111,12 @@ Get-ChildItem -Recurse -File -Force -LiteralPath $SearchPath | Where-Object {
 
 $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
 
-1..10 | ForEach-Object { Write-Host '' }
-Write-Host '=> filter unique'
+Write-Host ''
+Write-Host -ForegroundColor Green '=> filter unique'
 $modules2 = $($modules.Keys | Select-Object -Unique | Sort-Object )
-
-1..10 | ForEach-Object { Write-Host '' }
-Write-Host '=> found modules'
+Write-Host ''
+Write-Host -ForegroundColor Green '=> found modules'
 $modules2 | ForEach-Object { "$_" }
-
-1..10 | ForEach-Object { Write-Host '' }
 
 $fileHeaders = (
     '#',
@@ -154,7 +153,12 @@ $fileFooters = (
     '#'
 )
 
-Write-Host "=> generate module list file '$ModuleListFileTxt'"
+Write-Host ''
+Write-Host -ForegroundColor Green "=> generate module list file '$ModuleListFileTxt'"
 $fileHeaders, $modules2, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt
 
-1..10 | ForEach-Object { Write-Host '' }
+Write-Host ''
+Write-Host -ForegroundColor Green 'done'
+Write-Host ''
+Write-Host -ForegroundColor Green "... '$($MyInvocation.InvocationName)' ended"
+Write-Host ''
