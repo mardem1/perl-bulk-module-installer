@@ -123,9 +123,23 @@ $fileHeaders += $SearchPath | ForEach-Object {
     "# - $_" 
 }
 
+$winUser = $env:USERNAME
+$winHostName = $env:COMPUTERNAME
+$winOs =  ( Get-CimInstance Win32_OperatingSystem ).Caption
+
 $fileHeaders += (
     '#',
-    "# search done at '$now'",
+    "# Win-User     : $winUser",
+    "# Win-Host     : $winHostName",
+    "# Win-OS       : $winOs"
+)
+
+$fileHeaders += (
+    '#',
+    "# search done at '$now'"
+)
+
+$fileHeaders += (
     '#',
     '# modules found:', 
     '#',
