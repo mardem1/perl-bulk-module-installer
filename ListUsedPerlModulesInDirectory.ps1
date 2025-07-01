@@ -74,6 +74,11 @@ param (
 
 [hashtable] $modules = @{}
 
+$now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
+$winUser = $env:USERNAME
+$winHostName = $env:COMPUTERNAME
+$winOs = ( Get-CimInstance Win32_OperatingSystem ).Caption
+
 1..10 | ForEach-Object { Write-Host '' }
 Write-Host '=> Search for modules in'
 $SearchPath | ForEach-Object { "  - '$_'" }
@@ -102,6 +107,8 @@ Get-ChildItem -Recurse -File -Force -LiteralPath $SearchPath | Where-Object {
     }
 }
 
+$now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
+
 1..10 | ForEach-Object { Write-Host '' }
 Write-Host '=> filter unique'
 $modules2 = $($modules.Keys | Select-Object -Unique | Sort-Object )
@@ -112,8 +119,6 @@ $modules2 | ForEach-Object { "$_" }
 
 1..10 | ForEach-Object { Write-Host '' }
 
-$now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K'
-
 $fileHeaders = (
     '#',
     '# perl modules searched in:'
@@ -122,10 +127,6 @@ $fileHeaders = (
 $fileHeaders += $SearchPath | ForEach-Object { 
     "# - $_" 
 }
-
-$winUser = $env:USERNAME
-$winHostName = $env:COMPUTERNAME
-$winOs =  ( Get-CimInstance Win32_OperatingSystem ).Caption
 
 $fileHeaders += (
     '#',
