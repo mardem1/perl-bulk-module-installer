@@ -13,6 +13,8 @@ Directories to search in.
 
 Save result as List-File which can be used for PerlBulkModuleInstaller as Install-List.
 
+Also generates similar named PL file wich can be used for a compile check "perl -c".
+
 .NOTES
 
 BUG REPORTS
