@@ -82,6 +82,7 @@ $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
 $winUser = $env:USERNAME
 $winHostName = $env:COMPUTERNAME
 $winOs = ( Get-CimInstance Win32_OperatingSystem ).Caption
+$ModuleListFilePl = $ModuleListFileTxt.Replace('.txt', '.pl')
 
 Write-Host -ForegroundColor Green '=> Search for modules in'
 $SearchPath | ForEach-Object { "  - '$_'" }
@@ -114,8 +115,13 @@ $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
 Write-Host ''
 Write-Host -ForegroundColor Green '=> filter unique'
 $moduleNames = $($modules.Keys | Select-Object -Unique | Sort-Object )
+
+Write-Host '=> create Modules use'
+$modulesUse = $moduleNames | ForEach-Object { "use $_ qw();" }
 Write-Host ''
-Write-Host -ForegroundColor Green '=> found modules'
+
+Write-Host ''
+Write-Host -ForegroundColor Green '=> Modules plain'
 $moduleNames | ForEach-Object { "$_" }
 
 $fileHeaders = (
@@ -156,6 +162,10 @@ $fileFooters = (
 Write-Host ''
 Write-Host -ForegroundColor Green "=> generate module list file '$ModuleListFileTxt'"
 $fileHeaders, $moduleNames, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt
+
+Write-Host ''
+Write-Host -ForegroundColor Green "=> generate module compile check (perl -c) file '$ModuleListFilePl'"
+$fileHeaders, $modulesUse, $fileFooters | Out-File -LiteralPath $ModuleListFilePl
 
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
