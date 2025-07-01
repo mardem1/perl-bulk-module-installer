@@ -9,6 +9,10 @@ Browse one or more directories for perl files and search for used perl modules.
 
 Directories to search in.
 
+.PARAMETER ModuleListFileTxt
+
+Save result as List-File which can be used for PerlBulkModuleInstaller as Install-List.
+
 .NOTES
 
 BUG REPORTS
@@ -62,7 +66,10 @@ param (
     [ValidateScript({
             Test-Path -LiteralPath $_ -PathType Leaf -IsValid
         })]
-    [string] $ModuleListFile   
+    [ValidateScript({
+            $_ -like '*.txt'
+        })]
+    [string] $ModuleListFileTxt   
 )
 
 [hashtable] $modules = @{}
@@ -103,11 +110,11 @@ $modules2 = $($modules.Keys | Select-Object -Unique | Sort-Object )
 Write-Host '=> found modules'
 $modules2 | ForEach-Object { "$_" }
 
-if ( ! [string]::IsNullOrWhiteSpace($ModuleListFile) ) {
+if ( ! [string]::IsNullOrWhiteSpace($ModuleListFileTxt) ) {
     $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' 
     $SearchPath
     $modules2
     
-    Write-Host "=> generate module list file '$ModuleListFile'"
-    '#', "# perl modules searched in '$SearchPath'", "# search done at '$now'", '# modules found:', '#', $modules2, '#', '# list ended', '#' | Out-File -LiteralPath $ModuleListFile
+    Write-Host "=> generate module list file '$ModuleListFileTxt'"
+    '#', "# perl modules searched in '$SearchPath'", "# search done at '$now'", '# modules found:', '#', $modules2, '#', '# list ended', '#' | Out-File -LiteralPath $ModuleListFileTxt
 }
