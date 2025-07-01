@@ -113,10 +113,10 @@ $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
 
 Write-Host ''
 Write-Host -ForegroundColor Green '=> filter unique'
-$modules2 = $($modules.Keys | Select-Object -Unique | Sort-Object )
+$moduleNames = $($modules.Keys | Select-Object -Unique | Sort-Object )
 Write-Host ''
 Write-Host -ForegroundColor Green '=> found modules'
-$modules2 | ForEach-Object { "$_" }
+$moduleNames | ForEach-Object { "$_" }
 
 $fileHeaders = (
     '#',
@@ -155,7 +155,7 @@ $fileFooters = (
 
 Write-Host ''
 Write-Host -ForegroundColor Green "=> generate module list file '$ModuleListFileTxt'"
-$fileHeaders, $modules2, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt
+$fileHeaders, $moduleNames, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt
 
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
