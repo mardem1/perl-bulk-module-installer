@@ -61,7 +61,7 @@ param (
         })]
     [string[]] $SearchPath,
 
-    [Parameter(Mandatory = $false, Position = 1)]
+    [Parameter(Mandatory = $true, Position = 1)]
     [ValidateNotNullOrEmpty()]
     [ValidateScript({
             Test-Path -LiteralPath $_ -PathType Leaf -IsValid
@@ -112,36 +112,34 @@ $modules2 | ForEach-Object { "$_" }
 
 1..10 | ForEach-Object { Write-Host '' }
 
-if ( ! [string]::IsNullOrWhiteSpace($ModuleListFileTxt) ) {
-    $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K'
-    
-    $fileHeaders = (
-        '#',
-        '# perl modules searched in:'
-    )
+$now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K'
 
-    $fileHeaders += $SearchPath | ForEach-Object { 
-        "# - $_" 
-    }
+$fileHeaders = (
+    '#',
+    '# perl modules searched in:'
+)
 
-    $fileHeaders += (
-        '#',
-        "# search done at '$now'",
-        '#',
-        '# modules found:', 
-        '#',
-        '' # empty line before list
-    )
-
-    $fileFooters = (
-        '', # empty line after list
-        '#', 
-        '# list ended', 
-        '#'
-    )
-
-    Write-Host "=> generate module list file '$ModuleListFileTxt'"
-    $fileHeaders, $modules2, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt
-
-    1..10 | ForEach-Object { Write-Host '' }
+$fileHeaders += $SearchPath | ForEach-Object { 
+    "# - $_" 
 }
+
+$fileHeaders += (
+    '#',
+    "# search done at '$now'",
+    '#',
+    '# modules found:', 
+    '#',
+    '' # empty line before list
+)
+
+$fileFooters = (
+    '', # empty line after list
+    '#', 
+    '# list ended', 
+    '#'
+)
+
+Write-Host "=> generate module list file '$ModuleListFileTxt'"
+$fileHeaders, $modules2, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt
+
+1..10 | ForEach-Object { Write-Host '' }
