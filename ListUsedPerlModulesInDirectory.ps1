@@ -69,7 +69,7 @@ param (
     [ValidateScript({
             $_ -like '*.txt'
         })]
-    [string] $ModuleListFileTxt   
+    [string] $ModuleListFileTxt
 )
 
 Write-Host ''
@@ -123,8 +123,8 @@ $fileHeaders = (
     '# perl modules searched in:'
 )
 
-$fileHeaders += $SearchPath | ForEach-Object { 
-    "# - $_" 
+$fileHeaders += $SearchPath | ForEach-Object {
+    "# - $_"
 }
 
 $fileHeaders += (
@@ -141,15 +141,15 @@ $fileHeaders += (
 
 $fileHeaders += (
     '#',
-    '# modules found:', 
+    '# modules found:',
     '#',
     '' # empty line before list
 )
 
 $fileFooters = (
     '', # empty line after list
-    '#', 
-    '# list ended', 
+    '#',
+    '# list ended',
     '#'
 )
 
