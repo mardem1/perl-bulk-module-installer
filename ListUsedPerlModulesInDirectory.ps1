@@ -89,27 +89,36 @@ $winHostName = $env:COMPUTERNAME
 $winOs = ( Get-CimInstance Win32_OperatingSystem ).Caption
 $ModuleListFilePl = $ModuleListFileTxt.Replace('.txt', '.pl')
 
-Write-Host -ForegroundColor Green '=> Search for modules in'
-$SearchPath | ForEach-Object { "  - '$_'" }
+Write-Host -ForegroundColor Green '=> search for files ...'
+Write-Host -ForegroundColor Green '  => with extensions:'
+$extensions | ForEach-Object {
+    Write-Host -ForegroundColor Green "    => $_"
+}
+Write-Host -ForegroundColor Green '  => in directories:'
+$SearchPath | ForEach-Object {
+    Write-Host -ForegroundColor Green "    => $_"
+}
 
-Write-Host -ForegroundColor Green '=> search ...'
-Get-ChildItem -Recurse -File -Force -LiteralPath $SearchPath | Where-Object {
+$files = Get-ChildItem -Recurse -File -Force -LiteralPath $SearchPath | Where-Object {
     $_.Extension -in $extensions
-} | ForEach-Object {
+}
+
+Write-Host -ForegroundColor Green '=> matching files found - analyze ...'
+$files | ForEach-Object {
     Write-Host -ForegroundColor DarkGray "=> check found file: '$($_.FullName)'"
 
-    $_
-} | Get-Content | ForEach-Object {
-    # Upper-Case defined as first character for none core / standard modules
-    # should match => 'use XYZ...ABC;' 'use XYZ...ABC (..);'  'use XYZ...ABC qw(..);' 'use XYZ...ABC qw(' 'use XYZ...ABC'
-    # ending exclude ^: needed to exclude "use C:"
-    if ( $_ -cmatch '\buse\b\s+(([A-Z][a-zA-Z0-9_]*)([:][:][a-zA-Z0-9_]+)*)[^:]' ) {
-        $text = $Matches[1]
+    $_ | Get-Content | ForEach-Object {
+        # Upper-Case defined as first character for none core / standard modules
+        # should match => 'use XYZ...ABC;' 'use XYZ...ABC (..);'  'use XYZ...ABC qw(..);' 'use XYZ...ABC qw(' 'use XYZ...ABC'
+        # ending exclude ^: needed to exclude "use C:"
+        if ( $_ -cmatch '\buse\b\s+(([A-Z][a-zA-Z0-9_]*)([:][:][a-zA-Z0-9_]+)*)[^:]' ) {
+            $text = $Matches[1]
 
-        # add custom filter here - exclude own modules ?
-        if ( $true ) {
-            Write-Host -ForegroundColor Yellow "  => found module: '$text'"
-            $modules[$text] = $true
+            # add custom filter here - exclude own modules ?
+            if ( $true ) {
+                Write-Host -ForegroundColor Yellow "  => found module: '$text'"
+                $modules[$text] = $true
+            }
         }
     }
 }
@@ -130,18 +139,15 @@ $moduleNames | ForEach-Object { "$_" }
 
 $fileHeaders = (
     '#',
-    '# perl modules searched in:'
+    '# => search for files',
+    '#  => with extensions:'
 )
-
-$fileHeaders += $SearchPath | ForEach-Object {
-    "# - $_"
-}
+$fileHeaders += $extensions | ForEach-Object { "#   - $_" }
 
 $fileHeaders += (
-    '#',
-    '# perl file extensions:'
+    '#  => in directories:'
 )
-$fileHeaders += $extensions | ForEach-Object { "# - $_" }
+$fileHeaders += $SearchPath | ForEach-Object { "#   - $_" }
 
 $fileHeaders += (
     '#',
