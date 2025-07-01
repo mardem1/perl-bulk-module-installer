@@ -5,7 +5,7 @@
 
 Browse a directory for perl files and search for used perl modules.
 
-.PARAMETER LiteralPath
+.PARAMETER SearchPath
 
 Directory to search in.
 
@@ -46,7 +46,7 @@ param (
     [ValidateScript({
             Test-Path -LiteralPath $_ -PathType Container
         })]
-    [string] $LiteralPath,
+    [string] $SearchPath,
 
     [Parameter(Mandatory = $false, Position = 1)]
     [ValidateNotNullOrEmpty()]
@@ -59,10 +59,10 @@ param (
 [hashtable] $modules = @{}
 
 1..10 | ForEach-Object { Write-Host '' }
-Write-Host "=> Search for modules in '$LiteralPath'"
+Write-Host "=> Search for modules in '$SearchPath'"
 
 1..10 | ForEach-Object { Write-Host '' }
-Get-ChildItem -Recurse -File -Force -LiteralPath $LiteralPath | Where-Object {
+Get-ChildItem -Recurse -File -Force -LiteralPath $SearchPath | Where-Object {
     # BAT files for perl in batch wrapper
     $_.Name -match '\.(pl|pm|t|bat)$'
 } | ForEach-Object {
@@ -95,9 +95,9 @@ $modules2 | ForEach-Object { "$_" }
 
 if ( ! [string]::IsNullOrWhiteSpace($ModuleListFile) ) {
     $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' 
-    $LiteralPath
+    $SearchPath
     $modules2
     
     Write-Host "=> generate module list file '$ModuleListFile'"
-    '#', "# perl modules searched in '$LiteralPath'", "# search done at '$now'", '# modules found:', '#', $modules2, '#', '# list ended', '#' | Out-File -LiteralPath $ModuleListFile
+    '#', "# perl modules searched in '$SearchPath'", "# search done at '$now'", '# modules found:', '#', $modules2, '#', '# list ended', '#' | Out-File -LiteralPath $ModuleListFile
 }
