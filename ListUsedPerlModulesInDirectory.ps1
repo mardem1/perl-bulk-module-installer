@@ -3,11 +3,11 @@
 
 .SYNOPSIS
 
-Browse a directory for perl files and search for used perl modules.
+Browse one or more directories for perl files and search for used perl modules.
 
 .PARAMETER SearchPath
 
-Directory to search in.
+Directories to search in.
 
 .NOTES
 
@@ -44,9 +44,18 @@ param (
     [Parameter(Mandatory = $true, Position = 0)]
     [ValidateNotNullOrEmpty()]
     [ValidateScript({
-            Test-Path -LiteralPath $_ -PathType Container
+            $notFound = $false
+            $_ | ForEach-Object {
+                if ( [string]::IsNullOrWhiteSpace( $_ ) ) {
+                    $notFound = $true
+                }
+                elseif ( ! ( Test-Path -LiteralPath $_ -PathType Container ) ) {
+                    $notFound = $true
+                }
+            }
+            ! $notFound
         })]
-    [string] $SearchPath,
+    [string[]] $SearchPath,
 
     [Parameter(Mandatory = $false, Position = 1)]
     [ValidateNotNullOrEmpty()]
@@ -59,7 +68,8 @@ param (
 [hashtable] $modules = @{}
 
 1..10 | ForEach-Object { Write-Host '' }
-Write-Host "=> Search for modules in '$SearchPath'"
+Write-Host "=> Search for modules in"
+$SearchPath | ForEach-Object { "  - '$_'" }
 
 1..10 | ForEach-Object { Write-Host '' }
 Get-ChildItem -Recurse -File -Force -LiteralPath $SearchPath | Where-Object {
