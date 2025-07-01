@@ -75,7 +75,7 @@ param (
 [hashtable] $modules = @{}
 
 1..10 | ForEach-Object { Write-Host '' }
-Write-Host "=> Search for modules in"
+Write-Host '=> Search for modules in'
 $SearchPath | ForEach-Object { "  - '$_'" }
 
 1..10 | ForEach-Object { Write-Host '' }
@@ -110,11 +110,38 @@ $modules2 = $($modules.Keys | Select-Object -Unique | Sort-Object )
 Write-Host '=> found modules'
 $modules2 | ForEach-Object { "$_" }
 
+1..10 | ForEach-Object { Write-Host '' }
+
 if ( ! [string]::IsNullOrWhiteSpace($ModuleListFileTxt) ) {
-    $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' 
-    $SearchPath
-    $modules2
+    $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K'
     
+    $fileHeaders = (
+        '#',
+        '# perl modules searched in:'
+    )
+
+    $fileHeaders += $SearchPath | ForEach-Object { 
+        "# - $_" 
+    }
+
+    $fileHeaders += (
+        '#',
+        "# search done at '$now'",
+        '#',
+        '# modules found:', 
+        '#',
+        '' # empty line before list
+    )
+
+    $fileFooters = (
+        '', # empty line after list
+        '#', 
+        '# list ended', 
+        '#'
+    )
+
     Write-Host "=> generate module list file '$ModuleListFileTxt'"
-    '#', "# perl modules searched in '$SearchPath'", "# search done at '$now'", '# modules found:', '#', $modules2, '#', '# list ended', '#' | Out-File -LiteralPath $ModuleListFileTxt
+    $fileHeaders, $modules2, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt
+
+    1..10 | ForEach-Object { Write-Host '' }
 }
