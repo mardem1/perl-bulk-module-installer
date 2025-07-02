@@ -138,6 +138,8 @@ else {
 if (!$dontCompress) {
     Write-Host ''
     Write-Host -ForegroundColor Green "zip '$StrawberryDir' as '$targetPath'"
+    $zipStartTIme = Get-Date
+    Write-Host "zip start time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipStartTIme )"
     # Compress-Archive is really slow
     # Compress-Archive -LiteralPath $StrawberryDir -DestinationPath $targetPath -CompressionLevel Fastest
     # use .Net direct
@@ -147,6 +149,9 @@ if (!$dontCompress) {
         $targetPath,
         [System.IO.Compression.CompressionLevel]::Optimal,# Fastest
         $false )
+    $zipEndTime = Get-Date
+    Write-Host "zip end time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipEndTime)"
+    Write-Host "zip duration $( (New-TimeSpan -Start $zipStartTIme -End $zipEndTime).TotalSeconds )"
 }
 
 Write-Host ''
