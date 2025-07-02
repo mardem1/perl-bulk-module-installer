@@ -116,7 +116,38 @@ if ( 0 -ne $LASTEXITCODE) {
     exit
 }
 
-# TODO: implement
+# TODO: replace with Start-Process and created ARGV
+
+# for PerlBulkModuleInstaller
+$Env:PERL5LIB = "$((Get-Item -LiteralPath $InstallCpanModules).Directory.FullName)\lib"
+
+Write-Host -ForegroundColor Green "start '$InstallCpanModules' with '$InstallModuleListFile'"
+if ( [string]::IsNullOrWhiteSpace($DontTryModuleListFile) ) {
+    if ( $OnlyAllUpdates ) {
+        & $perlexe $InstallCpanModules '--only-all-updates' $InstallModuleListFile
+    }
+    elseif ( $AllUpdates ) {
+        & $perlexe $InstallCpanModules '--all-updates' $InstallModuleListFile
+    }
+    else {
+        & $perlexe $InstallCpanModules $InstallModuleListFile
+    }
+}
+else {
+    if ( $OnlyAllUpdates ) {
+        & $perlexe $InstallCpanModules '--only-all-updates' $InstallModuleListFile $DontTryModuleListFile
+    }
+    elseif ( $AllUpdates ) {
+        & $perlexe $InstallCpanModules '--all-updates' $InstallModuleListFile $DontTryModuleListFile
+    }
+    else {
+        & $perlexe $InstallCpanModules $InstallModuleListFile $DontTryModuleListFile
+    }
+}
+
+if ( 0 -ne $LASTEXITCODE) {
+    Write-Host -ForegroundColor Red "FATAL ERROR: '$InstallCpanModules' with '$LASTEXITCODE' failed?"
+}
 
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
