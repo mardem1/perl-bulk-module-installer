@@ -52,6 +52,7 @@ Write-Host ''
 Write-Host -ForegroundColor Green "started '$($MyInvocation.InvocationName)' ..."
 Write-Host ''
 
+$hasAdmin = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 $zip = Get-Item -LiteralPath $StrawberryZip
 $targetPath = "$($zip.Directory.FullName)\$($zip.BaseName)"
 
@@ -60,6 +61,41 @@ if ( Test-Path -LiteralPath $targetPath ) {
 }
 
 Expand-Archive -LiteralPath $StrawberryZip -DestinationPath $targetPath
+
+if ( ! $hasAdmin ) {
+    Write-Host 'admin required for defender config -> SKIP'
+}
+else {
+    Write-Host "add defender exclude '$targetPath'"
+    Add-MpPreference -ExclusionPath $targetPath -Verbose
+    Get-ChildItem -Recurse -File -LiteralPath $targetPath -Force -Filter '*.exe' | ForEach-Object {
+        Write-Host "add defender exclude '$_'"
+        Add-MpPreference -ExclusionProcess $_ -Verbose
+    }
+}
+
+<#
+remove for later ...
+
+if ( ! $hasAdmin ) {
+    Write-Host 'admin required for defender config -> SKIP'
+}
+else {
+    ( Get-MpPreference ).ExclusionPath | Where-Object {
+        $_.StartsWith($targetPath)
+    } | ForEach-Object {
+        Write-Host "remove defender exclude '$_'"
+        Remove-MpPreference -ExclusionExtension $_
+    }
+
+    ( Get-MpPreference ).ExclusionProcess | Where-Object {
+        $_.StartsWith($targetPath)
+    } | ForEach-Object {
+        Write-Host "remove defender exclude '$_'"
+        Remove-MpPreference -ExclusionExtension $_
+    }
+}
+#>
 
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
