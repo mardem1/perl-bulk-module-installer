@@ -72,6 +72,35 @@ else {
     Remove-Item -Recurse -Force -LiteralPath $cpanCacheDir
 }
 
+$hasAdmin = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+if ( ! $hasAdmin ) {
+    Write-Host 'admin required for defender config -> SKIP'
+}
+else {
+    Write-Host ''
+    Write-Host -ForegroundColor Green '=> check defender config'
+    Write-Host ''
+
+    ( Get-MpPreference ).ExclusionPath | ForEach-Object { $_ } | Where-Object {
+        # if none set $null given ? why
+        ! [string]::IsNullOrWhiteSpace($_) -and (
+            $_ -eq $StrawberryDir `
+                -or $_.StartsWith($StrawberryDir) )
+    } | ForEach-Object {
+        Write-Host "remove defender exclude dir '$_'"
+        Remove-MpPreference -ExclusionPath $_ -Force
+    }
+
+    ( Get-MpPreference ).ExclusionProcess | Where-Object {
+        ! [string]::IsNullOrWhiteSpace($_) -and `
+            $_.StartsWith($StrawberryDir)
+    } | ForEach-Object {
+        Write-Host "remove defender exclude process '$_'"
+        Remove-MpPreference -ExclusionProcess $_ -Force
+    }
+}
+
 Write-Host ''
 Write-Host -ForegroundColor Green "zip '$StrawberryDir' as '$targetPath'"
 Compress-Archive -LiteralPath $StrawberryDir -DestinationPath $targetPath -CompressionLevel Fastest
