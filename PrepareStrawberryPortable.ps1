@@ -66,11 +66,12 @@ if ( ! $hasAdmin ) {
     Write-Host 'admin required for defender config -> SKIP'
 }
 else {
-    Write-Host "add defender exclude '$targetPath'"
-    Add-MpPreference -ExclusionPath $targetPath -Verbose
+    Write-Host "add defender exclude dir '$targetPath'"
+    Add-MpPreference -ExclusionPath $targetPath -Force
+
     Get-ChildItem -Recurse -File -LiteralPath $targetPath -Force -Filter '*.exe' | ForEach-Object {
-        Write-Host "add defender exclude '$_'"
-        Add-MpPreference -ExclusionProcess $_ -Verbose
+        Write-Host "add defender exclude process '$_'"
+        Add-MpPreference -ExclusionProcess $_ -Force
     }
 }
 
