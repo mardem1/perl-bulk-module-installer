@@ -77,29 +77,6 @@ else {
     }
 }
 
-<#
-remove for later ...
-
-if ( ! $hasAdmin ) {
-    Write-Host 'admin required for defender config -> SKIP'
-}
-else {
-    ( Get-MpPreference ).ExclusionPath | Where-Object {
-        $_.StartsWith($targetPath)
-    } | ForEach-Object {
-        Write-Host "remove defender exclude '$_'"
-        Remove-MpPreference -ExclusionExtension $_
-    }
-
-    ( Get-MpPreference ).ExclusionProcess | Where-Object {
-        $_.StartsWith($targetPath)
-    } | ForEach-Object {
-        Write-Host "remove defender exclude '$_'"
-        Remove-MpPreference -ExclusionExtension $_
-    }
-}
-#>
-
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
 
