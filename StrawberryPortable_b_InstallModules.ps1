@@ -92,7 +92,7 @@ param (
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
     [ValidateScript({ $_ -like '*.txt' })]
-    [string] $DontTryModuleListFIle,
+    [string] $DontTryModuleListFile,
 
     [switch] $OnlyAllUpdates,
 
@@ -102,6 +102,24 @@ param (
 Write-Host ''
 Write-Host -ForegroundColor Green "started '$($MyInvocation.InvocationName)' ..."
 Write-Host ''
+
+$Env:PATH = "$($StrawberryDir )\perl\site\bin;$($StrawberryDir )\perl\bin;$($StrawberryDir )\c\bin;$Env:PATH"
+
+$Env:TERM = ''
+$Env:PERL_JSON_BACKEND = ''
+$Env:PERL_YAML_BACKEND = ''
+$Env:PERL5LIB = ''
+$Env:PERL5OPT = ''
+$Env:PERL_MM_OPT = ''
+$Env:PERL_MB_OPT = ''
+
+$perlexe = $StrawberryDir + '\perl\bin\perl.exe'
+& $perlexe -MConfig -e 'printf(qq{Perl executable: %s\nPerl version   : %vd / $Config{archname}\n\n}, $^X, $^V)' | Out-String | Write-Host -ForegroundColor Green
+
+if ( 0 -ne $LASTEXITCODE) {
+    Write-Host -ForegroundColor Red "FATAL ERROR: 'perl' failed - abort!"
+    exit
+}
 
 # TODO: implement
 
