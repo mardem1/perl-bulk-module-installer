@@ -73,6 +73,8 @@ else {
 
 $hasAdmin = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
+$dontCompress = $false
+
 if ( ! $hasAdmin ) {
     Write-Host 'admin required for defender config -> SKIP'
 }
@@ -98,19 +100,54 @@ else {
         Write-Host "remove defender exclude process '$_'"
         Remove-MpPreference -ExclusionProcess $_ -Force
     }
+
+    Write-Host ''
+    Write-Host -ForegroundColor Green "=> start defender scan '$StrawberryDir'"
+    Write-Host ''
+    $scanStartTime = Get-Date
+    Write-Host "scan start $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $scanStartTime )"
+    Start-MpScan -ScanPath $StrawberryDir -ScanType CustomScan
+    $scanEndTime = Get-Date
+    Write-Host "scan ended $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $scanEndTime)"
+    Write-Host "scan duration $( (New-TimeSpan -Start $scanStartTime -End $scanEndTime).TotalSeconds )"
+
+    Write-Host ''
+    Write-Host -ForegroundColor Green '=> check detected threats'
+    Write-Host ''
+    $foundThreats = Get-MpThreatDetection | Where-Object { $_.InitialDetectionTime -gt $scanStartTime }
+
+    if ( $foundThreats ) {
+        Write-Host ''
+        Write-Host -ForegroundColor Green '=> detected threats'
+        Write-Host ''
+
+        $foundThreats | Select-Object *
+
+        Write-Host ''
+        Write-Host -ForegroundColor Red '=> threats found - nocompress'
+        Write-Host ''
+
+        $dontCompress = $true
+    }
+    else {
+        Write-Host ''
+        Write-Host -ForegroundColor Green '=> no threats found'
+    }
 }
 
-Write-Host ''
-Write-Host -ForegroundColor Green "zip '$StrawberryDir' as '$targetPath'"
-# Compress-Archive is really slow
-# Compress-Archive -LiteralPath $StrawberryDir -DestinationPath $targetPath -CompressionLevel Fastest
-# use .Net direct
-Add-Type -Assembly System.IO.Compression.Filesystem
-[IO.Compression.ZipFile]::CreateFromDirectory(
-    $StrawberryDir,
-    $targetPath,
-    [System.IO.Compression.CompressionLevel]::Optimal,# Fastest
-    $false )
+if (!$dontCompress) {
+    Write-Host ''
+    Write-Host -ForegroundColor Green "zip '$StrawberryDir' as '$targetPath'"
+    # Compress-Archive is really slow
+    # Compress-Archive -LiteralPath $StrawberryDir -DestinationPath $targetPath -CompressionLevel Fastest
+    # use .Net direct
+    Add-Type -Assembly System.IO.Compression.Filesystem
+    [IO.Compression.ZipFile]::CreateFromDirectory(
+        $StrawberryDir,
+        $targetPath,
+        [System.IO.Compression.CompressionLevel]::Optimal,# Fastest
+        $false )
+}
 
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
