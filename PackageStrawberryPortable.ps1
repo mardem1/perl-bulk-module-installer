@@ -63,6 +63,16 @@ if ( Test-Path -LiteralPath $targetPath ) {
 }
 
 Write-Host ''
+$cpanCacheDir = "$StrawberryDir\data\.cpanm"
+if ( ! ( Test-Path -LiteralPath $cpanCacheDir ) ) {
+    Write-Host -ForegroundColor Green "no CPAN-Cache found '$cpanCacheDir' -> SKIP"
+}
+else {
+    Write-Host -ForegroundColor Green "CPAN-Cache found '$cpanCacheDir' remove"
+    Remove-Item -Recurse -Force -LiteralPath $cpanCacheDir
+}
+
+Write-Host ''
 Write-Host -ForegroundColor Green "zip '$StrawberryDir' as '$targetPath'"
 Compress-Archive -LiteralPath $StrawberryDir -DestinationPath $targetPath -CompressionLevel Fastest
 
