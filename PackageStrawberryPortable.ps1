@@ -52,7 +52,19 @@ Write-Host ''
 Write-Host -ForegroundColor Green "started '$($MyInvocation.InvocationName)' ..."
 Write-Host ''
 
-# TODO: only stub here ...
+$dir = Get-Item -LiteralPath $StrawberryDir
+
+$packagedTimestmp = Get-Date -Format 'yyyyMMdd_HHmmss'
+
+$targetPath = "$($dir.FullName)-packaged-$($packagedTimestmp).zip"
+
+if ( Test-Path -LiteralPath $targetPath ) {
+    throw "compress target $targetPath already exists"
+}
+
+Write-Host ''
+Write-Host -ForegroundColor Green "zip '$StrawberryDir' as '$targetPath'"
+Compress-Archive -LiteralPath $StrawberryDir -DestinationPath $targetPath -CompressionLevel Fastest
 
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
