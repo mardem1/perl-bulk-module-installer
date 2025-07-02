@@ -44,12 +44,22 @@ param (
     [Parameter(Mandatory = $true, Position = 0)]
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
+    [ValidateScript({ $_ -like '*strawberry*portable*.zip' })]
     [string] $StrawberryZip
 )
 
 Write-Host ''
 Write-Host -ForegroundColor Green "started '$($MyInvocation.InvocationName)' ..."
 Write-Host ''
+
+$zip = Get-Item -LiteralPath $StrawberryZip
+$targetPath = "$($zip.Directory.FullName)\$($zip.BaseName)"
+
+if ( Test-Path -LiteralPath $targetPath ) {
+    throw "extraction target $targetPath already exists"
+}
+
+Expand-Archive -LiteralPath $StrawberryZip -DestinationPath $targetPath
 
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
