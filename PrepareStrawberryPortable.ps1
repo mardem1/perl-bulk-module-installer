@@ -50,7 +50,6 @@ param (
 
 Write-Host ''
 Write-Host -ForegroundColor Green "started '$($MyInvocation.InvocationName)' ..."
-Write-Host ''
 
 $hasAdmin = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 $zip = Get-Item -LiteralPath $StrawberryZip
@@ -60,17 +59,20 @@ if ( Test-Path -LiteralPath $targetPath ) {
     throw "extraction target $targetPath already exists"
 }
 
+Write-Host ''
+Write-Host -ForegroundColor Green "unzip '$StrawberryZip' to '$targetPath'"
 Expand-Archive -LiteralPath $StrawberryZip -DestinationPath $targetPath
 
+Write-Host ''
 if ( ! $hasAdmin ) {
-    Write-Host 'admin required for defender config -> SKIP'
+    Write-Host -ForegroundColor Yellow 'admin required for defender config -> SKIP'
 }
 else {
-    Write-Host "add defender exclude dir '$targetPath'"
+    Write-Host -ForegroundColor Green"add defender exclude dir '$targetPath'"
     Add-MpPreference -ExclusionPath $targetPath -Force
 
     Get-ChildItem -Recurse -File -LiteralPath $targetPath -Force -Filter '*.exe' | ForEach-Object {
-        Write-Host "add defender exclude process '$_'"
+        Write-Host -ForegroundColor Green "add defender exclude process '$_'"
         Add-MpPreference -ExclusionProcess $_ -Force
     }
 }
@@ -100,6 +102,8 @@ else {
 
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
+
 Write-Host ''
 Write-Host -ForegroundColor Green "... '$($MyInvocation.InvocationName)' ended"
+
 Write-Host ''
