@@ -61,14 +61,21 @@ if ( Test-Path -LiteralPath $targetPath ) {
 
 Write-Host ''
 Write-Host -ForegroundColor Green "unzip '$StrawberryZip' to '$targetPath'"
-Expand-Archive -LiteralPath $StrawberryZip -DestinationPath $targetPath
+# Expand-Archive is really slow
+# Expand-Archive -LiteralPath $StrawberryZip -DestinationPath $targetPath
+# use .Net direct
+Add-Type -Assembly System.IO.Compression.Filesystem
+[IO.Compression.ZipFile]::ExtractToDirectory(
+    $StrawberryZip,
+    $targetPath,
+    $true )
 
 Write-Host ''
 if ( ! $hasAdmin ) {
     Write-Host -ForegroundColor Yellow 'admin required for defender config -> SKIP'
 }
 else {
-    Write-Host -ForegroundColor Green"add defender exclude dir '$targetPath'"
+    Write-Host -ForegroundColor Green "add defender exclude dir '$targetPath'"
     Add-MpPreference -ExclusionPath $targetPath -Force
 
     Get-ChildItem -Recurse -File -LiteralPath $targetPath -Force -Filter '*.exe' | ForEach-Object {
