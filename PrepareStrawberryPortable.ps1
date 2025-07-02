@@ -91,8 +91,6 @@ else {
 
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
-
 Write-Host ''
 Write-Host -ForegroundColor Green "... '$($MyInvocation.InvocationName)' ended"
-
 Write-Host ''
