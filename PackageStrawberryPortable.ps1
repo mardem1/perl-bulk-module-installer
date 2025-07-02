@@ -1,5 +1,4 @@
-﻿
-<#
+﻿<#
 
 .SYNOPSIS
 
@@ -103,7 +102,15 @@ else {
 
 Write-Host ''
 Write-Host -ForegroundColor Green "zip '$StrawberryDir' as '$targetPath'"
-Compress-Archive -LiteralPath $StrawberryDir -DestinationPath $targetPath -CompressionLevel Fastest
+# Compress-Archive is really slow
+# Compress-Archive -LiteralPath $StrawberryDir -DestinationPath $targetPath -CompressionLevel Fastest
+# use .Net direct
+Add-Type -Assembly System.IO.Compression.Filesystem
+[IO.Compression.ZipFile]::CreateFromDirectory(
+    $StrawberryDir,
+    $targetPath,
+    [System.IO.Compression.CompressionLevel]::Optimal,# Fastest
+    $false )
 
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
