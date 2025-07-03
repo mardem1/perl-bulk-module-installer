@@ -119,7 +119,7 @@ if ( 0 -ne $LASTEXITCODE) {
 # TODO: replace with Start-Process and created ARGV
 
 # for PerlBulkModuleInstaller
-$Env:PERL5LIB = "$((Get-Item -LiteralPath $InstallCpanModules).Directory.FullName)\lib"
+$Env:PERL5LIB = "$((Get-Item -LiteralPath $InstallCpanModules).Directory.FullName)\lib".Replace('\', '/')
 
 Write-Host -ForegroundColor Green "start '$InstallCpanModules' with '$InstallModuleListFile'"
 if ( [string]::IsNullOrWhiteSpace($DontTryModuleListFile) ) {
