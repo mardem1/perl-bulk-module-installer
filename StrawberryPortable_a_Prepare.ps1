@@ -48,8 +48,16 @@ param (
     [string] $StrawberryZip
 )
 
+$ScriptPath = $MyInvocation.InvocationName
+# Invoked wiht &
+if ( $ScriptPath -eq '&' -and
+        $null -ne $MyInvocation.MyCommand -and
+        ! [string]::IsNullOrWhiteSpace($MyInvocation.MyCommand.Path) ) {
+    $ScriptPath = $MyInvocation.MyCommand.Path
+}
+
 Write-Host ''
-Write-Host -ForegroundColor Green "started '$($MyInvocation.InvocationName)' ..."
+Write-Host -ForegroundColor Green "started '$ScriptPath' ..."
 
 $hasAdmin = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 $zip = Get-Item -LiteralPath $StrawberryZip
@@ -89,5 +97,5 @@ else {
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
 Write-Host ''
-Write-Host -ForegroundColor Green "... '$($MyInvocation.InvocationName)' ended"
+Write-Host -ForegroundColor Green "... '$ScriptPath' ended"
 Write-Host ''

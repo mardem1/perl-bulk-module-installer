@@ -47,8 +47,16 @@ param (
     [string] $StrawberryDir
 )
 
+$ScriptPath = $MyInvocation.InvocationName
+# Invoked wiht &
+if ( $ScriptPath -eq '&' -and
+        $null -ne $MyInvocation.MyCommand -and
+        ! [string]::IsNullOrWhiteSpace($MyInvocation.MyCommand.Path) ) {
+    $ScriptPath = $MyInvocation.MyCommand.Path
+}
+
 Write-Host ''
-Write-Host -ForegroundColor Green "started '$($MyInvocation.InvocationName)' ..."
+Write-Host -ForegroundColor Green "started '$ScriptPath' ..."
 Write-Host ''
 
 $dir = Get-Item -LiteralPath $StrawberryDir
@@ -157,5 +165,5 @@ if (!$dontCompress) {
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
 Write-Host ''
-Write-Host -ForegroundColor Green "... '$($MyInvocation.InvocationName)' ended"
+Write-Host -ForegroundColor Green "... '$ScriptPath' ended"
 Write-Host ''

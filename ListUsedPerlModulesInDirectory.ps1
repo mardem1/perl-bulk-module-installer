@@ -74,8 +74,16 @@ param (
     [string] $ModuleListFileTxt
 )
 
+$ScriptPath = $MyInvocation.InvocationName
+# Invoked wiht &
+if ( $ScriptPath -eq '&' -and
+        $null -ne $MyInvocation.MyCommand -and
+        ! [string]::IsNullOrWhiteSpace($MyInvocation.MyCommand.Path) ) {
+    $ScriptPath = $MyInvocation.MyCommand.Path
+}
+
 Write-Host ''
-Write-Host -ForegroundColor Green "started '$($MyInvocation.InvocationName)' ..."
+Write-Host -ForegroundColor Green "started '$ScriptPath' ..."
 Write-Host ''
 
 # BAT files for perl in batch wrapper
@@ -186,5 +194,5 @@ $fileHeaders, $modulesUse, $fileFooters | Out-File -LiteralPath $ModuleListFileP
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
 Write-Host ''
-Write-Host -ForegroundColor Green "... '$($MyInvocation.InvocationName)' ended"
+Write-Host -ForegroundColor Green "... '$ScriptPath' ended"
 Write-Host ''

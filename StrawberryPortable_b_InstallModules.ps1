@@ -99,8 +99,16 @@ param (
     [switch] $AllUpdates
 )
 
+$ScriptPath = $MyInvocation.InvocationName
+# Invoked wiht &
+if ( $ScriptPath -eq '&' -and
+        $null -ne $MyInvocation.MyCommand -and 
+        ! [string]::IsNullOrWhiteSpace($MyInvocation.MyCommand.Path) ) {
+    $ScriptPath = $MyInvocation.MyCommand.Path
+}
+
 Write-Host ''
-Write-Host -ForegroundColor Green "started '$($MyInvocation.InvocationName)' ..."
+Write-Host -ForegroundColor Green "started '$ScriptPath' ..."
 Write-Host ''
 
 $PathExtends = "$($StrawberryDir)\perl\site\bin;$($StrawberryDir)\perl\bin;$($StrawberryDir)\c\bin"
@@ -152,5 +160,5 @@ if ( 0 -ne $LASTEXITCODE) {
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
 Write-Host ''
-Write-Host -ForegroundColor Green "... '$($MyInvocation.InvocationName)' ended"
+Write-Host -ForegroundColor Green "... '$ScriptPath' ended"
 Write-Host ''
