@@ -1,0 +1,9 @@
+& "C:\_test\perl-bulk-module-installer\StrawberryPortable_a_Prepare.ps1" -StrawberryZip "C:\_test\strawberry-perl-5.40.2.1-64bit-portable.zip"
+
+& "C:\_test\perl-bulk-module-installer\StrawberryPortable_c_CpanL_ListModules.ps1" -StrawberryDir "C:\_test\strawberry-perl-5.40.2.1-64bit-portable" -ModuleListFileTxt "C:\_test\perl-bulk-module-installer\log\_list_before.txt"          
+
+& "C:\_test\perl-bulk-module-installer\StrawberryPortable_b_InstallModules.ps1" -StrawberryDir "C:\_test\strawberry-perl-5.40.2.1-64bit-portable" -InstallCpanModules "C:\_test\perl-bulk-module-installer\InstallCpanModules.pl" -InstallModuleListFile "C:\_test\perl-bulk-module-installer\test-module-lists\SmallModuleExample.txt" -DontTryModuleListFile "C:\_test\perl-bulk-module-installer\test-module-lists\_dont_try_modules.txt"                                                                                                                                                                            
+
+& "C:\_test\perl-bulk-module-installer\StrawberryPortable_c_CpanL_ListModules.ps1" -StrawberryDir "C:\_test\strawberry-perl-5.40.2.1-64bit-portable" -ModuleListFileTxt "C:\_test\perl-bulk-module-installer\log\_list_after.txt"          
+
+& "C:\_test\perl-bulk-module-installer\StrawberryPortable_d_Package.ps1" -StrawberryDir "C:\_test\strawberry-perl-5.40.2.1-64bit-portable"
