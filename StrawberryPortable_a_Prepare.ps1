@@ -67,10 +67,7 @@ Write-Host "unzip start time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zi
 # Expand-Archive -LiteralPath $StrawberryZip -DestinationPath $targetPath
 # use .Net direct
 Add-Type -Assembly System.IO.Compression.Filesystem
-[IO.Compression.ZipFile]::ExtractToDirectory(
-    $StrawberryZip,
-    $targetPath,
-    $true )
+[IO.Compression.ZipFile]::ExtractToDirectory( $StrawberryZip, $targetPath )
 $zipEndTime = Get-Date
 Write-Host "unzip end time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipEndTime)"
 Write-Host "unzip duration $( (New-TimeSpan -Start $zipStartTIme -End $zipEndTime).TotalSeconds )"
