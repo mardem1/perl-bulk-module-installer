@@ -1,5 +1,4 @@
-﻿
-<#
+﻿<#
 
 .SYNOPSIS
 
@@ -77,8 +76,8 @@ param (
 $ScriptPath = $MyInvocation.InvocationName
 # Invoked wiht &
 if ( $ScriptPath -eq '&' -and
-        $null -ne $MyInvocation.MyCommand -and
-        ! [string]::IsNullOrWhiteSpace($MyInvocation.MyCommand.Path) ) {
+    $null -ne $MyInvocation.MyCommand -and
+    ! [string]::IsNullOrWhiteSpace($MyInvocation.MyCommand.Path) ) {
     $ScriptPath = $MyInvocation.MyCommand.Path
 }
 
