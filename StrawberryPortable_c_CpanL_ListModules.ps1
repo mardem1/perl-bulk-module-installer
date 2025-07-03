@@ -8,6 +8,10 @@ List all installed modules via cpan -l
 
 Dir for strawberry dir to install the modules
 
+.PARAMETER ModuleListFileTxt
+
+Save list in text file
+
 .NOTES
 
 BUG REPORTS
@@ -44,7 +48,13 @@ param (
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Container })]
     [ValidateScript({ $_ -like '*strawberry*portable*' })]
-    [string] $StrawberryDir
+    [string] $StrawberryDir,
+
+    [Parameter(Mandatory = $true, Position = 0)]
+    [ValidateNotNullOrEmpty()]
+    [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf -IsValid })]
+    [ValidateScript({ $_ -like '*.txt' })]
+    [string] $ModuleListFileTxt
 )
 
 Write-Host ''
@@ -67,12 +77,15 @@ if ( 0 -ne $LASTEXITCODE) {
 # TODO: replace with Start-Process and created ARGV
 
 Write-Host -ForegroundColor Green '=> search modules via cpan -l ...'
-( & cmd.exe '/c' 'cpan.bat' '-l' '2>&1' )
+$generatedList = ( & cmd.exe '/c' 'cpan.bat' '-l' '2>&1' )
 Write-Host -ForegroundColor Green '=> ... module list generated'
 
 if ( 0 -ne $LASTEXITCODE) {
     Write-Host -ForegroundColor Red "FATAL ERROR: '$InstallCpanModules' with '$LASTEXITCODE' failed?"
 }
+
+Write-Host "write list file $ModuleListFileTxt"
+$generatedList | Out-File -LiteralPath $ModuleListFileTxt -Encoding default -Force -Confirm:$false -Width 999
 
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
