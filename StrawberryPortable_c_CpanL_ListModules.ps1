@@ -67,16 +67,48 @@ if ( $env:Path -notlike "*$PathExtends*" ) {
 }
 
 $perlexe = $StrawberryDir + '\perl\bin\perl.exe'
-& $perlexe -MConfig -e 'printf(qq{Perl executable: %s\nPerl version   : %vd / $Config{archname}\n\n}, $^X, $^V)' | Out-String | Write-Host -ForegroundColor Green
-
+$perlInfo = & $perlexe -MConfig -e 'printf(qq{Perl executable : %s\nPerl version    : %vd / $Config{archname}}, $^X, $^V)' | Out-String
 if ( 0 -ne $LASTEXITCODE) {
     Write-Host -ForegroundColor Red "FATAL ERROR: 'perl' failed with '$LASTEXITCODE' - abort!"
     exit
 }
 
-# TODO: replace with Start-Process and created ARGV
+$perlInfoList = $perlInfo.Split("`n") | Where-Object { ! [string]::IsNullOrWhiteSpace($_) } | ForEach-Object { $_.Trim() } | ForEach-Object  { "$_" }
+$perlInfo | Write-Host -ForegroundColor Green
+
+$now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
+$winUser = $env:USERNAME
+$winHostName = $env:COMPUTERNAME
+$winOs = ( Get-CimInstance Win32_OperatingSystem ).Caption
+
+$fileHeaders = (
+    '#',
+    '# list perl module via cpan -l',
+    '#',
+    "# StrawberryDir   : $StrawberryDir",
+    "# $($perlInfoList[0])",
+    "# $($perlInfoList[1])",
+    '#',
+    "# Win-User        : $winUser",
+    "# Win-Host        : $winHostName",
+    "# Win-OS          : $winOs",
+    '#',
+    "# search done at  : '$now'",
+    '#',
+    '# modules found:',
+    '#',
+    '' # empty line before list
+)
+
+$fileFooters = (
+    '', # empty line after list
+    '#',
+    '# list ended',
+    '#'
+)
 
 Write-Host -ForegroundColor Green '=> search modules via cpan -l ...'
+# TODO: replace with Start-Process and created ARGV
 $generatedList = ( & cmd.exe '/c' 'cpan.bat' '-l' '2>&1' )
 Write-Host -ForegroundColor Green '=> ... module list generated'
 
@@ -85,7 +117,7 @@ if ( 0 -ne $LASTEXITCODE) {
 }
 
 Write-Host "write list file $ModuleListFileTxt"
-$generatedList | Out-File -LiteralPath $ModuleListFileTxt -Encoding default -Force -Confirm:$false -Width 999
+$fileHeaders, $generatedList, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt -Encoding default -Force -Confirm:$false -Width 999
 
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
