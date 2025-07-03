@@ -73,7 +73,7 @@ if ( 0 -ne $LASTEXITCODE) {
     exit
 }
 
-$perlInfoList = $perlInfo.Split("`n") | Where-Object { ! [string]::IsNullOrWhiteSpace($_) } | ForEach-Object { $_.Trim() } | ForEach-Object  { "$_" }
+$perlInfoList = $perlInfo.Split("`n") | Where-Object { ! [string]::IsNullOrWhiteSpace($_) } | ForEach-Object { $_.Trim() } | ForEach-Object { "$_" }
 $perlInfo | Write-Host -ForegroundColor Green
 
 $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
@@ -116,8 +116,43 @@ if ( 0 -ne $LASTEXITCODE) {
     Write-Host -ForegroundColor Red "FATAL ERROR: '$InstallCpanModules' with '$LASTEXITCODE' failed?"
 }
 
-Write-Host "write list file $ModuleListFileTxt"
-$fileHeaders, $generatedList, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt -Encoding default -Force -Confirm:$false -Width 999
+Write-Host -ForegroundColor Green '=> check modules ...'
+$modules = $generatedList | Where-Object {
+    ! [string]::IsNullOrWhiteSpace( $_ )
+} | ForEach-Object {
+    ( $_ | Out-String ).Trim( )
+} | Where-Object {
+    ! [string]::IsNullOrWhiteSpace( $_ )
+} | Sort-Object -Unique | ForEach-Object {
+    $t = $_
+    # Write-Host -ForegroundColor DarkGray "  => check $t"
+    # line = modulename version
+    if ( $t -match '^([\S]+)' ) {
+        $m = $Matches[1]
+        # some moule wrong listend => ignore?
+        # if ( $m -match '^\d' -or $m -like ':*' ) {
+        # Upper-Case defined as first character for none core / standard modules
+        if ( $_ -notmatch '^(([A-Z][a-zA-Z0-9_]*)([:][:][a-zA-Z0-9_]+)*)[^:]' ) {
+            Write-Host -ForegroundColor Red "    => ignore - Match '$m'"
+        }
+        else {
+            # Write-Host -ForegroundColor Yellow "    => found $m"
+            $m
+        }
+    }
+}
+
+$now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewd finished search
+
+$modules = $modules | Sort-Object -Unique
+
+0..10 | ForEach-Object { Write-Host '' }
+Write-Host -ForegroundColor Green '=> found modules:'
+$modules | Write-Host
+0..10 | ForEach-Object { Write-Host '' }
+
+Write-Host -ForegroundColor Green "write list file $ModuleListFileTxt"
+$fileHeaders, $modules, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt -Encoding default -Force -Confirm:$false -Width 999
 
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
