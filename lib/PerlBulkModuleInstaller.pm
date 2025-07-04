@@ -829,6 +829,23 @@ sub search_for_installed_modules
             ( !defined $t[ 1 ] || $EMPTY_STRING eq $t[ 1 ] || 'undef' eq $t[ 1 ] ? undef : $t[ 1 ] );
     }
 
+    my $timestamp = get_timestamp_for_filename( $start_date );
+
+    my @moduleNames = sort keys %installed_module_version;
+    write_file( $log_dir_path . '/' . $timestamp . '_' . $logfile_suffix . '.txt',
+        "# $logfile_title TXT", @moduleNames );
+
+    my @moduleCsvLines = ();
+    foreach my $name ( @moduleNames ) {
+        my $version = $installed_module_version{ $name } // 'undef';
+        push @moduleCsvLines, "$name;$version";
+    }
+    write_file(
+        $log_dir_path . '/' . $timestamp . '_' . $logfile_suffix . '.csv',
+        "# $logfile_title CSV",
+        @moduleCsvLines
+    );
+
     say_ex( '' );
     say_ex(
         'installed_module_version: ' . scalar( keys %installed_module_version ) . "\n"
