@@ -137,29 +137,32 @@ $Env:PERL5LIB = "$((Get-Item -LiteralPath $InstallCpanModules).Directory.FullNam
 
 $InstallModuleListFile | ForEach-Object {
     $listfile = $_
+
+    0..25 | ForEach-Object { Write-Host '' }
     Write-Host -ForegroundColor Green "start '$InstallCpanModules' with '$listfile'"
+    Write-Host ''
 
     # TODO: replace with Start-Process and created ARGV
     if ( [string]::IsNullOrWhiteSpace($DontTryModuleListFile) ) {
         if ( $OnlyAllUpdates ) {
-            & $perlexe $InstallCpanModules '--only-all-updates' $listfile
+            & $perlexe $InstallCpanModules '--only-all-updates' $listfile | Write-Host
         }
         elseif ( $AllUpdates ) {
-            & $perlexe $InstallCpanModules '--all-updates' $listfile
+            & $perlexe $InstallCpanModules '--all-updates' $listfile | Write-Host
         }
         else {
-            & $perlexe $InstallCpanModules $listfile
+            & $perlexe $InstallCpanModules $listfile | Write-Host
         }
     }
     else {
         if ( $OnlyAllUpdates ) {
-            & $perlexe $InstallCpanModules '--only-all-updates' $listfile $DontTryModuleListFile
+            & $perlexe $InstallCpanModules '--only-all-updates' $listfile $DontTryModuleListFile | Write-Host
         }
         elseif ( $AllUpdates ) {
-            & $perlexe $InstallCpanModules '--all-updates' $listfile $DontTryModuleListFile
+            & $perlexe $InstallCpanModules '--all-updates' $listfile $DontTryModuleListFile | Write-Host
         }
         else {
-            & $perlexe $InstallCpanModules $listfile $DontTryModuleListFile
+            & $perlexe $InstallCpanModules $listfile $DontTryModuleListFile | Write-Host
         }
     }
 
@@ -168,6 +171,7 @@ $InstallModuleListFile | ForEach-Object {
     }
 }
 
+0..25 | ForEach-Object { Write-Host '' }
 
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
