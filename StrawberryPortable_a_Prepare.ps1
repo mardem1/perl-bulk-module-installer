@@ -57,6 +57,7 @@ if ( $ScriptPath -eq '&' -and
 
 Write-Host ''
 Write-Host -ForegroundColor Green "started '$ScriptPath' ..."
+Write-Host ''
 
 $hasAdmin = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 $zip = Get-Item -LiteralPath $StrawberryZip
