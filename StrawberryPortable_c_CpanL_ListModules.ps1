@@ -128,7 +128,9 @@ if ( 0 -ne $LASTEXITCODE) {
 }
 
 Write-Host -ForegroundColor Green '=> check modules ...'
-$modules = $generatedList | Where-Object {
+[hashtable] $modules = @{}
+
+$generatedList | Where-Object {
     ! [string]::IsNullOrWhiteSpace( $_ )
 } | ForEach-Object {
     ( $_ | Out-String ).Trim( )
@@ -138,8 +140,13 @@ $modules = $generatedList | Where-Object {
     $t = $_
     # Write-Host -ForegroundColor DarkGray "  => check $t"
     # line = modulename version
-    if ( $t -match '^([\S]+)' ) {
+    if ( $t -match '^([\S]+)[\s]+([\S]+)$' ) {
         $m = $Matches[1]
+        $m = "$m".Trim()
+
+        $v = $Matches[2]
+        $v = "$v".Trim()
+
         # some moule wrong listend => ignore?
         # if ( $m -match '^\d' -or $m -like ':*' ) {
         # Upper-Case defined as first character for none core / standard modules
@@ -148,26 +155,35 @@ $modules = $generatedList | Where-Object {
         }
         else {
             # Write-Host -ForegroundColor Yellow "    => found $m"
-            $m
+            $modules[$m] = $v
         }
     }
 }
 
 $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewd finished search
 
-$modules = $modules | Sort-Object -Unique
+$moduleNames = $($modules.Keys | Select-Object -Unique | Sort-Object )
 
 # 0..10 | ForEach-Object { Write-Host '' }
 # Write-Host -ForegroundColor Green '=> found modules:'
-# $modules | Write-Host
+# $moduleNames | Write-Host
 # 0..10 | ForEach-Object { Write-Host '' }
 
 Write-Host ''
-Write-Host -ForegroundColor Green "=> found modules: $($modules.Count)"
+Write-Host -ForegroundColor Green "=> found modules: $($moduleNames.Count)"
 Write-Host ''
 
 Write-Host -ForegroundColor Green "write list file $ModuleListFileTxt"
-$fileHeaders, $modules, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt -Encoding default -Force -Confirm:$false -Width 999
+$fileHeaders, $moduleNames, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt -Encoding default -Force -Confirm:$false -Width 999
+Write-Host ''
+
+$ModuleListFileCsv = $ModuleListFileTxt.Replace('.txt', '.csv')
+Write-Host -ForegroundColor Green "write csv file $ModuleListFileCsv"
+$moduleNames | ForEach-Object {
+    $m = $_
+    $v = $modules[$m]
+    "$m;$v"
+} | Out-File -LiteralPath $ModuleListFileCsv -Encoding default -Force -Confirm:$false -Width 999
 
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
