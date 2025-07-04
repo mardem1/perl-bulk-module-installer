@@ -157,10 +157,14 @@ $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewd finished search
 
 $modules = $modules | Sort-Object -Unique
 
-0..10 | ForEach-Object { Write-Host '' }
-Write-Host -ForegroundColor Green '=> found modules:'
-$modules | Write-Host
-0..10 | ForEach-Object { Write-Host '' }
+# 0..10 | ForEach-Object { Write-Host '' }
+# Write-Host -ForegroundColor Green '=> found modules:'
+# $modules | Write-Host
+# 0..10 | ForEach-Object { Write-Host '' }
+
+Write-Host ''
+Write-Host -ForegroundColor Green "=> found modules: $($modules.Count)"
+Write-Host ''
 
 Write-Host -ForegroundColor Green "write list file $ModuleListFileTxt"
 $fileHeaders, $modules, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt -Encoding default -Force -Confirm:$false -Width 999
