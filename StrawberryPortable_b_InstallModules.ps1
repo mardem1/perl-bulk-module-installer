@@ -11,10 +11,6 @@ details can be found in the C<README.md>
 
 Dir for strawberry dir to install the modules
 
-.PARAMETER InstallCpanModules
-
-Path to script InstallCpanModules.pl
-
 .PARAMETER InstallModuleListFile
 
 Filepath to a text file which contains Perl-Module-Names (eg. Perl::Critic) to
@@ -79,16 +75,10 @@ param (
     [Parameter(Mandatory = $true, Position = 1)]
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
-    [ValidateScript({ $_ -like '*InstallCpanModules.pl' })]
-    [string] $InstallCpanModules,
-
-    [Parameter(Mandatory = $true, Position = 2)]
-    [ValidateNotNullOrEmpty()]
-    [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
     [ValidateScript({ $_ -like '*.txt' })]
     [string] $InstallModuleListFile,
 
-    [Parameter(Mandatory = $false, Position = 3)]
+    [Parameter(Mandatory = $false, Position = 2)]
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
     [ValidateScript({ $_ -like '*.txt' })]
@@ -109,6 +99,8 @@ if ( $ScriptPath -eq '&' -and
 
 $ScriptItem = Get-Item -LiteralPath $ScriptPath -ErrorAction Stop
 Start-Transcript -LiteralPath "$($ScriptItem.Directory.FullName)\log\$(Get-Date -Format 'yyyyMMdd_HHmmss')_$($ScriptItem.BaseName).log"
+
+$InstallCpanModules = "$($ScriptItem.Directory.FullName)\InstallCpanModules.pl"
 
 Write-Host ''
 Write-Host -ForegroundColor Green "started '$ScriptPath' ..."
