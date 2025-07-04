@@ -65,6 +65,9 @@ if ( $ScriptPath -eq '&' -and
     $ScriptPath = $MyInvocation.MyCommand.Path
 }
 
+$ScriptItem = Get-Item -LiteralPath $ScriptPath -ErrorAction Stop
+Start-Transcript -LiteralPath "$($ScriptItem.Directory.FullName)\log\$(Get-Date -Format 'yyyyMMdd_HHmmss')_$($ScriptItem.BaseName).log"
+
 Write-Host ''
 Write-Host -ForegroundColor Green "started '$ScriptPath' ..."
 Write-Host ''
@@ -167,3 +170,5 @@ Write-Host -ForegroundColor Green 'done'
 Write-Host ''
 Write-Host -ForegroundColor Green "... '$ScriptPath' ended"
 Write-Host ''
+
+Stop-Transcript
