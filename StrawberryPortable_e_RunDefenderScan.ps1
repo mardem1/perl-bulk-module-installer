@@ -2,11 +2,11 @@
 
 .SYNOPSIS
 
-Remove Windows Defender exclusions, and do a manual defender scan.
+Run Windows Defender manual scan.
 
 .PARAMETER StrawberryDir
 
-Path to Strawberry directory for zipping
+Path to Strawberry directory
 
 .NOTES
 
@@ -75,28 +75,6 @@ if ( ! $hasAdmin ) {
 
     Stop-Transcript
     exit
-}
-
-Write-Host ''
-Write-Host -ForegroundColor Green '=> check defender config'
-Write-Host ''
-
-( Get-MpPreference ).ExclusionPath | ForEach-Object { $_ } | Where-Object {
-    # if none set $null given ? why
-    ! [string]::IsNullOrWhiteSpace($_) -and (
-        $_ -eq $StrawberryDir `
-            -or $_.StartsWith($StrawberryDir) )
-} | ForEach-Object {
-    Write-Host "remove defender exclude dir '$_'"
-    Remove-MpPreference -ExclusionPath $_ -Force
-}
-
-( Get-MpPreference ).ExclusionProcess | Where-Object {
-    ! [string]::IsNullOrWhiteSpace($_) -and `
-        $_.StartsWith($StrawberryDir)
-} | ForEach-Object {
-    Write-Host "remove defender exclude process '$_'"
-    Remove-MpPreference -ExclusionProcess $_ -Force
 }
 
 Write-Host ''
