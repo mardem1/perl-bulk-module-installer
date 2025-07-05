@@ -86,6 +86,7 @@ if ( 0 -ne $LASTEXITCODE) {
 
 $perlInfoList = $perlInfo.Split("`n") | Where-Object { ! [string]::IsNullOrWhiteSpace($_) } | ForEach-Object { $_.Trim() } | ForEach-Object { "$_" }
 $perlInfo | Write-Host -ForegroundColor Green
+Write-Host ''
 
 $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
 $winUser = $env:USERNAME
