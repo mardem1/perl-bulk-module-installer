@@ -8,6 +8,10 @@ Extracts the Strawberry ZIP and configure Windows Defender for more performance.
 
 Path to Strawberry ZIP portable.
 
+.PARAMETER Destination
+
+Optional path where extracted. If not given, extracted directory name is file name.
+
 .NOTES
 
 BUG REPORTS
@@ -44,7 +48,12 @@ param (
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
     [ValidateScript({ $_ -like '*strawberry*portable*.zip' })]
-    [string] $StrawberryZip
+    [string] $StrawberryZip,
+
+    [Parameter(Mandatory = $false, Position = 1)]
+    [ValidateNotNullOrEmpty()]
+    [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf -IsValid })]
+    [string] $Destination
 )
 
 $ScriptPath = $MyInvocation.InvocationName
@@ -64,7 +73,12 @@ Write-Host ''
 
 $hasAdmin = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 $zip = Get-Item -LiteralPath $StrawberryZip
-$targetPath = "$($zip.Directory.FullName)\$($zip.BaseName)"
+if ( [string]::IsNullOrWhiteSpace($Destination) ) {
+    $targetPath = "$($zip.Directory.FullName)\$($zip.BaseName)"
+}
+else {
+    $targetPath = $Destination
+}
 
 if ( Test-Path -LiteralPath $targetPath ) {
     throw "extraction target $targetPath already exists"
