@@ -833,7 +833,7 @@ sub search_for_installed_modules
 
     my @moduleNames = sort keys %installed_module_version;
     write_file( $log_dir_path . '/' . $timestamp . '_' . $logfile_suffix . '.txt',
-        "# $logfile_title TXT", @moduleNames );
+        "# $logfile_title $^V", @moduleNames );
 
     my @moduleCsvLines = ();
     foreach my $name ( @moduleNames ) {
@@ -842,7 +842,7 @@ sub search_for_installed_modules
     }
     write_file(
         $log_dir_path . '/' . $timestamp . '_' . $logfile_suffix . '.csv',
-        "# $logfile_title CSV",
+        "# $logfile_title;$^V",
         @moduleCsvLines
     );
 
