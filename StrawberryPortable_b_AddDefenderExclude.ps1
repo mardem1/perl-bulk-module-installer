@@ -2,15 +2,11 @@
 
 .SYNOPSIS
 
-Extracts the Strawberry ZIP
+Configure Windows Defender for more performance.
 
-.PARAMETER StrawberryZip
+.PARAMETER StrawberryDir
 
-Path to Strawberry ZIP portable.
-
-.PARAMETER Destination
-
-Optional path where extracted. If not given, extracted directory name is file name.
+Dir for strawberry dir to install the modules
 
 .NOTES
 
@@ -46,14 +42,9 @@ FOR A PARTICULAR PURPOSE.
 param (
     [Parameter(Mandatory = $true, Position = 0)]
     [ValidateNotNullOrEmpty()]
-    [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
-    [ValidateScript({ $_ -like '*strawberry*portable*.zip' })]
-    [string] $StrawberryZip,
-
-    [Parameter(Mandatory = $false, Position = 1)]
-    [ValidateNotNullOrEmpty()]
-    [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf -IsValid })]
-    [string] $Destination
+    [ValidateScript({ Test-Path -LiteralPath $_ -PathType Container })]
+    [ValidateScript({ $_ -like '*strawberry*portable*' })]
+    [string] $StrawberryDir
 )
 
 $ScriptPath = $MyInvocation.InvocationName
@@ -71,30 +62,28 @@ Write-Host ''
 Write-Host -ForegroundColor Green "started '$ScriptPath' ..."
 Write-Host ''
 
-$zip = Get-Item -LiteralPath $StrawberryZip
-if ( [string]::IsNullOrWhiteSpace($Destination) ) {
-    $targetPath = "$($zip.Directory.FullName)\$($zip.BaseName)"
-}
-else {
-    $targetPath = $Destination
-}
-
-if ( Test-Path -LiteralPath $targetPath ) {
-    throw "extraction target $targetPath already exists"
-}
+$hasAdmin = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
 Write-Host ''
-Write-Host -ForegroundColor Green "unzip '$StrawberryZip' to '$targetPath'"
-$zipStartTIme = Get-Date
-Write-Host "unzip start time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipStartTIme )"
-# Expand-Archive is really slow
-# Expand-Archive -LiteralPath $StrawberryZip -DestinationPath $targetPath
-# use .Net direct
-Add-Type -Assembly System.IO.Compression.Filesystem
-[IO.Compression.ZipFile]::ExtractToDirectory( $StrawberryZip, $targetPath )
-$zipEndTime = Get-Date
-Write-Host "unzip end time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipEndTime)"
-Write-Host "unzip duration $( (New-TimeSpan -Start $zipStartTIme -End $zipEndTime).TotalSeconds )"
+if ( ! $hasAdmin ) {
+    Write-Host -ForegroundColor Red 'ERROR: admin required for defender config!'
+    Write-Host ''
+    Write-Host -ForegroundColor Green 'done'
+    Write-Host ''
+    Write-Host -ForegroundColor Green "... '$ScriptPath' ended"
+    Write-Host ''
+
+    Stop-Transcript
+    exit
+}
+
+Write-Host -ForegroundColor Green "add defender exclude dir '$StrawberryDir'"
+Add-MpPreference -ExclusionPath $targetStrawberryDirPath -Force
+
+Get-ChildItem -Recurse -File -LiteralPath $StrawberryDir -Force -Filter '*.exe' | ForEach-Object {
+    Write-Host -ForegroundColor Green "add defender exclude process '$_'"
+    Add-MpPreference -ExclusionProcess $_ -Force
+}
 
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
