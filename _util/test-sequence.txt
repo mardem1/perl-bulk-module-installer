@@ -15,7 +15,6 @@
 & "C:\_test\perl-bulk-module-installer\StrawberryPortable_c_CpanL_ListModules.ps1" -StrawberryDir "C:\_test\strawberry-perl-5.36.3.1-64bit-portable" -ModuleListFileTxt "C:\_test\perl-bulk-module-installer\log\_list_5.36.3.1.txt"
 & "C:\_test\perl-bulk-module-installer\StrawberryPortable_c_CpanL_ListModules.ps1" -StrawberryDir "C:\_test\strawberry-perl-5.38.4.1-64bit-portable" -ModuleListFileTxt "C:\_test\perl-bulk-module-installer\log\_list_5.38.4.1.txt"
 & "C:\_test\perl-bulk-module-installer\StrawberryPortable_c_CpanL_ListModules.ps1" -StrawberryDir "C:\_test\strawberry-perl-5.40.2.1-64bit-portable" -ModuleListFileTxt "C:\_test\perl-bulk-module-installer\log\_list_5.40.2.1.txt"
-& "C:\_test\perl-bulk-module-installer\StrawberryPortable_c_CpanL_ListModules.ps1" -StrawberryDir "C:\_test\strawberry-perl-5.40.2.1-64bit-portable" -ModuleListFileTxt "C:\_test\perl-bulk-module-installer\log\_list_5.40.2.1.txt"
 
 & "C:\_test\perl-bulk-module-installer\CompareModuleListCsv.ps1" -ListA "C:\_test\perl-bulk-module-installer\log\_list_5.40.2.1.csv" -ListB "C:\_test\perl-bulk-module-installer\log\_list_5.38.4.1.csv"
 
