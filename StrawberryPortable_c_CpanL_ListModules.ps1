@@ -84,6 +84,10 @@ if ( 0 -ne $LASTEXITCODE) {
     exit
 }
 
+# perl -e "printf(qq{%s}, $^X)" = $perlexe
+$perlVersion = & $perlexe -e 'print "$^V"' | Out-String # = eg. 5.40.2
+# perl -MConfig -e "print $Config{archname}" = MSWin32-x64-multi-thread
+
 $perlInfoList = $perlInfo.Split("`n") | Where-Object { ! [string]::IsNullOrWhiteSpace($_) } | ForEach-Object { $_.Trim() } | ForEach-Object { "$_" }
 $perlInfo | Write-Host -ForegroundColor Green
 Write-Host ''
@@ -180,11 +184,14 @@ Write-Host ''
 
 $ModuleListFileCsv = $ModuleListFileTxt.Replace('.txt', '.csv')
 Write-Host -ForegroundColor Green "write csv file $ModuleListFileCsv"
-$moduleNames | ForEach-Object {
+
+$moduleLines = $moduleNames | ForEach-Object {
     $m = $_
     $v = $modules[$m]
     "$m;$v"
-} | Out-File -LiteralPath $ModuleListFileCsv -Encoding default -Force -Confirm:$false -Width 999
+}
+
+"installed_modules_found;$perlVersion", $moduleLines | Out-File -LiteralPath $ModuleListFileCsv -Encoding default -Force -Confirm:$false -Width 999
 
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
