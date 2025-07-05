@@ -2,7 +2,7 @@
 
 .SYNOPSIS
 
-Remove Windows Defender exclusions, do a manual defender scan and creates a ZIP for the Strawberry directory.
+Creates a ZIP for the Strawberry directory
 
 .PARAMETER StrawberryDir
 
@@ -82,88 +82,22 @@ else {
     Remove-Item -Recurse -Force -LiteralPath $cpanCacheDir
 }
 
-$hasAdmin = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-
-$dontCompress = $false
-
-if ( ! $hasAdmin ) {
-    Write-Host 'admin required for defender config -> SKIP'
-}
-else {
-    Write-Host ''
-    Write-Host -ForegroundColor Green '=> check defender config'
-    Write-Host ''
-
-    ( Get-MpPreference ).ExclusionPath | ForEach-Object { $_ } | Where-Object {
-        # if none set $null given ? why
-        ! [string]::IsNullOrWhiteSpace($_) -and (
-            $_ -eq $StrawberryDir `
-                -or $_.StartsWith($StrawberryDir) )
-    } | ForEach-Object {
-        Write-Host "remove defender exclude dir '$_'"
-        Remove-MpPreference -ExclusionPath $_ -Force
-    }
-
-    ( Get-MpPreference ).ExclusionProcess | Where-Object {
-        ! [string]::IsNullOrWhiteSpace($_) -and `
-            $_.StartsWith($StrawberryDir)
-    } | ForEach-Object {
-        Write-Host "remove defender exclude process '$_'"
-        Remove-MpPreference -ExclusionProcess $_ -Force
-    }
-
-    Write-Host ''
-    Write-Host -ForegroundColor Green "=> start defender scan '$StrawberryDir'"
-    Write-Host ''
-    $scanStartTime = Get-Date
-    Write-Host "scan start $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $scanStartTime )"
-    Start-MpScan -ScanPath $StrawberryDir -ScanType CustomScan
-    $scanEndTime = Get-Date
-    Write-Host "scan ended $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $scanEndTime)"
-    Write-Host "scan duration $( (New-TimeSpan -Start $scanStartTime -End $scanEndTime).TotalSeconds )"
-
-    Write-Host ''
-    Write-Host -ForegroundColor Green '=> check detected threats'
-    Write-Host ''
-    $foundThreats = Get-MpThreatDetection | Where-Object { $_.InitialDetectionTime -gt $scanStartTime }
-
-    if ( $foundThreats ) {
-        Write-Host ''
-        Write-Host -ForegroundColor Green '=> detected threats'
-        Write-Host ''
-
-        $foundThreats | Select-Object *
-
-        Write-Host ''
-        Write-Host -ForegroundColor Red '=> threats found - nocompress'
-        Write-Host ''
-
-        $dontCompress = $true
-    }
-    else {
-        Write-Host ''
-        Write-Host -ForegroundColor Green '=> no threats found'
-    }
-}
-
-if (!$dontCompress) {
-    Write-Host ''
-    Write-Host -ForegroundColor Green "zip '$StrawberryDir' as '$targetPath'"
-    $zipStartTIme = Get-Date
-    Write-Host "zip start time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipStartTIme )"
-    # Compress-Archive is really slow
-    # Compress-Archive -LiteralPath $StrawberryDir -DestinationPath $targetPath -CompressionLevel Fastest
-    # use .Net direct
-    Add-Type -Assembly System.IO.Compression.Filesystem
-    [IO.Compression.ZipFile]::CreateFromDirectory(
-        $StrawberryDir,
-        $targetPath,
-        [System.IO.Compression.CompressionLevel]::Optimal,# Fastest
-        $false )
-    $zipEndTime = Get-Date
-    Write-Host "zip end time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipEndTime)"
-    Write-Host "zip duration $( (New-TimeSpan -Start $zipStartTIme -End $zipEndTime).TotalSeconds )"
-}
+Write-Host ''
+Write-Host -ForegroundColor Green "zip '$StrawberryDir' as '$targetPath'"
+$zipStartTIme = Get-Date
+Write-Host "zip start time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipStartTIme )"
+# Compress-Archive is really slow
+# Compress-Archive -LiteralPath $StrawberryDir -DestinationPath $targetPath -CompressionLevel Fastest
+# use .Net direct
+Add-Type -Assembly System.IO.Compression.Filesystem
+[IO.Compression.ZipFile]::CreateFromDirectory(
+    $StrawberryDir,
+    $targetPath,
+    [System.IO.Compression.CompressionLevel]::Optimal,# Fastest
+    $false )
+$zipEndTime = Get-Date
+Write-Host "zip end time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipEndTime)"
+Write-Host "zip duration $( (New-TimeSpan -Start $zipStartTIme -End $zipEndTime).TotalSeconds )"
 
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
