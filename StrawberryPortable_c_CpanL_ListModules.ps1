@@ -143,7 +143,7 @@ $generatedList | ForEach-Object {
     $line = $_
     # Write-Host -ForegroundColor DarkGray "  => check $line"
     # line = modulename version
-    if ( $t -notmatch '^([\S]+)[\s]+([\S]+)$' ) {
+    if ( $line -notmatch '^([\S]+)[\s]+([\S]+)$' ) {
         Write-Host -ForegroundColor Red "    => ignore - unknown line format '$line'"
     }
     else {
