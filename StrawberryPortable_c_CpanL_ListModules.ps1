@@ -139,7 +139,7 @@ $generatedList | ForEach-Object {
     ( $_ | Out-String ).Trim( )
 } | Where-Object {
     ! [string]::IsNullOrWhiteSpace( $_ )
-} | Sort-Object -Unique | ForEach-Object {
+} | ForEach-Object {
     $t = $_
     # Write-Host -ForegroundColor DarkGray "  => check $t"
     # line = modulename version
