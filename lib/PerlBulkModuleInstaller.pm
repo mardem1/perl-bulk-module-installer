@@ -820,17 +820,20 @@ sub search_for_installed_modules
     }
 
     foreach my $line ( @output ) {
-        $line = trim($line);
-        if( $EMPTY_STRING eq $line ) {
+        $line = trim( $line );
+        if ( $EMPTY_STRING eq $line ) {
             next;
         }
 
-        my @t = split /\s+/, $line;
-        my $m = trim( $t[ 0 ] );
-        my $v = trim( $t[ 1 ] );
+        if ( $line !~ /^([\S]+)[\s]+([\S]+)$/ ) {
+            # ignore - unknown line format '$line'
+            next;
+        }
 
-        $installed_module_version{ $m } =
-            ( $EMPTY_STRING eq $v || 'undef' eq $v ? undef : $v );
+        my $m = trim( $1 );
+        my $v = trim( $2 );
+
+        $installed_module_version{ $m } = ( $EMPTY_STRING eq $v || 'undef' eq $v ? undef : $v );
     }
 
     my $timestamp = get_timestamp_for_filename( $start_date );
