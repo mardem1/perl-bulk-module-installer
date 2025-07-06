@@ -840,6 +840,7 @@ sub search_for_installed_modules
             next;
         }
 
+        # FIXME: what if module already there but other version ?
         $installed_module_version{ $m } = ( $EMPTY_STRING eq $v || 'undef' eq $v ? undef : $v );
     }
 

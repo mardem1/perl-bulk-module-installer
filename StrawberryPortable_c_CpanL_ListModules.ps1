@@ -160,6 +160,8 @@ $generatedList | ForEach-Object {
             Write-Host -ForegroundColor Red "    => ignore - Match '$m'"
         }
         else {
+            # FIXME: what if module already there but other version ?
+
             # Write-Host -ForegroundColor Yellow "    => found $m"
             $modules[$m] = $v
         }
