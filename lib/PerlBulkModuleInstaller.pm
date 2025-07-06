@@ -784,7 +784,8 @@ sub print_perl_detail_info
     my $logfile_suffix = 'perl_detail_info';
     my $logfile_title  = 'perl_detail_info';
 
-    my @cmd = ( 'cmd.exe', '/c', 'perl', '-V', '2>&1' );
+    # my @cmd = ( 'cmd.exe', '/c', 'perl', '-V', '2>&1' );
+    my @cmd = ( 'cmd.exe', '/c', $^X, '-V', '2>&1' );
 
     say_ex( '==> ' . 'perl information' );
 

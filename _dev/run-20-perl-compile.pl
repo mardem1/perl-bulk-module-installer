@@ -100,7 +100,8 @@ sub run_compile_test
 
     my $time_start = time();
 
-    my $failure = run_system_visible( 'perl', '-c', $filepath );
+    # my $failure = run_system_visible( 'perl', '-c', $filepath );
+    my $failure = run_system_visible( $^X, '-c', $filepath );
 
     my $time_end = time();
     my $duration = $time_end - $time_start;

@@ -92,7 +92,8 @@ sub run_test_visible
 {
     my ( $filepath ) = @_;
 
-    my $failure = run_system_visible( 'perl', $filepath );
+    # my $failure = run_system_visible( 'perl', $filepath );
+    my $failure = run_system_visible( $^X, $filepath );
 
     return !!$failure;
 }
