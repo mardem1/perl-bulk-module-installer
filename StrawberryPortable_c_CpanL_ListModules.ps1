@@ -135,9 +135,7 @@ if ( 0 -ne $LASTEXITCODE) {
 Write-Host -ForegroundColor Green '=> check modules ...'
 [hashtable] $modules = @{}
 
-$generatedList | Where-Object {
-    ! [string]::IsNullOrWhiteSpace( $_ )
-} | ForEach-Object {
+$generatedList | ForEach-Object {
     ( $_ | Out-String ).Trim( )
 } | Where-Object {
     ! [string]::IsNullOrWhiteSpace( $_ )
