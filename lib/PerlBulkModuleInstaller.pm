@@ -834,11 +834,12 @@ sub search_for_installed_modules
         my $v = trim( $2 );
         $v = ( $EMPTY_STRING eq $v || 'undef' eq $v ? undef : $v );
 
+        # some modules wrong listed - end with : ? => ignore?
         # Upper-Case defined as first character for none core / standard modules
         # but we need all modules for dependency check here so also lower case start allowed
         if ( $line !~ /^(([a-zA-Z][a-zA-Z0-9_]*)([:][:][a-zA-Z0-9_]+)*)[^:]/io ) {
-            # ignore - Match '$m'
             next;
+            say_ex( '    ==> ' . "ignore - no match - '$m'" );
         }
 
         # FIXME: what if module already there but other version ?

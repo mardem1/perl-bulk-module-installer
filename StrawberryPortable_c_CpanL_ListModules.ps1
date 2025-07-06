@@ -156,10 +156,10 @@ $generatedList | ForEach-Object {
             $v = 'undef'; # as perl verison
         }
 
-        # some moule wrong listend => ignore?
+        # some moule wrong listed - end with : ? => ignore?
         # if ( $m -match '^\d' -or $m -like ':*' ) {
         # Upper-Case defined as first character for none core / standard modules
-        if ( $m -notmatch '^(([A-Z][a-zA-Z0-9_]*)([:][:][a-zA-Z0-9_]+)*)[^:]' ) {
+        if ( $line -notmatch '^(([A-Z][a-zA-Z0-9_]*)([:][:][a-zA-Z0-9_]+)*)[^:]' ) {
             Write-Host -ForegroundColor Red "    => ignore - no match '$m'"
         }
         else {
