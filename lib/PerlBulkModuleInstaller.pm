@@ -820,6 +820,11 @@ sub search_for_installed_modules
     }
 
     foreach my $line ( @output ) {
+        $line = trim($line);
+        if( $EMPTY_STRING eq $line ) {
+            next;
+        }
+
         my @t = split /\s+/, $line;
 
         if ( !defined $t[ 0 ] || $EMPTY_STRING eq $t[ 0 ] ) {
