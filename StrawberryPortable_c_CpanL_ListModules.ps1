@@ -140,11 +140,11 @@ $generatedList | ForEach-Object {
 } | Where-Object {
     ! [string]::IsNullOrWhiteSpace( $_ )
 } | ForEach-Object {
-    $t = $_
-    # Write-Host -ForegroundColor DarkGray "  => check $t"
+    $line = $_
+    # Write-Host -ForegroundColor DarkGray "  => check $line"
     # line = modulename version
     if ( $t -notmatch '^([\S]+)[\s]+([\S]+)$' ) {
-        # Write-Host -ForegroundColor Red "    => ignore - unknown line format '$t'"
+        Write-Host -ForegroundColor Red "    => ignore - unknown line format '$line'"
     }
     else {
         $m = $Matches[1]
@@ -152,12 +152,15 @@ $generatedList | ForEach-Object {
 
         $v = $Matches[2]
         $v = "$v".Trim()
+        if ( '' -eq $v ) {
+            $v = 'undef'; # as perl verison
+        }
 
         # some moule wrong listend => ignore?
         # if ( $m -match '^\d' -or $m -like ':*' ) {
         # Upper-Case defined as first character for none core / standard modules
         if ( $m -notmatch '^(([A-Z][a-zA-Z0-9_]*)([:][:][a-zA-Z0-9_]+)*)[^:]' ) {
-            Write-Host -ForegroundColor Red "    => ignore - Match '$m'"
+            Write-Host -ForegroundColor Red "    => ignore - no match '$m'"
         }
         else {
             # FIXME: what if module already there but other version ?
