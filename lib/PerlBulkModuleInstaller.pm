@@ -832,6 +832,7 @@ sub search_for_installed_modules
 
         my $m = trim( $1 );
         my $v = trim( $2 );
+        $v = ( $EMPTY_STRING eq $v || 'undef' eq $v ? undef : $v );
 
         # Upper-Case defined as first character for none core / standard modules
         # but we need all modules for dependency check here so also lower case start allowed
@@ -841,7 +842,7 @@ sub search_for_installed_modules
         }
 
         # FIXME: what if module already there but other version ?
-        $installed_module_version{ $m } = ( $EMPTY_STRING eq $v || 'undef' eq $v ? undef : $v );
+        $installed_module_version{ $m } = $v;
     }
 
     my $timestamp = get_timestamp_for_filename( $start_date );
