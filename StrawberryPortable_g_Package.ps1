@@ -2,7 +2,7 @@
 
 .SYNOPSIS
 
-Creates a ZIP for the Strawberry directory
+Removes CPAN-Cache data and merge perl lib dirs for performance and  create a ZIP for the Strawberry directory
 
 .PARAMETER StrawberryDir
 
@@ -80,6 +80,42 @@ if ( ! ( Test-Path -LiteralPath $cpanCacheDir ) ) {
 else {
     Write-Host -ForegroundColor Green "CPAN-Cache found '$cpanCacheDir' remove"
     Remove-Item -Recurse -Force -LiteralPath $cpanCacheDir
+}
+
+#
+# windows is fs-access sensitive so merge libs
+# @INC:
+#   strawberry/perl/site/lib/MSWin32-x64-multi-thread
+#   strawberry/perl/site/lib
+#   strawberry/perl/vendor/lib
+#   strawberry/perl/lib
+#
+
+Write-Host ''
+Write-Host -ForegroundColor Green "merge and remove perl libs for improved performance"
+
+$perlDir = "$StrawberryDir\perl\"
+
+$vendorDir = "$perlDir\vendor"
+if ( Test-Path -LiteralPath $vendorDir ) {
+    Write-Host -ForegroundColor Green "copy and remove '$vendorDir''"
+    Copy-Item -Path "$vendorDir\*" -Destination "$perlDir\" -Force -Confirm:$false -ErrorAction Stop
+    Remove-Item -Path "$vendorDir" -Recurse -Force -Confirm:$false -ErrorAction Stop
+}
+
+$siteDir = "$perlDir\site"
+if ( Test-Path -LiteralPath $siteDir ) {
+    Write-Host -ForegroundColor Green "copy and remove '$siteDir''"
+    Copy-Item -Path "$siteDir\*" -Destination "$perlDir\" -Force -Confirm:$false -ErrorAction Stop
+    Remove-Item -Path "$siteDir" -Recurse -Force -Confirm:$false -ErrorAction Stop
+}
+
+# perl\lib\MSWin32-x64-multi-thread instad of perl\site\lib\MSWin32-x64-multi-thread because before relocated !
+$ms32Dir = "$perlDir\lib\MSWin32-x64-multi-thread"
+if ( Test-Path -LiteralPath $ms32Dir ) {
+    Write-Host -ForegroundColor Green "copy and remove '$ms32Dir''"
+    Copy-Item -Path "$ms32Dir\*" -Destination "$perlDir\lib\" -Force -Confirm:$false -ErrorAction Stop
+    Remove-Item -Path "$ms32Dir" -Recurse -Force -Confirm:$false -ErrorAction Stop
 }
 
 Write-Host ''
