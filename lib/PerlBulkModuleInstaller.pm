@@ -845,7 +845,9 @@ sub search_for_installed_modules
 
     my $timestamp = get_timestamp_for_filename( $start_date );
 
-    my @moduleNames = sort keys %installed_module_version;
+    # for module list txt and csv files reduce to Upper-Case start - see above
+    my @moduleNames = grep { $_ =~ /^[A-Z]/o } sort keys %installed_module_version;
+
     write_file( $log_dir_path . '/' . $timestamp . '_' . $logfile_suffix . '.txt',
         "# $logfile_title $^V", @moduleNames );
 
