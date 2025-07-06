@@ -833,6 +833,12 @@ sub search_for_installed_modules
         my $m = trim( $1 );
         my $v = trim( $2 );
 
+        # Upper-Case defined as first character for none core / standard modules
+        if ( $line !~ /^(([A-Z][a-zA-Z0-9_]*)([:][:][a-zA-Z0-9_]+)*)[^:]/ ) {
+            # ignore - Match '$m'
+            next;
+        }
+
         $installed_module_version{ $m } = ( $EMPTY_STRING eq $v || 'undef' eq $v ? undef : $v );
     }
 
