@@ -668,9 +668,7 @@ sub print_install_state_summary
 
     # no dumper with need and ok - not necessary as temporary state.
 
-    say_ex( 'modules_install_ok - '
-            . scalar( keys %modules_install_ok ) . "\n"
-            . Dumper( \%modules_install_ok ) );
+    say_ex( 'modules_install_ok - ' . scalar( keys %modules_install_ok ) . "\n" . Dumper( \%modules_install_ok ) );
 
     say_ex(   'modules_need_to_install left - '
             . scalar( keys %modules_need_to_install ) . "\n"
@@ -819,14 +817,18 @@ sub search_for_installed_modules
         return;           # error nothing found
     }
 
+    say_ex( '  ==> ' . 'analyze found modules' );
+
     foreach my $line ( @output ) {
         $line = trim( $line );
         if ( $EMPTY_STRING eq $line ) {
             next;
         }
 
+        # say_ex( '  ==> ' . "check $line");
+
         if ( $line !~ /^([\S]+)[\s]+([\S]+)$/ ) {
-            # ignore - unknown line format '$line'
+            say_ex( '    ==> ' . "ignore - unknown line format - '$line'" );
             next;
         }
 
@@ -838,12 +840,52 @@ sub search_for_installed_modules
         # Upper-Case defined as first character for none core / standard modules
         # but we need all modules for dependency check here so also lower case start allowed
         if ( $line !~ /^(([a-zA-Z][a-zA-Z0-9_]*)([:][:][a-zA-Z0-9_]+)*)[^:]/io ) {
-            next;
             say_ex( '    ==> ' . "ignore - no match - '$m'" );
         }
+        elsif ( !exists $installed_module_version{ $m } ) {
+            # say_ex( '    ==> ' . "unknown module save it - '$m'" );
+            $installed_module_version{ $m } = $v;
+        }
+        elsif ( !defined $installed_module_version{ $m } && !defined $v ) {
+            # say_ex( '    ==> ' . "both modules undefined number, do nothing - '$m'" );
+        }
+        elsif ( defined $installed_module_version{ $m } && !defined $v ) {
+            # say_ex( '    ==> ' . "already known number, keep it - '$m'" );
+        }
+        elsif ( !defined $installed_module_version{ $m } && defined $v ) {
+            # say_ex( '    ==> ' . "replace undefined with defined version number - '$m'" );
+            $installed_module_version{ $m } = $v;
+        }
+        else {
+            # elsif ( defined $installed_module_version{ $m }  && defined $v ) {
 
-        # FIXME: what if module already there but other version ?
-        $installed_module_version{ $m } = $v;
+            my $version_m = version->parse( $installed_module_version{ $m } );
+            my $version_v = version->parse( $v );
+
+            if ( !$version_m ) {
+                say_ex( '    ==> ' . "version convert failed - '$m' " . $installed_module_version{ $m } );
+
+                # TODO: what to do ?
+            }
+            elsif ( !$version_v ) {
+                say_ex( '    ==> ' . "version convert failed - '$m' " . $v );
+
+                # TODO: what to do ?
+            }
+            elsif ( ( $version_m cmp $version_v ) >= 0 ) {
+                say_ex(   '    ==> '
+                        . "known module equal or newer - '$m' "
+                        . $installed_module_version{ $m } . " vs. "
+                        . $v );
+            }
+            else {
+                say_ex(   '    ==> '
+                        . "found module newer, replace - '$m' "
+                        . $installed_module_version{ $m } . " vs. "
+                        . $v );
+                $installed_module_version{ $m } = $v;
+            }
+        }
     }
 
     my $timestamp = get_timestamp_for_filename( $start_date );

@@ -162,11 +162,52 @@ $generatedList | ForEach-Object {
         if ( $line -notmatch '^(([A-Z][a-zA-Z0-9_]*)([:][:][a-zA-Z0-9_]+)*)[^:]' ) {
             Write-Host -ForegroundColor Red "    => ignore - no match '$m'"
         }
-        else {
-            # FIXME: what if module already there but other version ?
-
-            # Write-Host -ForegroundColor Yellow "    => found $m"
+        elseif ( ! $modules.ContainsKey($m) ) {
+            # Write-Host  "    => unknown module save it - '$m'"
             $modules[$m] = $v
+        }
+        elseif ( 'undef' -eq $modules[$m] -and 'undef' -eq $v ) {
+            # Write-Host  "    => both modules undefined number, do nothing - '$m'"
+        }
+        elseif ( 'undef' -ne $modules[$m] -and 'undef' -eq $v ) {
+            # Write-Host  "    => already known number, keep it - '$m'"
+        }
+        elseif ( 'undef' -eq $modules[$m] -and 'undef' -ne $v ) {
+            # Write-Host  "    => replace undefined with defined version number - '$m'"
+            $modules[$m] = $v
+        }
+        else {
+            # elseif ( 'undef' -ne $modules[$m] -and 'undef' -ne $v ) {
+            $version_m = $null
+            $version_v = $null
+
+            try {
+                $version_m = [version]::new($modules[$m] -replace '^v', '') # if starting wiht v remove it
+            }
+            catch {
+                Write-Host -ForegroundColor Red "ERROR: can't parse Version $($modules[$m]) - $_"
+            }
+
+            try {
+                $version_v = [version]::new($v -replace '^v', '')
+            }
+            catch {
+                Write-Host -ForegroundColor Red "ERROR: can't parse Version $($v) - $_"
+            }
+
+            if ( $null -eq $version_m) {
+                # TODO: what to do ?
+            }
+            elseif ( $null -eq $version_v ) {
+                # TODO: what to do ?
+            }
+            elseif ( $version_m -ge $version_v) {
+                Write-Host "    => known module equal or newer '$m' $($modules[$m]) vs. $v"
+            }
+            else {
+                Write-Host "    => found module newer, replace '$m' $($modules[$m]) vs. $v"
+                $modules[$m] = $v
+            }
         }
     }
 }
