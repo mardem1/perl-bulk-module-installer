@@ -155,7 +155,7 @@ $generatedList | Where-Object {
         # some moule wrong listend => ignore?
         # if ( $m -match '^\d' -or $m -like ':*' ) {
         # Upper-Case defined as first character for none core / standard modules
-        if ( $_ -notmatch '^(([A-Z][a-zA-Z0-9_]*)([:][:][a-zA-Z0-9_]+)*)[^:]' ) {
+        if ( $m -notmatch '^(([A-Z][a-zA-Z0-9_]*)([:][:][a-zA-Z0-9_]+)*)[^:]' ) {
             Write-Host -ForegroundColor Red "    => ignore - Match '$m'"
         }
         else {
