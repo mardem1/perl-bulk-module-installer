@@ -143,7 +143,10 @@ $generatedList | ForEach-Object {
     $t = $_
     # Write-Host -ForegroundColor DarkGray "  => check $t"
     # line = modulename version
-    if ( $t -match '^([\S]+)[\s]+([\S]+)$' ) {
+    if ( $t -notmatch '^([\S]+)[\s]+([\S]+)$' ) {
+        # Write-Host -ForegroundColor Red "    => ignore - unknown line format '$t'"
+    }
+    else {
         $m = $Matches[1]
         $m = "$m".Trim()
 
