@@ -826,13 +826,11 @@ sub search_for_installed_modules
         }
 
         my @t = split /\s+/, $line;
+        my $m = trim( $t[ 0 ] );
+        my $v = trim( $t[ 1 ] );
 
-        if ( !defined $t[ 0 ] || $EMPTY_STRING eq $t[ 0 ] ) {
-            next;
-        }
-
-        $installed_module_version{ $t[ 0 ] } =
-            ( !defined $t[ 1 ] || $EMPTY_STRING eq $t[ 1 ] || 'undef' eq $t[ 1 ] ? undef : $t[ 1 ] );
+        $installed_module_version{ $m } =
+            ( $EMPTY_STRING eq $v || 'undef' eq $v ? undef : $v );
     }
 
     my $timestamp = get_timestamp_for_filename( $start_date );
