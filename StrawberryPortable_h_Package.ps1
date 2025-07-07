@@ -56,6 +56,7 @@ param (
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Container })]
     [ValidateScript({ $_ -like '*strawberry*portable*' })]
+    [ValidateScript({ $_ -notlike '*\' })]
     [string] $StrawberryDir,
 
     [Parameter(ParameterSetName = 'SevenZipPath', Mandatory = $true, Position = 1)]
