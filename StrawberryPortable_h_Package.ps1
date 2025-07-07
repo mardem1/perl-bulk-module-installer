@@ -52,7 +52,9 @@ FOR A PARTICULAR PURPOSE.
 
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory = $true, Position = 0)]
+    [Parameter(ParameterSetName = 'OnlyZip', Mandatory = $true, Position = 0)]
+    [Parameter(ParameterSetName = 'SevenZipPath', Mandatory = $true, Position = 0)]
+    [Parameter(ParameterSetName = 'DetectSevenZip', Mandatory = $true, Position = 0)]
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Container })]
     [ValidateScript({ $_ -like '*strawberry*portable*' })]
