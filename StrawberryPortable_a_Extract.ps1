@@ -12,7 +12,7 @@ Path to Strawberry ZIP portable.
 
 Optional path where extracted. If not given, extracted directory name is file name.
 
-.PARAMETER SevenZip
+.PARAMETER SevenZipPath
 
 Optional path to 7z.exe
 
@@ -67,7 +67,7 @@ param (
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
     [ValidateScript({ $_ -like '*7z.exe' })]
-    [string] $SevenZip,
+    [string] $SevenZipPath,
 
     [switch] $DetectSevenZip
 )
@@ -99,7 +99,7 @@ if ( Test-Path -LiteralPath $targetPath ) {
     throw "extraction target $targetPath already exists"
 }
 
-if ( $DetectSevenZip -and [string]::IsNullOrWhiteSpace($SevenZip) ) {
+if ( $DetectSevenZip -and [string]::IsNullOrWhiteSpace($SevenZipPath) ) {
     Write-Host -ForegroundColor Green 'search for 7z'
 
     $sz_pf64 = "$($Env:ProgramFiles)\7-Zip\7z.exe"
@@ -107,19 +107,19 @@ if ( $DetectSevenZip -and [string]::IsNullOrWhiteSpace($SevenZip) ) {
 
     $sz = Get-Command 7z -ErrorAction SilentlyContinue
     if ( $sz ) {
-        $SevenZip = $sz.Source
+        $SevenZipPath = $sz.Source
     }
     elseif ( Test-Path -LiteralPath $sz_pf64 -PathType Leaf) {
-        $SevenZip = $sz_pf64
+        $SevenZipPath = $sz_pf64
     }
     elseif ( Test-Path -LiteralPath $sz_pf32 -PathType Leaf) {
-        $SevenZip = $sz_pf32
+        $SevenZipPath = $sz_pf32
     }
     else {
         throw '7z not found!'
     }
 
-    Write-Host -ForegroundColor Green "found at '$SevenZip'"
+    Write-Host -ForegroundColor Green "found at '$SevenZipPath'"
 }
 
 Write-Host ''
@@ -130,7 +130,7 @@ $failed = $false
 $zipStartTIme = Get-Date
 Write-Host "unzip start time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipStartTIme )"
 
-if ( [string]::IsNullOrWhiteSpace($SevenZip) ) {
+if ( [string]::IsNullOrWhiteSpace($SevenZipPath) ) {
     try {
         # Expand-Archive is really slow
         # Expand-Archive -LiteralPath $StrawberryZip -DestinationPath $targetPath
@@ -145,7 +145,7 @@ if ( [string]::IsNullOrWhiteSpace($SevenZip) ) {
 }
 else {
     # 7z is faster
-    & "$SevenZip" 'x' '-bt' '-spe' '-aoa' '-bb0' '-bd' "-o$targetPath" "$StrawberryZip"
+    & "$SevenZipPath" 'x' '-bt' '-spe' '-aoa' '-bb0' '-bd' "-o$targetPath" "$StrawberryZip"
     if ( 0 -ne $LASTEXITCODE ) {
         $failed = $true
         Write-Host -ForegroundColor Red "ERROR unzip '$StrawberryZip' to '$targetPath' - FAILED ! LASTEXITCODE: $LASTEXITCODE"
