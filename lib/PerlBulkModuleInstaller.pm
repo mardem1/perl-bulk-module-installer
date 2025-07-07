@@ -1361,7 +1361,7 @@ sub install_modules_sequentially
         my $duration_s             = floor( $duration_total_seconds - ( $duration_h * 3600 ) - ( $duration_m * 60 ) );
         my $duration_txt           = sprintf( '%02d:%02d:%02d', $duration_h, $duration_m, $duration_s );
 
-        my $expect_total_seconds = $duration_total_seconds * $remaining;
+        my $expect_total_seconds = ( ( 0.0 + $duration_total_seconds ) / $install_count ) * $remaining;
         my $expect_h             = floor( ( 0.0 + $expect_total_seconds ) / 3600 );
         my $expect_m             = floor( ( 0.0 + ( $expect_total_seconds - ( $expect_h * 3600 ) ) ) / 60 );
         my $expect_s             = floor( $expect_total_seconds - ( $expect_h * 3600 ) - ( $expect_m * 60 ) );
