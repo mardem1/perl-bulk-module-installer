@@ -79,7 +79,7 @@ if ( ! $hasAdmin ) {
 }
 
 Write-Host -ForegroundColor Green "add defender exclude dir '$StrawberryDir'"
-Add-MpPreference -ExclusionPath $targetStrawberryDirPath -Force
+Add-MpPreference -ExclusionPath $StrawberryDir -Force
 
 Get-ChildItem -Recurse -File -LiteralPath $StrawberryDir -Force -Filter '*.exe' | ForEach-Object {
     Write-Host -ForegroundColor Green "add defender exclude process '$_'"
