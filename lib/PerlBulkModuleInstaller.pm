@@ -819,6 +819,9 @@ sub search_for_installed_modules
 
     say_ex( '  ==> ' . 'analyze found modules' );
 
+    # extra hash needed instead of direct use of installed_module_version because update / duplicate check.
+    # second run would be always a duplicate.
+    my %found_module_version = ();
     foreach my $line ( @output ) {
         $line = trim( $line );
         if ( $EMPTY_STRING eq $line ) {
@@ -842,28 +845,28 @@ sub search_for_installed_modules
         if ( $line !~ /^(([a-zA-Z][a-zA-Z0-9_]*)([:][:][a-zA-Z0-9_]+)*)[^:]/io ) {
             say_ex( '    ==> ' . "ignore - no match - '$m'" );
         }
-        elsif ( !exists $installed_module_version{ $m } ) {
+        elsif ( !exists $found_module_version{ $m } ) {
             # say_ex( '    ==> ' . "unknown module save it - '$m'" );
-            $installed_module_version{ $m } = $v;
+            $found_module_version{ $m } = $v;
         }
-        elsif ( !defined $installed_module_version{ $m } && !defined $v ) {
+        elsif ( !defined $found_module_version{ $m } && !defined $v ) {
             # say_ex( '    ==> ' . "both modules undefined number, do nothing - '$m'" );
         }
-        elsif ( defined $installed_module_version{ $m } && !defined $v ) {
+        elsif ( defined $found_module_version{ $m } && !defined $v ) {
             # say_ex( '    ==> ' . "already known number, keep it - '$m'" );
         }
-        elsif ( !defined $installed_module_version{ $m } && defined $v ) {
+        elsif ( !defined $found_module_version{ $m } && defined $v ) {
             # say_ex( '    ==> ' . "replace undefined with defined version number - '$m'" );
-            $installed_module_version{ $m } = $v;
+            $found_module_version{ $m } = $v;
         }
         else {
-            # elsif ( defined $installed_module_version{ $m }  && defined $v ) {
+            # elsif ( defined $found_module_version{ $m }  && defined $v ) {
 
-            my $version_m = version->parse( $installed_module_version{ $m } );
+            my $version_m = version->parse( $found_module_version{ $m } );
             my $version_v = version->parse( $v );
 
             if ( !$version_m ) {
-                say_ex( '    ==> ' . "version convert failed - '$m' " . $installed_module_version{ $m } );
+                say_ex( '    ==> ' . "version convert failed - '$m' " . $found_module_version{ $m } );
 
                 # TODO: what to do ?
             }
@@ -875,15 +878,15 @@ sub search_for_installed_modules
             elsif ( ( $version_m cmp $version_v ) >= 0 ) {
                 say_ex(   '    ==> '
                         . "known module equal or newer - '$m' "
-                        . $installed_module_version{ $m } . " vs. "
+                        . $found_module_version{ $m } . " vs. "
                         . $v );
             }
             else {
                 say_ex(   '    ==> '
                         . "found module newer, replace - '$m' "
-                        . $installed_module_version{ $m } . " vs. "
+                        . $found_module_version{ $m } . " vs. "
                         . $v );
-                $installed_module_version{ $m } = $v;
+                $found_module_version{ $m } = $v;
             }
         }
     }
@@ -891,14 +894,14 @@ sub search_for_installed_modules
     my $timestamp = get_timestamp_for_filename( $start_date );
 
     # for module list txt and csv files reduce to Upper-Case start - see above
-    my @moduleNames = grep { $_ =~ /^[A-Z]/o } sort keys %installed_module_version;
+    my @moduleNames = grep { $_ =~ /^[A-Z]/o } sort keys %found_module_version;
 
     write_file( $log_dir_path . '/' . $timestamp . '_' . $logfile_suffix . '.txt',
         "# $logfile_title $^V", @moduleNames );
 
     my @moduleCsvLines = ();
     foreach my $name ( @moduleNames ) {
-        my $version = $installed_module_version{ $name } // 'undef';
+        my $version = $found_module_version{ $name } // 'undef';
         push @moduleCsvLines, "$name;$version";
     }
     write_file(
@@ -906,6 +909,11 @@ sub search_for_installed_modules
         "# $logfile_title;$^V",
         @moduleCsvLines
     );
+
+    # import found modules to install modules
+    foreach my $name ( keys %found_module_version ) {
+        $installed_module_version{ $name } = $found_module_version{ $name };
+    }
 
     say_ex( '' );
     say_ex(
