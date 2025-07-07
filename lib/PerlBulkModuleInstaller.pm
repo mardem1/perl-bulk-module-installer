@@ -923,8 +923,6 @@ sub search_for_installed_modules
     );
     say_ex( '' );
 
-    generate_modules_need_to_install();
-
     return;
 }
 
@@ -986,6 +984,7 @@ sub install_single_module
     my $logfile_suffix = 'install_module__' . $module_n . '__' . $type;
     my $logfile_title  = 'install_module -> ' . $module . ' -> ' . $type;
 
+    # for update force not needed
     my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '2>&1' );
 
     my ( $start_date, $end_date, $child_exit_status, @output ) =
@@ -1446,6 +1445,8 @@ sub main
     else {
         say_ex( 'no --all-updates or --only-all-updates: skip update module list import' );
     }
+
+    generate_modules_need_to_install();
 
     install_modules_sequentially();
 
