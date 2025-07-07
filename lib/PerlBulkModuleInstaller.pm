@@ -1427,11 +1427,11 @@ sub main
 
     search_for_installed_modules();
 
-    if ( !$all_updates ) {
-        say_ex( 'no --all-updates: skip update module list import' );
+    if ( $only_all_updates || $all_updates ) {
+        search_for_modules_for_available_updates();
     }
     else {
-        search_for_modules_for_available_updates();
+        say_ex( 'no --all-updates or --only-all-updates: skip update module list import' );
     }
 
     install_modules_sequentially();
