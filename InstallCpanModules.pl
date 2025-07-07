@@ -64,8 +64,8 @@ will be installed!
 
 =item C<--all-updates>
 
-Do not install updates for modules, exception a new module require a module
-update as dependency.
+Install all available module updates, if not given updates are only installed,
+if a module require a new version of a module.
 
 =back
 
