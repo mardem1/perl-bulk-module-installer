@@ -1,3 +1,3 @@
-rmdir /S /Q "C:\_test\strawberry-perl-5.40.2.1-64bit-portable\data\.cpanm"
+rmdir /S /Q "C:\perl-build\strawberry-perl-5.40.2.1-64bit-portable\data\.cpanm"
 
 pause

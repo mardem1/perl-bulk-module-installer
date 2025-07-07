@@ -1,6 +1,6 @@
 
 $portableBaseName = 'strawberry-perl-5.40.2.1-64bit-portable'
-$baseDir = 'C:\_test'
+$baseDir = 'C:\perl-build'
 
 & "$baseDir\perl-bulk-module-installer\StrawberryPortable_a_Extract.ps1" -StrawberryZip "$baseDir\$portableBaseName.zip" -Destination "$baseDir\$portableBaseName"
 & "$baseDir\perl-bulk-module-installer\StrawberryPortable_b_AddDefenderExclude.ps1" -StrawberryDir "$baseDir\$portableBaseName"
