@@ -140,7 +140,7 @@ if ( [string]::IsNullOrWhiteSpace($SevenZipPath) ) {
     }
     catch {
         $failed = $true
-        Write-Host -ForegroundColor Red "ERROR unzip '$StrawberryZip' to '$targetPath' - FAILED ! msg: $_"
+        Write-Host -ForegroundColor Red "ERROR: unzip '$StrawberryZip' to '$targetPath' - FAILED ! msg: $_"
     }
 }
 else {
@@ -148,7 +148,7 @@ else {
     & "$SevenZipPath" 'x' '-bt' '-spe' '-aoa' '-bb0' '-bd' "-o$targetPath" "$StrawberryZip"
     if ( 0 -ne $LASTEXITCODE ) {
         $failed = $true
-        Write-Host -ForegroundColor Red "ERROR unzip '$StrawberryZip' to '$targetPath' - FAILED ! LASTEXITCODE: $LASTEXITCODE"
+        Write-Host -ForegroundColor Red "ERROR: unzip '$StrawberryZip' to '$targetPath' - FAILED ! LASTEXITCODE: $LASTEXITCODE"
     }
 }
 
