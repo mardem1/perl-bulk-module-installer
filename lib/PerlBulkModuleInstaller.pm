@@ -16,7 +16,7 @@ BEGIN {
 use base qw(Exporter);
 
 use version;
-use POSIX qw( :sys_wait_h );
+use POSIX qw( floor :sys_wait_h );
 use Carp  qw( croak );
 use Carp::Always;
 use IPC::Open3;
@@ -1319,8 +1319,10 @@ sub install_modules_sequentially
     dump_state_to_logfiles();
     print_install_state_summary();
 
-    my $remaining = scalar( keys %modules_need_to_install );
-    my $check_i   = 0;
+    my $start_time           = time;
+    my $install_target_count = scalar( keys %modules_need_to_install );
+    my $remaining            = $install_target_count;
+    my $check_i              = 0;
 
     my $module = q{};
     $module = ( keys %modules_need_to_install )[ 0 ];
@@ -1341,12 +1343,32 @@ sub install_modules_sequentially
             next;
         }
 
-        say_ex( '==> ' . "handle next install list module - ($check_i - $remaining) - $module" );
+        say_ex( '==> ' . "handle next install list module - ($check_i - $remaining) - $module ..." );
 
         install_module_with_dependencies_first_recursive( $module );
 
+        say_ex( '==> ' . "... handle install list module - ($check_i - $remaining) - $module done" );
+
         $remaining = scalar( keys %modules_need_to_install );
         $module    = ( keys %modules_need_to_install )[ 0 ];
+
+        my $now_time      = time;
+        my $install_count = $install_target_count - $remaining;
+
+        my $duration_total_seconds = $now_time - $start_time;
+        my $duration_h             = floor( ( 0.0 + $duration_total_seconds ) / 3600 );
+        my $duration_m             = floor( ( 0.0 + ( $duration_total_seconds - ( $duration_h * 3600 ) ) ) / 60 );
+        my $duration_s             = floor( $duration_total_seconds - ( $duration_h * 3600 ) - ( $duration_m * 60 ) );
+        my $duration_txt           = sprintf( '%02d:%02d:%02d', $duration_h, $duration_m, $duration_s );
+
+        my $expect_total_seconds = $duration_total_seconds * $remaining;
+        my $expect_h             = floor( ( 0.0 + $expect_total_seconds ) / 3600 );
+        my $expect_m             = floor( ( 0.0 + ( $expect_total_seconds - ( $expect_h * 3600 ) ) ) / 60 );
+        my $expect_s             = floor( $expect_total_seconds - ( $expect_h * 3600 ) - ( $expect_m * 60 ) );
+        my $expect_txt           = sprintf( '%02d:%02d:%02d', $expect_h, $expect_m, $expect_s );
+        say_ex(   '==> '
+                . "installed $install_count modules from start-list in $duration_txt (hh:mm:ss) - expect remaining $remaining modules needs $expect_txt (hh:mm:ss)"
+        );
     }
 
     dump_state_to_logfiles();
