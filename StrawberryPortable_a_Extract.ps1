@@ -74,96 +74,113 @@ param (
     [switch] $DetectSevenZip
 )
 
-$ScriptPath = $MyInvocation.InvocationName
-# Invoked wiht &
-if ( $ScriptPath -eq '&' -and
-    $null -ne $MyInvocation.MyCommand -and
-    ! [string]::IsNullOrWhiteSpace($MyInvocation.MyCommand.Path) ) {
-    $ScriptPath = $MyInvocation.MyCommand.Path
-}
+$ScriptPath = ''
+$transcript = $false
 
-$ScriptItem = Get-Item -LiteralPath $ScriptPath -ErrorAction Stop
-Start-Transcript -LiteralPath "$($ScriptItem.Directory.FullName)\log\$(Get-Date -Format 'yyyyMMdd_HHmmss')_$($ScriptItem.BaseName).log"
-
-Write-Host ''
-Write-Host -ForegroundColor Green "started '$ScriptPath' ..."
-Write-Host ''
-
-$zip = Get-Item -LiteralPath $StrawberryZip
-if ( [string]::IsNullOrWhiteSpace($Destination) ) {
-    $targetPath = "$($zip.Directory.FullName)\$($zip.BaseName)"
-}
-else {
-    $targetPath = $Destination
-}
-
-if ( Test-Path -LiteralPath $targetPath ) {
-    throw "extraction target $targetPath already exists"
-}
-
-if ( $DetectSevenZip -and [string]::IsNullOrWhiteSpace($SevenZipPath) ) {
-    Write-Host -ForegroundColor Green 'search for 7z'
-
-    $sz_pf64 = "$($Env:ProgramFiles)\7-Zip\7z.exe"
-    $sz_pf32 = "$(${env:ProgramFiles(x86)})\7-Zip\7z.exe"
-
-    $sz = Get-Command 7z -ErrorAction SilentlyContinue
-    if ( $sz ) {
-        $SevenZipPath = $sz.Source
+try {
+    $ScriptPath = $MyInvocation.InvocationName
+    # Invoked wiht &
+    if ( $ScriptPath -eq '&' -and
+        $null -ne $MyInvocation.MyCommand -and
+        ! [string]::IsNullOrWhiteSpace($MyInvocation.MyCommand.Path) ) {
+        $ScriptPath = $MyInvocation.MyCommand.Path
     }
-    elseif ( Test-Path -LiteralPath $sz_pf64 -PathType Leaf) {
-        $SevenZipPath = $sz_pf64
-    }
-    elseif ( Test-Path -LiteralPath $sz_pf32 -PathType Leaf) {
-        $SevenZipPath = $sz_pf32
+
+    $ScriptItem = Get-Item -LiteralPath $ScriptPath -ErrorAction Stop
+    Start-Transcript -LiteralPath "$($ScriptItem.Directory.FullName)\log\$(Get-Date -Format 'yyyyMMdd_HHmmss')_$($ScriptItem.BaseName).log" -ErrorAction Stop
+    $transcript = $true
+
+    Write-Host ''
+    Write-Host -ForegroundColor Green "started '$ScriptPath' ..."
+    Write-Host ''
+
+    $zip = Get-Item -LiteralPath $StrawberryZip
+    if ( [string]::IsNullOrWhiteSpace($Destination) ) {
+        $targetPath = "$($zip.Directory.FullName)\$($zip.BaseName)"
     }
     else {
-        throw '7z not found!'
+        $targetPath = $Destination
     }
 
-    Write-Host -ForegroundColor Green "found at '$SevenZipPath'"
-}
-
-Write-Host ''
-Write-Host -ForegroundColor Green "unzip '$StrawberryZip' to '$targetPath'"
-
-$failed = $false
-
-$zipStartTIme = Get-Date
-Write-Host "unzip start time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipStartTIme )"
-
-if ( [string]::IsNullOrWhiteSpace($SevenZipPath) ) {
-    try {
-        # Expand-Archive is really slow
-        # Expand-Archive -LiteralPath $StrawberryZip -DestinationPath $targetPath
-        # use .Net direct
-        Add-Type -Assembly System.IO.Compression.Filesystem
-        [IO.Compression.ZipFile]::ExtractToDirectory( $StrawberryZip, $targetPath )
+    if ( Test-Path -LiteralPath $targetPath ) {
+        throw "extraction target $targetPath already exists"
     }
-    catch {
-        $failed = $true
-        Write-Host -ForegroundColor Red "ERROR: unzip '$StrawberryZip' to '$targetPath' - FAILED ! msg: $_"
+
+    if ( $DetectSevenZip -and [string]::IsNullOrWhiteSpace($SevenZipPath) ) {
+        Write-Host -ForegroundColor Green 'search for 7z'
+
+        $sz_pf64 = "$($Env:ProgramFiles)\7-Zip\7z.exe"
+        $sz_pf32 = "$(${env:ProgramFiles(x86)})\7-Zip\7z.exe"
+
+        $sz = Get-Command 7z -ErrorAction SilentlyContinue
+        if ( $sz ) {
+            $SevenZipPath = $sz.Source
+        }
+        elseif ( Test-Path -LiteralPath $sz_pf64 -PathType Leaf) {
+            $SevenZipPath = $sz_pf64
+        }
+        elseif ( Test-Path -LiteralPath $sz_pf32 -PathType Leaf) {
+            $SevenZipPath = $sz_pf32
+        }
+        else {
+            throw '7z not found!'
+        }
+
+        Write-Host -ForegroundColor Green "found at '$SevenZipPath'"
+    }
+
+    Write-Host ''
+    Write-Host -ForegroundColor Green "unzip '$StrawberryZip' to '$targetPath'"
+
+    $failed = $false
+
+    $zipStartTIme = Get-Date
+    Write-Host "unzip start time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipStartTIme )"
+
+    if ( [string]::IsNullOrWhiteSpace($SevenZipPath) ) {
+        try {
+            # Expand-Archive is really slow
+            # Expand-Archive -LiteralPath $StrawberryZip -DestinationPath $targetPath
+            # use .Net direct
+            Add-Type -Assembly System.IO.Compression.Filesystem
+            [IO.Compression.ZipFile]::ExtractToDirectory( $StrawberryZip, $targetPath )
+        }
+        catch {
+            $failed = $true
+            Write-Host -ForegroundColor Red "ERROR: unzip '$StrawberryZip' to '$targetPath' - FAILED ! msg: $_"
+        }
+    }
+    else {
+        # 7z is faster
+        & "$SevenZipPath" 'x' '-bt' '-spe' '-aoa' '-bb0' '-bd' "-o$targetPath" "$StrawberryZip"
+        if ( 0 -ne $LASTEXITCODE ) {
+            $failed = $true
+            Write-Host -ForegroundColor Red "ERROR: unzip '$StrawberryZip' to '$targetPath' - FAILED ! LASTEXITCODE: $LASTEXITCODE"
+        }
+    }
+
+    if ( ! $failed ) {
+        $zipEndTime = Get-Date
+        Write-Host "unzip end time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipEndTime)"
+        Write-Host "unzip duration $( (New-TimeSpan -Start $zipStartTIme -End $zipEndTime).TotalSeconds )"
+        exit 0
+    }
+    else {
+        exit 1
     }
 }
-else {
-    # 7z is faster
-    & "$SevenZipPath" 'x' '-bt' '-spe' '-aoa' '-bb0' '-bd' "-o$targetPath" "$StrawberryZip"
-    if ( 0 -ne $LASTEXITCODE ) {
-        $failed = $true
-        Write-Host -ForegroundColor Red "ERROR: unzip '$StrawberryZip' to '$targetPath' - FAILED ! LASTEXITCODE: $LASTEXITCODE"
+catch {
+    Write-Host -ForegroundColor Red "ERROR: msg: $_"
+    exit 1
+}
+finally {
+    Write-Host ''
+    Write-Host -ForegroundColor Green 'done'
+    Write-Host ''
+    Write-Host -ForegroundColor Green "... '$ScriptPath' ended"
+    Write-Host ''
+
+    if ($transcript) {
+        Stop-Transcript
     }
 }
-
-if ( ! $failed ) {
-    $zipEndTime = Get-Date
-    Write-Host "unzip end time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipEndTime)"
-    Write-Host "unzip duration $( (New-TimeSpan -Start $zipStartTIme -End $zipEndTime).TotalSeconds )"
-}
-
-Write-Host ''
-Write-Host -ForegroundColor Green 'done'
-Write-Host ''
-Write-Host -ForegroundColor Green "... '$ScriptPath' ended"
-Write-Host ''
-
-Stop-Transcript

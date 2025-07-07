@@ -103,81 +103,97 @@ param (
     [switch] $AllUpdates
 )
 
-$ScriptPath = $MyInvocation.InvocationName
-# Invoked wiht &
-if ( $ScriptPath -eq '&' -and
-    $null -ne $MyInvocation.MyCommand -and
-    ! [string]::IsNullOrWhiteSpace($MyInvocation.MyCommand.Path) ) {
-    $ScriptPath = $MyInvocation.MyCommand.Path
-}
+$ScriptPath = ''
+$transcript = $false
 
-$ScriptItem = Get-Item -LiteralPath $ScriptPath -ErrorAction Stop
-Start-Transcript -LiteralPath "$($ScriptItem.Directory.FullName)\log\$(Get-Date -Format 'yyyyMMdd_HHmmss')_$($ScriptItem.BaseName).log"
+try {
+    $ScriptPath = $MyInvocation.InvocationName
+    # Invoked wiht &
+    if ( $ScriptPath -eq '&' -and
+        $null -ne $MyInvocation.MyCommand -and
+        ! [string]::IsNullOrWhiteSpace($MyInvocation.MyCommand.Path) ) {
+        $ScriptPath = $MyInvocation.MyCommand.Path
+    }
 
-$InstallCpanModules = "$($ScriptItem.Directory.FullName)\InstallCpanModules.pl"
+    $ScriptItem = Get-Item -LiteralPath $ScriptPath -ErrorAction Stop
+    Start-Transcript -LiteralPath "$($ScriptItem.Directory.FullName)\log\$(Get-Date -Format 'yyyyMMdd_HHmmss')_$($ScriptItem.BaseName).log" -ErrorAction Stop
+    $transcript = $true
 
-Write-Host ''
-Write-Host -ForegroundColor Green "started '$ScriptPath' ..."
-Write-Host ''
+    $InstallCpanModules = "$($ScriptItem.Directory.FullName)\InstallCpanModules.pl"
 
-$PathExtends = "$($StrawberryDir)\perl\site\bin;$($StrawberryDir)\perl\bin;$($StrawberryDir)\c\bin"
-if ( $env:Path -notlike "*$PathExtends*" ) {
-    $Env:PATH = "$PathExtends;$Env:PATH"
-}
-
-$perlexe = $StrawberryDir + '\perl\bin\perl.exe'
-& $perlexe -MConfig -e 'printf(qq{Perl executable: %s\nPerl version   : %s / $Config{archname}\n\n}, $^X, $^V)' | Out-String | Write-Host -ForegroundColor Green
-
-if ( 0 -ne $LASTEXITCODE) {
-    Write-Host -ForegroundColor Red "FATAL ERROR: 'perl' failed with '$LASTEXITCODE' - abort!"
-    exit
-}
-
-# for PerlBulkModuleInstaller
-$Env:PERL5LIB = "$((Get-Item -LiteralPath $InstallCpanModules).Directory.FullName)\lib".Replace('\', '/')
-
-$InstallModuleListFile | ForEach-Object {
-    $listfile = $_
-
-    0..25 | ForEach-Object { Write-Host '' }
-    Write-Host -ForegroundColor Green "start '$InstallCpanModules' with '$listfile'"
+    Write-Host ''
+    Write-Host -ForegroundColor Green "started '$ScriptPath' ..."
     Write-Host ''
 
-    # TODO: replace with Start-Process and created ARGV
-    if ( [string]::IsNullOrWhiteSpace($DontTryModuleListFile) ) {
-        if ( $OnlyAllUpdates ) {
-            & $perlexe $InstallCpanModules '--only-all-updates' $listfile | Write-Host
-        }
-        elseif ( $AllUpdates ) {
-            & $perlexe $InstallCpanModules '--all-updates' $listfile | Write-Host
-        }
-        else {
-            & $perlexe $InstallCpanModules $listfile | Write-Host
-        }
+    $PathExtends = "$($StrawberryDir)\perl\site\bin;$($StrawberryDir)\perl\bin;$($StrawberryDir)\c\bin"
+    if ( $env:Path -notlike "*$PathExtends*" ) {
+        $Env:PATH = "$PathExtends;$Env:PATH"
     }
-    else {
-        if ( $OnlyAllUpdates ) {
-            & $perlexe $InstallCpanModules '--only-all-updates' $listfile $DontTryModuleListFile | Write-Host
-        }
-        elseif ( $AllUpdates ) {
-            & $perlexe $InstallCpanModules '--all-updates' $listfile $DontTryModuleListFile | Write-Host
-        }
-        else {
-            & $perlexe $InstallCpanModules $listfile $DontTryModuleListFile | Write-Host
-        }
-    }
+
+    $perlexe = $StrawberryDir + '\perl\bin\perl.exe'
+    & $perlexe -MConfig -e 'printf(qq{Perl executable: %s\nPerl version   : %s / $Config{archname}\n\n}, $^X, $^V)' | Out-String | Write-Host -ForegroundColor Green
 
     if ( 0 -ne $LASTEXITCODE) {
-        Write-Host -ForegroundColor Red "FATAL ERROR: '$InstallCpanModules' with '$LASTEXITCODE' failed?"
+        Write-Host -ForegroundColor Red "FATAL ERROR: 'perl' failed with '$LASTEXITCODE' - abort!"
+        throw 'perl not working'
+    }
+
+    # for PerlBulkModuleInstaller
+    $Env:PERL5LIB = "$((Get-Item -LiteralPath $InstallCpanModules).Directory.FullName)\lib".Replace('\', '/')
+
+    $InstallModuleListFile | ForEach-Object {
+        $listfile = $_
+
+        0..25 | ForEach-Object { Write-Host '' }
+        Write-Host -ForegroundColor Green "start '$InstallCpanModules' with '$listfile'"
+        Write-Host ''
+
+        # TODO: replace with Start-Process and created ARGV
+        if ( [string]::IsNullOrWhiteSpace($DontTryModuleListFile) ) {
+            if ( $OnlyAllUpdates ) {
+                & $perlexe $InstallCpanModules '--only-all-updates' $listfile | Write-Host
+            }
+            elseif ( $AllUpdates ) {
+                & $perlexe $InstallCpanModules '--all-updates' $listfile | Write-Host
+            }
+            else {
+                & $perlexe $InstallCpanModules $listfile | Write-Host
+            }
+        }
+        else {
+            if ( $OnlyAllUpdates ) {
+                & $perlexe $InstallCpanModules '--only-all-updates' $listfile $DontTryModuleListFile | Write-Host
+            }
+            elseif ( $AllUpdates ) {
+                & $perlexe $InstallCpanModules '--all-updates' $listfile $DontTryModuleListFile | Write-Host
+            }
+            else {
+                & $perlexe $InstallCpanModules $listfile $DontTryModuleListFile | Write-Host
+            }
+        }
+
+        if ( 0 -ne $LASTEXITCODE) {
+            Write-Host -ForegroundColor Red "FATAL ERROR: '$InstallCpanModules' with '$LASTEXITCODE' failed?"
+            throw 'InstallCpanModules failed'
+        }
+    }
+
+    0..25 | ForEach-Object { Write-Host '' }
+
+    exit 0
+}
+catch {
+    Write-Host -ForegroundColor Red "ERROR: msg: $_"
+    exit 1
+}
+finally {
+    Write-Host ''
+    Write-Host -ForegroundColor Green 'done'
+    Write-Host ''
+    Write-Host -ForegroundColor Green "... '$ScriptPath' ended"
+    Write-Host ''
+
+    if ($transcript) {
+        Stop-Transcript
     }
 }
-
-0..25 | ForEach-Object { Write-Host '' }
-
-Write-Host ''
-Write-Host -ForegroundColor Green 'done'
-Write-Host ''
-Write-Host -ForegroundColor Green "... '$ScriptPath' ended"
-Write-Host ''
-
-Stop-Transcript

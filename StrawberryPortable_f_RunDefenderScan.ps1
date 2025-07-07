@@ -48,71 +48,79 @@ param (
     [string] $StrawberryDir
 )
 
-$ScriptPath = $MyInvocation.InvocationName
-# Invoked wiht &
-if ( $ScriptPath -eq '&' -and
-    $null -ne $MyInvocation.MyCommand -and
-    ! [string]::IsNullOrWhiteSpace($MyInvocation.MyCommand.Path) ) {
-    $ScriptPath = $MyInvocation.MyCommand.Path
+$ScriptPath = ''
+$transcript = $false
+
+try {
+    $ScriptPath = $MyInvocation.InvocationName
+    # Invoked wiht &
+    if ( $ScriptPath -eq '&' -and
+        $null -ne $MyInvocation.MyCommand -and
+        ! [string]::IsNullOrWhiteSpace($MyInvocation.MyCommand.Path) ) {
+        $ScriptPath = $MyInvocation.MyCommand.Path
+    }
+
+    $ScriptItem = Get-Item -LiteralPath $ScriptPath -ErrorAction Stop
+    Start-Transcript -LiteralPath "$($ScriptItem.Directory.FullName)\log\$(Get-Date -Format 'yyyyMMdd_HHmmss')_$($ScriptItem.BaseName).log" -ErrorAction Stop
+    $transcript = $true
+
+    Write-Host ''
+    Write-Host -ForegroundColor Green "started '$ScriptPath' ..."
+    Write-Host ''
+
+    $hasAdmin = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+    Write-Host ''
+    if ( ! $hasAdmin ) {
+        Write-Host -ForegroundColor Red 'ERROR: admin required for defender config!'
+        throw 'admin required'
+    }
+
+    Write-Host ''
+    Write-Host -ForegroundColor Green "=> start defender scan '$StrawberryDir'"
+    Write-Host ''
+    $scanStartTime = Get-Date
+    Write-Host "scan start $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $scanStartTime )"
+    Start-MpScan -ScanPath $StrawberryDir -ScanType CustomScan
+    $scanEndTime = Get-Date
+    Write-Host "scan ended $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $scanEndTime)"
+    Write-Host "scan duration $( (New-TimeSpan -Start $scanStartTime -End $scanEndTime).TotalSeconds )"
+
+    Write-Host ''
+    Write-Host -ForegroundColor Green '=> check detected threats'
+    Write-Host ''
+    $foundThreats = Get-MpThreatDetection | Where-Object { $_.InitialDetectionTime -gt $scanStartTime }
+
+    if ( $foundThreats ) {
+        Write-Host ''
+        Write-Host -ForegroundColor Green '=> detected threats'
+        Write-Host ''
+
+        $foundThreats | Select-Object *
+
+        Write-Host ''
+        Write-Host -ForegroundColor Red '=> threats found!'
+        throw 'threats found'
+    }
+    else {
+        Write-Host ''
+        Write-Host -ForegroundColor Green '=> no threats found'
+    }
+
+    exit 0
 }
-
-$ScriptItem = Get-Item -LiteralPath $ScriptPath -ErrorAction Stop
-Start-Transcript -LiteralPath "$($ScriptItem.Directory.FullName)\log\$(Get-Date -Format 'yyyyMMdd_HHmmss')_$($ScriptItem.BaseName).log"
-
-Write-Host ''
-Write-Host -ForegroundColor Green "started '$ScriptPath' ..."
-Write-Host ''
-
-$hasAdmin = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-
-Write-Host ''
-if ( ! $hasAdmin ) {
-    Write-Host -ForegroundColor Red 'ERROR: admin required for defender config!'
+catch {
+    Write-Host -ForegroundColor Red "ERROR: msg: $_"
+    exit 1
+}
+finally {
     Write-Host ''
     Write-Host -ForegroundColor Green 'done'
     Write-Host ''
     Write-Host -ForegroundColor Green "... '$ScriptPath' ended"
     Write-Host ''
 
-    Stop-Transcript
-    exit
+    if ($transcript) {
+        Stop-Transcript
+    }
 }
-
-Write-Host ''
-Write-Host -ForegroundColor Green "=> start defender scan '$StrawberryDir'"
-Write-Host ''
-$scanStartTime = Get-Date
-Write-Host "scan start $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $scanStartTime )"
-Start-MpScan -ScanPath $StrawberryDir -ScanType CustomScan
-$scanEndTime = Get-Date
-Write-Host "scan ended $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $scanEndTime)"
-Write-Host "scan duration $( (New-TimeSpan -Start $scanStartTime -End $scanEndTime).TotalSeconds )"
-
-Write-Host ''
-Write-Host -ForegroundColor Green '=> check detected threats'
-Write-Host ''
-$foundThreats = Get-MpThreatDetection | Where-Object { $_.InitialDetectionTime -gt $scanStartTime }
-
-if ( $foundThreats ) {
-    Write-Host ''
-    Write-Host -ForegroundColor Green '=> detected threats'
-    Write-Host ''
-
-    $foundThreats | Select-Object *
-
-    Write-Host ''
-    Write-Host -ForegroundColor Red '=> threats found!'
-    Write-Host ''
-}
-else {
-    Write-Host ''
-    Write-Host -ForegroundColor Green '=> no threats found'
-}
-
-Write-Host ''
-Write-Host -ForegroundColor Green 'done'
-Write-Host ''
-Write-Host -ForegroundColor Green "... '$ScriptPath' ended"
-Write-Host ''
-
-Stop-Transcript

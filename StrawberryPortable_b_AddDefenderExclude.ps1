@@ -48,48 +48,56 @@ param (
     [string] $StrawberryDir
 )
 
-$ScriptPath = $MyInvocation.InvocationName
-# Invoked wiht &
-if ( $ScriptPath -eq '&' -and
-    $null -ne $MyInvocation.MyCommand -and
-    ! [string]::IsNullOrWhiteSpace($MyInvocation.MyCommand.Path) ) {
-    $ScriptPath = $MyInvocation.MyCommand.Path
+$ScriptPath = ''
+$transcript = $false
+
+try {
+    $ScriptPath = $MyInvocation.InvocationName
+    # Invoked wiht &
+    if ( $ScriptPath -eq '&' -and
+        $null -ne $MyInvocation.MyCommand -and
+        ! [string]::IsNullOrWhiteSpace($MyInvocation.MyCommand.Path) ) {
+        $ScriptPath = $MyInvocation.MyCommand.Path
+    }
+
+    $ScriptItem = Get-Item -LiteralPath $ScriptPath -ErrorAction Stop
+    Start-Transcript -LiteralPath "$($ScriptItem.Directory.FullName)\log\$(Get-Date -Format 'yyyyMMdd_HHmmss')_$($ScriptItem.BaseName).log" -ErrorAction Stop
+    $transcript = $true
+
+    Write-Host ''
+    Write-Host -ForegroundColor Green "started '$ScriptPath' ..."
+    Write-Host ''
+
+    $hasAdmin = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+    Write-Host ''
+    if ( ! $hasAdmin ) {
+        Write-Host -ForegroundColor Red 'ERROR: admin required for defender config!'
+        throw 'admin required'
+    }
+
+    Write-Host -ForegroundColor Green "add defender exclude dir '$StrawberryDir'"
+    Add-MpPreference -ExclusionPath $StrawberryDir -Force
+
+    Get-ChildItem -Recurse -File -LiteralPath $StrawberryDir -Force -Filter '*.exe' | ForEach-Object {
+        Write-Host -ForegroundColor Green "add defender exclude process '$_'"
+        Add-MpPreference -ExclusionProcess $_ -Force
+    }
+
+    exit 0
 }
-
-$ScriptItem = Get-Item -LiteralPath $ScriptPath -ErrorAction Stop
-Start-Transcript -LiteralPath "$($ScriptItem.Directory.FullName)\log\$(Get-Date -Format 'yyyyMMdd_HHmmss')_$($ScriptItem.BaseName).log"
-
-Write-Host ''
-Write-Host -ForegroundColor Green "started '$ScriptPath' ..."
-Write-Host ''
-
-$hasAdmin = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-
-Write-Host ''
-if ( ! $hasAdmin ) {
-    Write-Host -ForegroundColor Red 'ERROR: admin required for defender config!'
+catch {
+    Write-Host -ForegroundColor Red "ERROR: msg: $_"
+    exit 1
+}
+finally {
     Write-Host ''
     Write-Host -ForegroundColor Green 'done'
     Write-Host ''
     Write-Host -ForegroundColor Green "... '$ScriptPath' ended"
     Write-Host ''
 
-    Stop-Transcript
-    exit
+    if ($transcript) {
+        Stop-Transcript
+    }
 }
-
-Write-Host -ForegroundColor Green "add defender exclude dir '$StrawberryDir'"
-Add-MpPreference -ExclusionPath $StrawberryDir -Force
-
-Get-ChildItem -Recurse -File -LiteralPath $StrawberryDir -Force -Filter '*.exe' | ForEach-Object {
-    Write-Host -ForegroundColor Green "add defender exclude process '$_'"
-    Add-MpPreference -ExclusionProcess $_ -Force
-}
-
-Write-Host ''
-Write-Host -ForegroundColor Green 'done'
-Write-Host ''
-Write-Host -ForegroundColor Green "... '$ScriptPath' ended"
-Write-Host ''
-
-Stop-Transcript

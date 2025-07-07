@@ -75,111 +75,129 @@ param (
     [switch] $Use7zFormat
 )
 
-$ScriptPath = $MyInvocation.InvocationName
-# Invoked wiht &
-if ( $ScriptPath -eq '&' -and
-    $null -ne $MyInvocation.MyCommand -and
-    ! [string]::IsNullOrWhiteSpace($MyInvocation.MyCommand.Path) ) {
-    $ScriptPath = $MyInvocation.MyCommand.Path
-}
+$ScriptPath = ''
+$transcript = $false
 
-$ScriptItem = Get-Item -LiteralPath $ScriptPath -ErrorAction Stop
-Start-Transcript -LiteralPath "$($ScriptItem.Directory.FullName)\log\$(Get-Date -Format 'yyyyMMdd_HHmmss')_$($ScriptItem.BaseName).log"
-
-Write-Host ''
-Write-Host -ForegroundColor Green "started '$ScriptPath' ..."
-Write-Host ''
-
-$dir = Get-Item -LiteralPath $StrawberryDir
-
-$packagedTimestmp = Get-Date -Format 'yyyyMMdd_HHmmss'
-
-$targetPath = "$($dir.FullName)-packaged-$($packagedTimestmp)"
-if ( $Use7zFormat ) {
-    $targetPath = "$($targetPath).7z"
-}
-else {
-    $targetPath = "$($targetPath).zip"
-}
-
-if ( Test-Path -LiteralPath $targetPath ) {
-    throw "compress target $targetPath already exists"
-}
-
-if ( $DetectSevenZip -and [string]::IsNullOrWhiteSpace($SevenZipPath) ) {
-    Write-Host -ForegroundColor Green 'search for 7z'
-
-    $sz_pf64 = "$($Env:ProgramFiles)\7-Zip\7z.exe"
-    $sz_pf32 = "$(${env:ProgramFiles(x86)})\7-Zip\7z.exe"
-
-    $sz = Get-Command 7z -ErrorAction SilentlyContinue
-    if ( $sz ) {
-        $SevenZipPath = $sz.Source
-    }
-    elseif ( Test-Path -LiteralPath $sz_pf64 -PathType Leaf) {
-        $SevenZipPath = $sz_pf64
-    }
-    elseif ( Test-Path -LiteralPath $sz_pf32 -PathType Leaf) {
-        $SevenZipPath = $sz_pf32
-    }
-    else {
-        throw '7z not found!'
+try {
+    $ScriptPath = $MyInvocation.InvocationName
+    # Invoked wiht &
+    if ( $ScriptPath -eq '&' -and
+        $null -ne $MyInvocation.MyCommand -and
+        ! [string]::IsNullOrWhiteSpace($MyInvocation.MyCommand.Path) ) {
+        $ScriptPath = $MyInvocation.MyCommand.Path
     }
 
-    Write-Host -ForegroundColor Green "found at '$SevenZipPath'"
-}
+    $ScriptItem = Get-Item -LiteralPath $ScriptPath -ErrorAction Stop
+    Start-Transcript -LiteralPath "$($ScriptItem.Directory.FullName)\log\$(Get-Date -Format 'yyyyMMdd_HHmmss')_$($ScriptItem.BaseName).log" -ErrorAction Stop
+    $transcript = $true
 
-Write-Host ''
-Write-Host -ForegroundColor Green "zip '$StrawberryDir' as '$targetPath'"
+    Write-Host ''
+    Write-Host -ForegroundColor Green "started '$ScriptPath' ..."
+    Write-Host ''
 
-$failed = $false
+    $dir = Get-Item -LiteralPath $StrawberryDir
 
-$zipStartTIme = Get-Date
-Write-Host "zip start time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipStartTIme )"
+    $packagedTimestmp = Get-Date -Format 'yyyyMMdd_HHmmss'
 
-if ( [string]::IsNullOrWhiteSpace($SevenZipPath) ) {
-    try {
-        # Compress-Archive is really slow
-        # Compress-Archive -LiteralPath $StrawberryDir -DestinationPath $targetPath -CompressionLevel Fastest
-        # use .Net direct
-        Add-Type -Assembly System.IO.Compression.Filesystem
-        [IO.Compression.ZipFile]::CreateFromDirectory(
-            $StrawberryDir,
-            $targetPath,
-            [System.IO.Compression.CompressionLevel]::Optimal, # Fastest
-            $false)
-    }
-    catch {
-        $failed = $true
-        Write-Host -ForegroundColor Red "ERROR: zip '$StrawberryDir' as '$targetPath' - FAILED ! msg: $_"
-    }
-}
-else {
-    # 7z is faster
+    $targetPath = "$($dir.FullName)-packaged-$($packagedTimestmp)"
     if ( $Use7zFormat ) {
-        & "$SevenZipPath" 'a' '-t7z' '-mx=1' '-stl' '-bt' '-aoa' '-bb0' '-bd' "$targetPath" "$StrawberryDir\*"
+        $targetPath = "$($targetPath).7z"
     }
     else {
-        # 'x=5' # default | 'x=1' # fasterst |'x=9' # Ultra
-        & "$SevenZipPath" 'a' '-tzip' '-mx=9' '-stl' '-bt' '-aoa' '-bb0' '-bd' "$targetPath" "$StrawberryDir\*"
+        $targetPath = "$($targetPath).zip"
     }
 
-    if ( 0 -ne $LASTEXITCODE ) {
-        $failed = $true
-        Write-Host -ForegroundColor Red "ERROR: zip '$StrawberryDir' as '$targetPath' - FAILED ! LASTEXITCODE: $LASTEXITCODE"
+    if ( Test-Path -LiteralPath $targetPath ) {
+        throw "compress target $targetPath already exists"
+    }
+
+    if ( $DetectSevenZip -and [string]::IsNullOrWhiteSpace($SevenZipPath) ) {
+        Write-Host -ForegroundColor Green 'search for 7z'
+
+        $sz_pf64 = "$($Env:ProgramFiles)\7-Zip\7z.exe"
+        $sz_pf32 = "$(${env:ProgramFiles(x86)})\7-Zip\7z.exe"
+
+        $sz = Get-Command 7z -ErrorAction SilentlyContinue
+        if ( $sz ) {
+            $SevenZipPath = $sz.Source
+        }
+        elseif ( Test-Path -LiteralPath $sz_pf64 -PathType Leaf) {
+            $SevenZipPath = $sz_pf64
+        }
+        elseif ( Test-Path -LiteralPath $sz_pf32 -PathType Leaf) {
+            $SevenZipPath = $sz_pf32
+        }
+        else {
+            throw '7z not found!'
+        }
+
+        Write-Host -ForegroundColor Green "found at '$SevenZipPath'"
+    }
+
+    Write-Host ''
+    Write-Host -ForegroundColor Green "zip '$StrawberryDir' as '$targetPath'"
+
+    $failed = $false
+
+    $zipStartTIme = Get-Date
+    Write-Host "zip start time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipStartTIme )"
+
+    if ( [string]::IsNullOrWhiteSpace($SevenZipPath) ) {
+        try {
+            # Compress-Archive is really slow
+            # Compress-Archive -LiteralPath $StrawberryDir -DestinationPath $targetPath -CompressionLevel Fastest
+            # use .Net direct
+            Add-Type -Assembly System.IO.Compression.Filesystem
+            [IO.Compression.ZipFile]::CreateFromDirectory(
+                $StrawberryDir,
+                $targetPath,
+                [System.IO.Compression.CompressionLevel]::Optimal, # Fastest
+                $false)
+        }
+        catch {
+            $failed = $true
+            Write-Host -ForegroundColor Red "ERROR: zip '$StrawberryDir' as '$targetPath' - FAILED ! msg: $_"
+        }
+    }
+    else {
+        # 7z is faster
+        if ( $Use7zFormat ) {
+            & "$SevenZipPath" 'a' '-t7z' '-mx=1' '-stl' '-bt' '-aoa' '-bb0' '-bd' "$targetPath" "$StrawberryDir\*"
+        }
+        else {
+            # 'x=5' # default | 'x=1' # fasterst |'x=9' # Ultra
+            & "$SevenZipPath" 'a' '-tzip' '-mx=9' '-stl' '-bt' '-aoa' '-bb0' '-bd' "$targetPath" "$StrawberryDir\*"
+        }
+
+        if ( 0 -ne $LASTEXITCODE ) {
+            $failed = $true
+            Write-Host -ForegroundColor Red "ERROR: zip '$StrawberryDir' as '$targetPath' - FAILED ! LASTEXITCODE: $LASTEXITCODE"
+        }
+    }
+
+    if ( ! $failed ) {
+        $zipEndTime = Get-Date
+        Write-Host "zip end time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipEndTime )"
+        Write-Host "zip duration $( (New-TimeSpan -Start $zipStartTIme -End $zipEndTime).TotalSeconds )"
+
+        exit 0
+    }
+    else {
+        exit 1
     }
 }
-
-if ( ! $failed ) {
-    $zipEndTime = Get-Date
-    Write-Host "zip end time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipEndTime )"
-    Write-Host "zip duration $( (New-TimeSpan -Start $zipStartTIme -End $zipEndTime).TotalSeconds )"
+catch {
+    Write-Host -ForegroundColor Red "ERROR: msg: $_"
+    exit 1
 }
+finally {
+    Write-Host ''
+    Write-Host -ForegroundColor Green 'done'
+    Write-Host ''
+    Write-Host -ForegroundColor Green "... '$ScriptPath' ended"
+    Write-Host ''
 
-Write-Host ''
-Write-Host -ForegroundColor Green 'done'
-Write-Host ''
-Write-Host -ForegroundColor Green "... '$ScriptPath' ended"
-Write-Host ''
-
-Stop-Transcript
+    if ($transcript) {
+        Stop-Transcript
+    }
+}
