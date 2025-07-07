@@ -12,6 +12,10 @@ Path to Strawberry ZIP portable.
 
 Optional path where extracted. If not given, extracted directory name is file name.
 
+.PARAMETER SevenZip
+
+Optional path to 7z.exe
+
 .NOTES
 
 BUG REPORTS
@@ -53,7 +57,13 @@ param (
     [Parameter(Mandatory = $false, Position = 1)]
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf -IsValid })]
-    [string] $Destination
+    [string] $Destination,
+
+    [Parameter(Mandatory = $false, Position = 2)]
+    [ValidateNotNullOrEmpty()]
+    [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
+    [ValidateScript({ $_ -like '*7z.exe' })]
+    [string] $SevenZip
 )
 
 $ScriptPath = $MyInvocation.InvocationName
@@ -91,16 +101,26 @@ $failed = $false
 $zipStartTIme = Get-Date
 Write-Host "unzip start time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipStartTIme )"
 
-try {
-    # Expand-Archive is really slow
-    # Expand-Archive -LiteralPath $StrawberryZip -DestinationPath $targetPath
-    # use .Net direct
-    Add-Type -Assembly System.IO.Compression.Filesystem
-    [IO.Compression.ZipFile]::ExtractToDirectory( $StrawberryZip, $targetPath )
+if ( [string]::IsNullOrWhiteSpace($SevenZip) ) {
+    try {
+        # Expand-Archive is really slow
+        # Expand-Archive -LiteralPath $StrawberryZip -DestinationPath $targetPath
+        # use .Net direct
+        Add-Type -Assembly System.IO.Compression.Filesystem
+        [IO.Compression.ZipFile]::ExtractToDirectory( $StrawberryZip, $targetPath )
+    }
+    catch {
+        $failed = $true
+        Write-Host -ForegroundColor Red "ERROR unzip '$StrawberryZip' to '$targetPath' - FAILED ! msg: $_"
+    }
 }
-catch {
-    $failed = $true
-    Write-Host -ForegroundColor Red "ERROR unzip '$StrawberryZip' to '$targetPath' - FAILED ! msg: $_"
+else {
+    # 7z is faster
+    & "$SevenZip" 'x' '-bt' '-spe' '-aoa' '-bb0' '-bd' "-o$targetPath" "$StrawberryZip"
+    if ( 0 -ne $LASTEXITCODE ) {
+        $failed = $true
+        Write-Host -ForegroundColor Red "ERROR unzip '$StrawberryZip' to '$targetPath' - FAILED ! LASTEXITCODE: $LASTEXITCODE"
+    }
 }
 
 if ( ! $failed ) {
