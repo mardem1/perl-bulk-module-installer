@@ -16,6 +16,10 @@ Optional path where extracted. If not given, extracted directory name is file na
 
 Optional path to 7z.exe
 
+.PARAMETER DetectSevenZip
+
+Optional auto detect 7z path
+
 .NOTES
 
 BUG REPORTS
@@ -63,7 +67,9 @@ param (
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
     [ValidateScript({ $_ -like '*7z.exe' })]
-    [string] $SevenZip
+    [string] $SevenZip,
+
+    [switch] $DetectSevenZip
 )
 
 $ScriptPath = $MyInvocation.InvocationName
@@ -91,6 +97,29 @@ else {
 
 if ( Test-Path -LiteralPath $targetPath ) {
     throw "extraction target $targetPath already exists"
+}
+
+if ( $DetectSevenZip -and [string]::IsNullOrWhiteSpace($SevenZip) ) {
+    Write-Host -ForegroundColor Green 'search for 7z'
+
+    $sz_pf64 = "$($Env:ProgramFiles)\7-Zip\7z.exe"
+    $sz_pf32 = "$(${env:ProgramFiles(x86)})\7-Zip\7z.exe"
+
+    $sz = Get-Command 7z -ErrorAction SilentlyContinue
+    if ( $sz ) {
+        $SevenZip = $sz.Source
+    }
+    elseif ( Test-Path -LiteralPath $sz_pf64 -PathType Leaf) {
+        $SevenZip = $sz_pf64
+    }
+    elseif ( Test-Path -LiteralPath $sz_pf32 -PathType Leaf) {
+        $SevenZip = $sz_pf32
+    }
+    else {
+        throw '7z not found!'
+    }
+
+    Write-Host -ForegroundColor Green "found at '$SevenZip'"
 }
 
 Write-Host ''
