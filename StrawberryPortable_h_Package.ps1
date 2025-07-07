@@ -8,6 +8,14 @@ create a ZIP for the Strawberry directory
 
 Path to Strawberry directory for zipping
 
+.PARAMETER SevenZipPath
+
+Optional path to 7z.exe
+
+.PARAMETER DetectSevenZip
+
+Optional auto detect 7z path
+
 .NOTES
 
 BUG REPORTS
@@ -44,7 +52,15 @@ param (
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Container })]
     [ValidateScript({ $_ -like '*strawberry*portable*' })]
-    [string] $StrawberryDir
+    [string] $StrawberryDir,
+
+    [Parameter(Mandatory = $false, Position = 1)]
+    [ValidateNotNullOrEmpty()]
+    [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
+    [ValidateScript({ $_ -like '*7z.exe' })]
+    [string] $SevenZipPath,
+
+    [switch] $DetectSevenZip
 )
 
 $ScriptPath = $MyInvocation.InvocationName
@@ -72,6 +88,29 @@ if ( Test-Path -LiteralPath $targetPath ) {
     throw "compress target $targetPath already exists"
 }
 
+if ( $DetectSevenZip -and [string]::IsNullOrWhiteSpace($SevenZipPath) ) {
+    Write-Host -ForegroundColor Green 'search for 7z'
+
+    $sz_pf64 = "$($Env:ProgramFiles)\7-Zip\7z.exe"
+    $sz_pf32 = "$(${env:ProgramFiles(x86)})\7-Zip\7z.exe"
+
+    $sz = Get-Command 7z -ErrorAction SilentlyContinue
+    if ( $sz ) {
+        $SevenZipPath = $sz.Source
+    }
+    elseif ( Test-Path -LiteralPath $sz_pf64 -PathType Leaf) {
+        $SevenZipPath = $sz_pf64
+    }
+    elseif ( Test-Path -LiteralPath $sz_pf32 -PathType Leaf) {
+        $SevenZipPath = $sz_pf32
+    }
+    else {
+        throw '7z not found!'
+    }
+
+    Write-Host -ForegroundColor Green "found at '$SevenZipPath'"
+}
+
 Write-Host ''
 Write-Host -ForegroundColor Green "zip '$StrawberryDir' as '$targetPath'"
 
@@ -80,20 +119,31 @@ $failed = $false
 $zipStartTIme = Get-Date
 Write-Host "zip start time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipStartTIme )"
 
-try {
-    # Compress-Archive is really slow
-    # Compress-Archive -LiteralPath $StrawberryDir -DestinationPath $targetPath -CompressionLevel Fastest
-    # use .Net direct
-    Add-Type -Assembly System.IO.Compression.Filesystem
-    [IO.Compression.ZipFile]::CreateFromDirectory(
-        $StrawberryDir,
-        $targetPath,
-        [System.IO.Compression.CompressionLevel]::Optimal, # Fastest
-        $false)
+if ( [string]::IsNullOrWhiteSpace($SevenZipPath) ) {
+    try {
+        # Compress-Archive is really slow
+        # Compress-Archive -LiteralPath $StrawberryDir -DestinationPath $targetPath -CompressionLevel Fastest
+        # use .Net direct
+        Add-Type -Assembly System.IO.Compression.Filesystem
+        [IO.Compression.ZipFile]::CreateFromDirectory(
+            $StrawberryDir,
+            $targetPath,
+            [System.IO.Compression.CompressionLevel]::Optimal, # Fastest
+            $false)
+    }
+    catch {
+        $failed = $true
+        Write-Host -ForegroundColor Red "ERROR: zip '$StrawberryDir' as '$targetPath' - FAILED ! msg: $_"
+    }
 }
-catch {
-    $failed = $true
-    Write-Host -ForegroundColor Red "ERROR: zip '$StrawberryDir' as '$targetPath' - FAILED ! msg: $_"
+else {
+    # 7z is faster
+    # 'x=5' # default | 'x=1' # fasterst |'x=9' # Ultra
+    & "$SevenZipPath" 'a' '-tzip' '-mx=9' '-stl' '-bt' '-aoa' '-bb0' '-bd' "$targetPath" "$StrawberryDir"
+    if ( 0 -ne $LASTEXITCODE ) {
+        $failed = $true
+        Write-Host -ForegroundColor Red "ERROR: zip '$StrawberryDir' as '$targetPath' - FAILED ! LASTEXITCODE: $LASTEXITCODE"
+    }
 }
 
 if ( ! $failed ) {
