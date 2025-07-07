@@ -2,7 +2,7 @@
 
 .SYNOPSIS
 
-Removes CPAN-Cache data and merge perl lib dirs for performance and  create a ZIP for the Strawberry directory
+Removes CPAN-Cache data and merge perl lib dirs for performance
 
 .PARAMETER StrawberryDir
 
@@ -62,16 +62,6 @@ Write-Host ''
 Write-Host -ForegroundColor Green "started '$ScriptPath' ..."
 Write-Host ''
 
-$dir = Get-Item -LiteralPath $StrawberryDir
-
-$packagedTimestmp = Get-Date -Format 'yyyyMMdd_HHmmss'
-
-$targetPath = "$($dir.FullName)-packaged-$($packagedTimestmp).zip"
-
-if ( Test-Path -LiteralPath $targetPath ) {
-    throw "compress target $targetPath already exists"
-}
-
 Write-Host ''
 $cpanCacheDir = "$StrawberryDir\data\.cpanm"
 if ( ! ( Test-Path -LiteralPath $cpanCacheDir ) ) {
@@ -123,23 +113,6 @@ if ( Test-Path -LiteralPath $ms32Dir ) {
     Copy-Item -Recurse -Path "$ms32Dir\*" -Destination "$perlDir\lib\" -Force -Confirm:$false -ErrorAction Stop
     Remove-Item -Path "$ms32Dir" -Recurse -Force -Confirm:$false -ErrorAction Stop
 }
-
-Write-Host ''
-Write-Host -ForegroundColor Green "zip '$StrawberryDir' as '$targetPath'"
-$zipStartTIme = Get-Date
-Write-Host "zip start time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipStartTIme )"
-# Compress-Archive is really slow
-# Compress-Archive -LiteralPath $StrawberryDir -DestinationPath $targetPath -CompressionLevel Fastest
-# use .Net direct
-Add-Type -Assembly System.IO.Compression.Filesystem
-[IO.Compression.ZipFile]::CreateFromDirectory(
-    $StrawberryDir,
-    $targetPath,
-    [System.IO.Compression.CompressionLevel]::Optimal,# Fastest
-    $false )
-$zipEndTime = Get-Date
-Write-Host "zip end time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipEndTime)"
-Write-Host "zip duration $( (New-TimeSpan -Start $zipStartTIme -End $zipEndTime).TotalSeconds )"
 
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
