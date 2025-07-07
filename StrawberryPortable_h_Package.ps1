@@ -157,11 +157,11 @@ if ( [string]::IsNullOrWhiteSpace($SevenZipPath) ) {
 else {
     # 7z is faster
     if ( $Use7zFormat ) {
-        & "$SevenZipPath" 'a' '-t7z' '-mx=1' '-stl' '-bt' '-aoa' '-bb0' '-bd' "$targetPath" "$StrawberryDir"
+        & "$SevenZipPath" 'a' '-t7z' '-mx=1' '-stl' '-bt' '-aoa' '-bb0' '-bd' "$targetPath" "$StrawberryDir\*"
     }
     else {
         # 'x=5' # default | 'x=1' # fasterst |'x=9' # Ultra
-        & "$SevenZipPath" 'a' '-tzip' '-mx=9' '-stl' '-bt' '-aoa' '-bb0' '-bd' "$targetPath" "$StrawberryDir"
+        & "$SevenZipPath" 'a' '-tzip' '-mx=9' '-stl' '-bt' '-aoa' '-bb0' '-bd' "$targetPath" "$StrawberryDir\*"
     }
 
     if ( 0 -ne $LASTEXITCODE ) {
