@@ -145,7 +145,20 @@ try {
         $listfile = $_
 
         0..25 | ForEach-Object { Write-Host '' }
-        Write-Host -ForegroundColor Green "start '$InstallCpanModules' with '$listfile'"
+
+        $tmp = ''
+        if ( [string]::IsNullOrWhiteSpace($DontTryModuleListFile) ) {
+            $tmp += " and $DontTryModuleListFile"
+        }
+
+        if ( $OnlyAllUpdates ) {
+            $tmp += ' and --only-all-updates'
+        }
+        elseif ( $AllUpdates ) {
+            $tmp += ' and --only-all-updates'
+        }
+
+        Write-Host -ForegroundColor Green "start '$InstallCpanModules' with '$listfile'$tmp"
         Write-Host ''
 
         # TODO: replace with Start-Process and created ARGV
