@@ -514,7 +514,7 @@ sub mark_module_as_ok
     say_ex( 'remove ', $module, ' from modules_need_to_install' );
     delete $modules_need_to_install{ $module };
 
-    say_ex( 'remove ', $module, ' from $modules_need_to_update' );
+    say_ex( 'remove ', $module, ' from modules_need_to_update' );
     delete $modules_need_to_update{ $module };
 
     return;
@@ -543,7 +543,7 @@ sub mark_module_as_failed
     say_ex( 'remove ', $module, ' from modules_need_to_install' );
     delete $modules_need_to_install{ $module };    # remove module - don't care if failed - no retry of failed
 
-    say_ex( 'remove ', $module, ' from $modules_need_to_update' );
+    say_ex( 'remove ', $module, ' from modules_need_to_update' );
     delete $modules_need_to_update{ $module };
 
     return;
@@ -567,7 +567,7 @@ sub mark_module_as_not_found
     say_ex( 'remove ', $module, ' from modules_need_to_install' );
     delete $modules_need_to_install{ $module };    # remove module - don't care if not found - no retry of not found
 
-    say_ex( 'remove ', $module, ' from $modules_need_to_update' );
+    say_ex( 'remove ', $module, ' from modules_need_to_update' );
     delete $modules_need_to_update{ $module };
 
     return;
@@ -614,6 +614,21 @@ sub was_module_already_tried
 
 sub generate_modules_need_to_install
 {
+    foreach my $module ( keys %modules_need_to_update ) {
+        if (   exists $modules_install_dont_try{ $module }
+            || exists $modules_install_ok{ $module }
+            || exists $modules_install_failed{ $module }
+            || exists $modules_install_not_found{ $module }
+            || exists $modules_need_to_install{ $module } )
+        {
+            # already marked somewhere - ignore
+        }
+        # no check $installed_module_version if update already exist
+        else {
+            $modules_need_to_install{ $module } = undef;
+        }
+    }
+
     foreach my $module ( keys %modules_to_install ) {
         if (   exists $modules_install_dont_try{ $module }
             || exists $modules_install_ok{ $module }
