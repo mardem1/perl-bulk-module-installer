@@ -85,16 +85,29 @@ if ( Test-Path -LiteralPath $targetPath ) {
 
 Write-Host ''
 Write-Host -ForegroundColor Green "unzip '$StrawberryZip' to '$targetPath'"
+
+$failed = $false
+
 $zipStartTIme = Get-Date
 Write-Host "unzip start time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipStartTIme )"
-# Expand-Archive is really slow
-# Expand-Archive -LiteralPath $StrawberryZip -DestinationPath $targetPath
-# use .Net direct
-Add-Type -Assembly System.IO.Compression.Filesystem
-[IO.Compression.ZipFile]::ExtractToDirectory( $StrawberryZip, $targetPath )
-$zipEndTime = Get-Date
-Write-Host "unzip end time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipEndTime)"
-Write-Host "unzip duration $( (New-TimeSpan -Start $zipStartTIme -End $zipEndTime).TotalSeconds )"
+
+try {
+    # Expand-Archive is really slow
+    # Expand-Archive -LiteralPath $StrawberryZip -DestinationPath $targetPath
+    # use .Net direct
+    Add-Type -Assembly System.IO.Compression.Filesystem
+    [IO.Compression.ZipFile]::ExtractToDirectory( $StrawberryZip, $targetPath )
+}
+catch {
+    $failed = $true
+    Write-Host -ForegroundColor Red "ERROR unzip '$StrawberryZip' to '$targetPath' - FAILED ! msg: $_"
+}
+
+if ( ! $failed ) {
+    $zipEndTime = Get-Date
+    Write-Host "unzip end time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipEndTime)"
+    Write-Host "unzip duration $( (New-TimeSpan -Start $zipStartTIme -End $zipEndTime).TotalSeconds )"
+}
 
 Write-Host ''
 Write-Host -ForegroundColor Green 'done'
