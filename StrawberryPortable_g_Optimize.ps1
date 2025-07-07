@@ -44,7 +44,9 @@ param (
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Container })]
     [ValidateScript({ $_ -like '*strawberry*portable*' })]
-    [string] $StrawberryDir
+    [string] $StrawberryDir,
+
+    [switch] $NoMerge
 )
 
 $ScriptPath = $MyInvocation.InvocationName
@@ -72,46 +74,52 @@ else {
     Remove-Item -Recurse -Force -LiteralPath $cpanCacheDir
 }
 
-#
-# windows is fs-access sensitive so merge libs
-# @INC:
-#   strawberry/perl/site/lib/MSWin32-x64-multi-thread
-#   strawberry/perl/site/lib
-#   strawberry/perl/vendor/lib
-#   strawberry/perl/lib
-#
-
-Write-Host ''
-Write-Host -ForegroundColor Green 'merge and remove perl libs for improved performance'
-
-$perlDir = "$StrawberryDir\perl"
-
-$vendorDir = "$perlDir\vendor"
-if ( Test-Path -LiteralPath $vendorDir ) {
-    $dirCount = @(Get-ChildItem -LiteralPath $vendorDir -Recurse -Directory -Force -ErrorAction Continue ).Count
-    $fileCount = @(Get-ChildItem -LiteralPath $vendorDir -Recurse -File -Force -ErrorAction Continue ).Count
-    Write-Host -ForegroundColor Green "copy and remove '$vendorDir' ($dirCount dirs, $fileCount files)"
-    Copy-Item -Recurse -Path "$vendorDir\*" -Destination "$perlDir\" -Force -Confirm:$false -ErrorAction Stop
-    Remove-Item -Path "$vendorDir" -Recurse -Force -Confirm:$false -ErrorAction Stop
+if ( $NoMerge ) {
+    Write-Host ''
+    Write-Host -ForegroundColor Green 'NoMerge given - SKIP'
 }
+else {
+    #
+    # windows is fs-access sensitive so merge libs
+    # @INC:
+    #   strawberry/perl/site/lib/MSWin32-x64-multi-thread
+    #   strawberry/perl/site/lib
+    #   strawberry/perl/vendor/lib
+    #   strawberry/perl/lib
+    #
 
-$siteDir = "$perlDir\site"
-if ( Test-Path -LiteralPath $siteDir ) {
-    $dirCount = @(Get-ChildItem -LiteralPath $siteDir -Recurse -Directory -Force -ErrorAction Continue ).Count
-    $fileCount = @(Get-ChildItem -LiteralPath $siteDir -Recurse -File -Force -ErrorAction Continue ).Count
-    Write-Host -ForegroundColor Green "copy and remove '$siteDir' ($dirCount dirs, $fileCount files)"
-    Copy-Item -Recurse -Path "$siteDir\*" -Destination "$perlDir\" -Force -Confirm:$false -ErrorAction Stop
-    Remove-Item -Path "$siteDir" -Recurse -Force -Confirm:$false -ErrorAction Stop
-}
+    Write-Host ''
+    Write-Host -ForegroundColor Green 'merge and remove perl libs for improved performance'
 
-# perl\lib\MSWin32-x64-multi-thread instad of perl\site\lib\MSWin32-x64-multi-thread because before relocated !
-$ms32Dir = "$perlDir\lib\MSWin32-x64-multi-thread"
-if ( Test-Path -LiteralPath $ms32Dir ) {
-    $dirCount = @(Get-ChildItem -LiteralPath $ms32Dir -Recurse -Directory -Force -ErrorAction Continue ).Count
-    $fileCount = @(Get-ChildItem -LiteralPath $ms32Dir -Recurse -File -Force -ErrorAction Continue ).Count
-    Write-Host -ForegroundColor Green "copy and remove '$ms32Dir' ($dirCount dirs, $fileCount files)"
-    Copy-Item -Recurse -Path "$ms32Dir\*" -Destination "$perlDir\lib\" -Force -Confirm:$false -ErrorAction Stop
-    Remove-Item -Path "$ms32Dir" -Recurse -Force -Confirm:$false -ErrorAction Stop
+    $perlDir = "$StrawberryDir\perl"
+
+    $vendorDir = "$perlDir\vendor"
+    if (Test-Path -LiteralPath $vendorDir) {
+        $dirCount = @(Get-ChildItem -LiteralPath $vendorDir -Recurse -Directory -Force -ErrorAction Continue ).Count
+        $fileCount = @(Get-ChildItem -LiteralPath $vendorDir -Recurse -File -Force -ErrorAction Continue ).Count
+        Write-Host -ForegroundColor Green "copy and remove '$vendorDir' ($dirCount dirs, $fileCount files)"
+        Copy-Item -Recurse -Path "$vendorDir\*" -Destination "$perlDir\" -Force -Confirm:$false -ErrorAction Stop
+        Remove-Item -Path "$vendorDir" -Recurse -Force -Confirm:$false -ErrorAction Stop
+    }
+
+    $siteDir = "$perlDir\site"
+    if (Test-Path -LiteralPath $siteDir) {
+        $dirCount = @(Get-ChildItem -LiteralPath $siteDir -Recurse -Directory -Force -ErrorAction Continue ).Count
+        $fileCount = @(Get-ChildItem -LiteralPath $siteDir -Recurse -File -Force -ErrorAction Continue ).Count
+        Write-Host -ForegroundColor Green "copy and remove '$siteDir' ($dirCount dirs, $fileCount files)"
+        Copy-Item -Recurse -Path "$siteDir\*" -Destination "$perlDir\" -Force -Confirm:$false -ErrorAction Stop
+        Remove-Item -Path "$siteDir" -Recurse -Force -Confirm:$false -ErrorAction Stop
+    }
+
+    # perl\lib\MSWin32-x64-multi-thread instad of perl\site\lib\MSWin32-x64-multi-thread because before relocated !
+    $ms32Dir = "$perlDir\lib\MSWin32-x64-multi-thread"
+    if (Test-Path -LiteralPath $ms32Dir) {
+        $dirCount = @(Get-ChildItem -LiteralPath $ms32Dir -Recurse -Directory -Force -ErrorAction Continue ).Count
+        $fileCount = @(Get-ChildItem -LiteralPath $ms32Dir -Recurse -File -Force -ErrorAction Continue ).Count
+        Write-Host -ForegroundColor Green "copy and remove '$ms32Dir' ($dirCount dirs, $fileCount files)"
+        Copy-Item -Recurse -Path "$ms32Dir\*" -Destination "$perlDir\lib\" -Force -Confirm:$false -ErrorAction Stop
+        Remove-Item -Path "$ms32Dir" -Recurse -Force -Confirm:$false -ErrorAction Stop
+    }
 }
 
 Write-Host ''
