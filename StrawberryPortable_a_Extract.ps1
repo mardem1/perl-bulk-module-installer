@@ -61,6 +61,8 @@ param (
     [Parameter(Mandatory = $false, Position = 1)]
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf -IsValid })]
+    [ValidateScript({ $_ -like '*strawberry*portable*' })]
+    [ValidateScript({ $_ -notlike '*\' })]
     [string] $Destination,
 
     [Parameter(Mandatory = $false, Position = 2)]
