@@ -16,6 +16,10 @@ Optional path to 7z.exe
 
 Optional auto detect 7z path
 
+.PARAMETER Use7zFormat
+
+Optional pack as 7z instead of zip
+
 .NOTES
 
 BUG REPORTS
@@ -54,13 +58,18 @@ param (
     [ValidateScript({ $_ -like '*strawberry*portable*' })]
     [string] $StrawberryDir,
 
-    [Parameter(Mandatory = $false, Position = 1)]
+    [Parameter(ParameterSetName = 'SevenZipPath', Mandatory = $true, Position = 1)]
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
     [ValidateScript({ $_ -like '*7z.exe' })]
     [string] $SevenZipPath,
 
-    [switch] $DetectSevenZip
+    [Parameter(ParameterSetName = 'DetectSevenZip', Mandatory = $true, Position = 1)]
+    [switch] $DetectSevenZip,
+
+    [Parameter(ParameterSetName = 'SevenZipPath')]
+    [Parameter(ParameterSetName = 'DetectSevenZip')]
+    [switch] $Use7zFormat
 )
 
 $ScriptPath = $MyInvocation.InvocationName
@@ -82,7 +91,13 @@ $dir = Get-Item -LiteralPath $StrawberryDir
 
 $packagedTimestmp = Get-Date -Format 'yyyyMMdd_HHmmss'
 
-$targetPath = "$($dir.FullName)-packaged-$($packagedTimestmp).zip"
+$targetPath = "$($dir.FullName)-packaged-$($packagedTimestmp)"
+if ( $Use7zFormat ) {
+    $targetPath = "$($targetPath).7z"
+}
+else {
+    $targetPath = "$($targetPath).zip"
+}
 
 if ( Test-Path -LiteralPath $targetPath ) {
     throw "compress target $targetPath already exists"
@@ -138,8 +153,14 @@ if ( [string]::IsNullOrWhiteSpace($SevenZipPath) ) {
 }
 else {
     # 7z is faster
-    # 'x=5' # default | 'x=1' # fasterst |'x=9' # Ultra
-    & "$SevenZipPath" 'a' '-tzip' '-mx=9' '-stl' '-bt' '-aoa' '-bb0' '-bd' "$targetPath" "$StrawberryDir"
+    if ( $Use7zFormat ) {
+        & "$SevenZipPath" 'a' '-t7z' '-mx=1' '-stl' '-bt' '-aoa' '-bb0' '-bd' "$targetPath" "$StrawberryDir"
+    }
+    else {
+        # 'x=5' # default | 'x=1' # fasterst |'x=9' # Ultra
+        & "$SevenZipPath" 'a' '-tzip' '-mx=9' '-stl' '-bt' '-aoa' '-bb0' '-bd' "$targetPath" "$StrawberryDir"
+    }
+
     if ( 0 -ne $LASTEXITCODE ) {
         $failed = $true
         Write-Host -ForegroundColor Red "ERROR: zip '$StrawberryDir' as '$targetPath' - FAILED ! LASTEXITCODE: $LASTEXITCODE"
