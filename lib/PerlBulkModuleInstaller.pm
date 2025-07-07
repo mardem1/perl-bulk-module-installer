@@ -1355,7 +1355,12 @@ sub handle_main_arguments
 
     if ( $arg1 eq '--only-all-updates' ) {
         $only_all_updates = $TRUE;
+
         if ( !is_string_empty( $arg2 ) ) {
+            $filepath_dont_try = $arg2;
+        }
+
+        if ( !is_string_empty( $arg3 ) ) {
             croak 'wrong parameter set';
         }
     }

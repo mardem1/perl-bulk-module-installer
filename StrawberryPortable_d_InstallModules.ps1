@@ -66,14 +66,15 @@ FOR A PARTICULAR PURPOSE.
 
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory = $true, Position = 0)]
+    [Parameter(ParameterSetName = 'Standard', Mandatory = $true, Position = 0)]
+    [Parameter(ParameterSetName = 'OnlyAllUpdates', Mandatory = $true, Position = 0)]
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Container })]
     [ValidateScript({ $_ -like '*strawberry*portable*' })]
     [ValidateScript({ $_ -notlike '*\' })]
     [string] $StrawberryDir,
 
-    [Parameter(Mandatory = $true, Position = 1)]
+    [Parameter(ParameterSetName = 'Standard', Mandatory = $true, Position = 1)]
     [ValidateNotNullOrEmpty()]
     [ValidateScript({
             $notFound = $false
@@ -92,14 +93,17 @@ param (
         })]
     [string[]] $InstallModuleListFile,
 
-    [Parameter(Mandatory = $false, Position = 2)]
+    [Parameter(ParameterSetName = 'Standard', Mandatory = $false, Position = 2)]
+    [Parameter(ParameterSetName = 'OnlyAllUpdates', Mandatory = $false, Position = 1)]
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
     [ValidateScript({ $_ -like '*.txt' })]
     [string] $DontTryModuleListFile,
 
+    [Parameter(ParameterSetName = 'OnlyAllUpdates')]
     [switch] $OnlyAllUpdates,
 
+    [Parameter(ParameterSetName = 'Standard')]
     [switch] $AllUpdates
 )
 
@@ -141,53 +145,64 @@ try {
     # for PerlBulkModuleInstaller
     $Env:PERL5LIB = "$((Get-Item -LiteralPath $InstallCpanModules).Directory.FullName)\lib".Replace('\', '/')
 
-    $InstallModuleListFile | ForEach-Object {
-        $listfile = $_
+    0..25 | ForEach-Object { Write-Host '' }
 
-        0..25 | ForEach-Object { Write-Host '' }
-
-        $tmp = ''
-        if ( [string]::IsNullOrWhiteSpace($DontTryModuleListFile) ) {
-            $tmp += " and $DontTryModuleListFile"
-        }
-
-        if ( $OnlyAllUpdates ) {
-            $tmp += ' and --only-all-updates'
-        }
-        elseif ( $AllUpdates ) {
-            $tmp += ' and --only-all-updates'
-        }
-
-        Write-Host -ForegroundColor Green "start '$InstallCpanModules' with '$listfile'$tmp"
-        Write-Host ''
-
-        # TODO: replace with Start-Process and created ARGV
-        if ( [string]::IsNullOrWhiteSpace($DontTryModuleListFile) ) {
-            if ( $OnlyAllUpdates ) {
-                & $perlexe $InstallCpanModules '--only-all-updates' $listfile | Write-Host
-            }
-            elseif ( $AllUpdates ) {
-                & $perlexe $InstallCpanModules '--all-updates' $listfile | Write-Host
-            }
-            else {
-                & $perlexe $InstallCpanModules $listfile | Write-Host
-            }
+    if ( $OnlyAllUpdates) {
+        if ( [string]::IsNullOrWhiteSpace($DontTryModuleListFile)) {
+            Write-Host -ForegroundColor Green "start '$InstallCpanModules' with --only-all-updates"
+            Write-Host ''
+            & $perlexe $InstallCpanModules '--only-all-updates' | Write-Host
         }
         else {
-            if ( $OnlyAllUpdates ) {
-                & $perlexe $InstallCpanModules '--only-all-updates' $listfile $DontTryModuleListFile | Write-Host
-            }
-            elseif ( $AllUpdates ) {
-                & $perlexe $InstallCpanModules '--all-updates' $listfile $DontTryModuleListFile | Write-Host
-            }
-            else {
-                & $perlexe $InstallCpanModules $listfile $DontTryModuleListFile | Write-Host
-            }
+            Write-Host -ForegroundColor Green "start '$InstallCpanModules' with --only-all-updates and $DontTryModuleListFile"
+            Write-Host ''
+            & $perlexe $InstallCpanModules '--only-all-updates' $DontTryModuleListFile | Write-Host
         }
 
-        if ( 0 -ne $LASTEXITCODE) {
+        if (0 -ne $LASTEXITCODE) {
             Write-Host -ForegroundColor Red "FATAL ERROR: '$InstallCpanModules' with '$LASTEXITCODE' failed?"
             throw 'InstallCpanModules failed'
+        }
+    }
+    else {
+        $InstallModuleListFile | ForEach-Object {
+            $listfile = $_
+
+            $tmp = ''
+
+            if ( $AllUpdates ) {
+                $tmp += ' and --all-updates'
+            }
+
+            if ( ! [string]::IsNullOrWhiteSpace($DontTryModuleListFile)) {
+                $tmp += " and $DontTryModuleListFile"
+            }
+
+            Write-Host -ForegroundColor Green "start '$InstallCpanModules' with '$listfile'$tmp"
+            Write-Host ''
+
+            # TODO: replace with Start-Process and created ARGV
+            if ( [string]::IsNullOrWhiteSpace($DontTryModuleListFile)) {
+                if ( $AllUpdates ) {
+                    & $perlexe $InstallCpanModules '--all-updates' $listfile | Write-Host
+                }
+                else {
+                    & $perlexe $InstallCpanModules $listfile | Write-Host
+                }
+            }
+            else {
+                if ( $AllUpdates ) {
+                    & $perlexe $InstallCpanModules '--all-updates' $listfile $DontTryModuleListFile | Write-Host
+                }
+                else {
+                    & $perlexe $InstallCpanModules $listfile $DontTryModuleListFile | Write-Host
+                }
+            }
+
+            if (0 -ne $LASTEXITCODE) {
+                Write-Host -ForegroundColor Red "FATAL ERROR: '$InstallCpanModules' with '$LASTEXITCODE' failed?"
+                throw 'InstallCpanModules failed'
+            }
         }
     }
 

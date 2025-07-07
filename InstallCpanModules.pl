@@ -33,7 +33,9 @@ __END__
 
 =head1 NAME
 
-InstallCpanModules.pl [ --only-all-updates | --all-updates ] filepath_install [ filepath_dont_try ]
+InstallCpanModules.pl [ --all-updates ] filepath_install [ filepath_dont_try ]
+
+InstallCpanModules.pl --only-all-updates [ filepath_dont_try ]
 
 =head1 DESCRIPTION
 
