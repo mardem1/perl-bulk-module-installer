@@ -50,6 +50,8 @@ my %modules_with_available_updates = ();
 
 # modules which should be installed (listfile) and are already installed on the system, generated with -> generate_modules_need_to_install()
 # will not changed after init
+# will only exported as file after init
+# TODO: should it be updated after system module list import update -> eg. some Sub-Module on list Perl::Critic::Utils::McCabe and Perl::Critic itself. After Perl::Critic installed it should recocnize thate McCabe also installed ?
 my %modules_install_already = ();
 
 # modules which are installed on the system, checked with -> search_for_installed_modules()
@@ -725,14 +727,6 @@ sub dump_state_to_logfiles
 
     my $timestamp = get_timestamp_for_filename();
 
-    if ( %modules_install_already ) {
-        write_file(
-            $log_dir_path . '/' . $timestamp . '_' . 'modules_install_already.log',
-            'modules_install_already: ' . scalar( keys %modules_install_already ),
-            Dumper( \%modules_install_already ),
-        );
-    }
-
     if ( %modules_install_ok ) {
         write_file(
             $log_dir_path . '/' . $timestamp . '_' . 'modules_install_ok.log',
@@ -773,12 +767,6 @@ sub print_install_end_summary
         say_ex( '' );
     }
     say_ex( '==> ' . 'summary' );
-    say_ex( '' );
-
-    say_ex( '' );
-    say_ex(   'modules_install_already: '
-            . scalar( keys %modules_install_already ) . "\n"
-            . Dumper( \%modules_install_already ) );
     say_ex( '' );
 
     say_ex( '' );
