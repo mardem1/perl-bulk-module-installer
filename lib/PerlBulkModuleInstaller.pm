@@ -1091,16 +1091,19 @@ sub fetch_dependencies_for_module
     }
 
     if ( !defined $child_exit_status ) {
+        mark_module_as_not_found( $module );
         return undef;    # as not found
     }
 
     if ( $child_exit_status && !@output ) {
         say_ex( 'ERROR: search failed - exitcode - ' . $child_exit_status );
+        mark_module_as_not_found( $module );
         return undef;    # as not found
     }
 
     if ( ( join '', @output ) =~ /Couldn't find module or a distribution/io ) {
         say_ex( 'ERROR: module not found - ' . $module );
+        mark_module_as_not_found( $module );
         return undef;    # as not found
     }
 
