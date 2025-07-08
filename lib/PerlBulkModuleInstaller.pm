@@ -41,8 +41,10 @@ my %modules_install_dont_try = ();
 my %modules_to_install = ();
 
 # modules which has an update available to installed, checked with -> search_for_modules_for_available_updates()
-# removed from hash when done
-my %modules_need_to_update  = ();
+# will be added to %modules_need_to_install with -> generate_modules_need_to_install()
+# will not changed after init
+# will only exported as file after init
+my %modules_with_available_updates = ();
 
 # modules which should be installed (listfile) and are already installed on the system, generated with -> generate_modules_need_to_install()
 # will not changed after init
@@ -53,11 +55,11 @@ my %modules_install_already = ();
 my %installed_module_version = ();
 
 # will be added if install OK -> install_single_module() / mark_module_as_ok()
-my %modules_install_ok      = ();
+my %modules_install_ok = ();
 
 # will be added if install FAILED -> install_single_module() / mark_module_as_failed()
 # hint: modules which are on %modules_install_dont_try will not be added as failed and ignored
-my %modules_install_failed  = ();
+my %modules_install_failed = ();
 
 # will be added if module not found at dependency check -> fetch_dependencies_for_module() / mark_module_as_not_found()
 my %modules_install_not_found = ();
@@ -533,9 +535,6 @@ sub mark_module_as_ok
     say_ex( 'remove ', $module, ' from modules_need_to_install' );
     delete $modules_need_to_install{ $module };
 
-    say_ex( 'remove ', $module, ' from modules_need_to_update' );
-    delete $modules_need_to_update{ $module };
-
     return;
 }
 
@@ -562,9 +561,6 @@ sub mark_module_as_failed
     say_ex( 'remove ', $module, ' from modules_need_to_install' );
     delete $modules_need_to_install{ $module };    # remove module - don't care if failed - no retry of failed
 
-    say_ex( 'remove ', $module, ' from modules_need_to_update' );
-    delete $modules_need_to_update{ $module };
-
     return;
 }
 
@@ -585,9 +581,6 @@ sub mark_module_as_not_found
 
     say_ex( 'remove ', $module, ' from modules_need_to_install' );
     delete $modules_need_to_install{ $module };    # remove module - don't care if not found - no retry of not found
-
-    say_ex( 'remove ', $module, ' from modules_need_to_update' );
-    delete $modules_need_to_update{ $module };
 
     return;
 }
@@ -633,7 +626,7 @@ sub was_module_already_tried
 
 sub generate_modules_need_to_install
 {
-    foreach my $module ( keys %modules_need_to_update ) {
+    foreach my $module ( keys %modules_with_available_updates ) {
         if (   exists $modules_install_dont_try{ $module }
             || exists $modules_install_ok{ $module }
             || exists $modules_install_failed{ $module }
@@ -962,6 +955,10 @@ sub search_for_installed_modules
 
 sub search_for_modules_for_available_updates
 {
+    if ( is_string_empty( $log_dir_path ) ) {
+        croak 'param filepath empty!';
+    }
+
     my $logfile_suffix = 'modules_with_available_updates';
     my $logfile_title  = 'modules_with_available_updates';
 
@@ -979,16 +976,24 @@ sub search_for_modules_for_available_updates
     }
 
     foreach my $module ( @output ) {
-        $modules_need_to_update{ $module } = undef;
+        $modules_with_available_updates{ $module } = undef;
     }
 
     say_ex( '' );
-    say_ex 'modules_need_to_update: '
-        . scalar( keys %modules_need_to_update ) . "\n"
-        . Dumper( \%modules_need_to_update );
+    say_ex 'modules_with_available_updates: '
+        . scalar( keys %modules_with_available_updates ) . "\n"
+        . Dumper( \%modules_with_available_updates );
     say_ex( '' );
 
-    print_install_state_summary();
+    my $timestamp = get_timestamp_for_filename();
+
+    if ( %modules_with_available_updates ) {
+        write_file(
+            $log_dir_path . '/' . $timestamp . '_' . 'modules_with_available_updates.log',
+            'modules_with_available_updates: ' . scalar( keys %modules_with_available_updates ),
+            Dumper( \%modules_with_available_updates ),
+        );
+    }
 
     return;
 }
