@@ -1035,9 +1035,8 @@ sub install_single_module
         say_ex( '==> ' . 'after successful module install - reimport all installed modules from system' );
         search_for_installed_modules();
     }
-    else {
-        dump_state_to_logfiles();
-    }
+
+    dump_state_to_logfiles();
 
     return $hasError;
 }
