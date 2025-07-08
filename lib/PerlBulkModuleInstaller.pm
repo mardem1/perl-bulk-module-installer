@@ -32,19 +32,36 @@ our @EXPORT_OK = qw(
 
 our $VERSION = '0.01';
 
+# modules which should be installed, imported from file via -> import_module_list_from_file()
+# will not changed after init
 my %modules_to_install = ();
 
+# modules which are installed on the system, checked with -> search_for_installed_modules()
+# will be updated after every module installation
 my %installed_module_version = ();
 
+# modules which needs to be processed (installed/updated), generated with -> generate_modules_need_to_install()
+# removed from hash when done
 my %modules_need_to_install = ();
+
+# modules which has an update available to installed, checked with -> search_for_modules_for_available_updates()
+# removed from hash when done
 my %modules_need_to_update  = ();
 
+# modules which should be installed (listfile) and are already installed on the system, generated with -> generate_modules_need_to_install()
+# will not changed after init
 my %modules_install_already = ();
+
+# will be added if install OK -> install_single_module() / mark_module_as_ok()
 my %modules_install_ok      = ();
+
+# will be added if install FAILED -> install_single_module() / mark_module_as_failed()
 my %modules_install_failed  = ();
 
+# will be added if module not found at dependency check -> fetch_dependencies_for_module() / mark_module_as_not_found()
 my %modules_install_not_found = ();
 
+# modules which are known to fail, imported from file via -> import_module_dont_try_list_from_file()
 my %modules_install_dont_try = ();
 
 my $INSTALL_MODULE_TIMEOUT_IN_SECONDS               = 60 * 10;
