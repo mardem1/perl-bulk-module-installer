@@ -770,7 +770,33 @@ sub print_install_end_summary
     say_ex( '' );
 
     say_ex( '' );
-    say_ex( 'modules_install_ok: ' . scalar( keys %modules_install_ok ) . "\n" . Dumper( \%modules_install_ok ) );
+    say_ex(   'modules_install_dont_try_from_file: '
+            . scalar( keys %modules_install_dont_try_from_file ) . "\n"
+            . Dumper( \%modules_install_dont_try_from_file ) );
+    say_ex( '' );
+
+    say_ex( '' );
+    say_ex(   'modules_to_install_from_file: '
+            . scalar( keys %modules_to_install_from_file ) . "\n"
+            . Dumper( \%modules_to_install_from_file ) );
+    say_ex( '' );
+
+    say_ex( '' );
+    say_ex(   'modules_with_available_updates: '
+            . scalar( keys %modules_with_available_updates ) . "\n"
+            . Dumper( \%modules_with_available_updates ) );
+    say_ex( '' );
+
+    say_ex( '' );
+    say_ex(   'installed_module_version: '
+            . scalar( keys %installed_module_version ) . "\n"
+            . Dumper( \%installed_module_version ) );
+    say_ex( '' );
+
+    say_ex( '' );
+    say_ex(   'modules_install_already: '
+            . scalar( keys %modules_install_already ) . "\n"
+            . Dumper( \%modules_install_already ) );
     say_ex( '' );
 
     say_ex( '' );
@@ -783,6 +809,10 @@ sub print_install_end_summary
     say_ex(   'modules_install_failed: '
             . scalar( keys %modules_install_failed ) . "\n"
             . Dumper( \%modules_install_failed ) );
+    say_ex( '' );
+
+    say_ex( '' );
+    say_ex( 'modules_install_ok: ' . scalar( keys %modules_install_ok ) . "\n" . Dumper( \%modules_install_ok ) );
     say_ex( '' );
 
     say_ex( '' );
@@ -943,6 +973,8 @@ sub search_for_installed_modules
             . ''
     );
     say_ex( '' );
+
+    # filedump not needed exported as txt and csv
 
     return;
 }
