@@ -956,7 +956,7 @@ sub search_for_installed_modules
 sub search_for_modules_for_available_updates
 {
     if ( is_string_empty( $log_dir_path ) ) {
-        croak 'param filepath empty!';
+        croak 'log_dir_path empty!';
     }
 
     my $logfile_suffix = 'modules_with_available_updates';
@@ -987,13 +987,11 @@ sub search_for_modules_for_available_updates
 
     my $timestamp = get_timestamp_for_filename();
 
-    if ( %modules_with_available_updates ) {
-        write_file(
-            $log_dir_path . '/' . $timestamp . '_' . 'modules_with_available_updates.log',
-            'modules_with_available_updates: ' . scalar( keys %modules_with_available_updates ),
-            Dumper( \%modules_with_available_updates ),
-        );
-    }
+    write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_with_available_updates.log',
+        'modules_with_available_updates: ' . scalar( keys %modules_with_available_updates ),
+        Dumper( \%modules_with_available_updates ),
+    );
 
     return;
 }
