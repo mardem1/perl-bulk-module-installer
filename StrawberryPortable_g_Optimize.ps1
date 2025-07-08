@@ -52,8 +52,11 @@ param (
 
 $ScriptPath = ''
 $transcript = $false
+$ori_ErrorActionPreference = $Global:ErrorActionPreference
 
 try {
+    $Global:ErrorActionPreference = 'Stop'
+
     $ScriptPath = $MyInvocation.InvocationName
     # Invoked wiht &
     if ( $ScriptPath -eq '&' -and
@@ -144,4 +147,6 @@ finally {
     if ($transcript) {
         Stop-Transcript
     }
+
+    $Global:ErrorActionPreference = $ori_ErrorActionPreference
 }
