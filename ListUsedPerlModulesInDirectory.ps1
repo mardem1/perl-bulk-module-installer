@@ -73,130 +73,153 @@ param (
     [string] $ModuleListFileTxt
 )
 
-$ScriptPath = $MyInvocation.InvocationName
-# Invoked wiht &
-if ( $ScriptPath -eq '&' -and
-    $null -ne $MyInvocation.MyCommand -and
-    ! [string]::IsNullOrWhiteSpace($MyInvocation.MyCommand.Path) ) {
-    $ScriptPath = $MyInvocation.MyCommand.Path
-}
+$ScriptStartTime = Get-Date
+$ScriptPath = ''
+$transcript = $false
+$ori_ErrorActionPreference = $Global:ErrorActionPreference
 
-$ScriptItem = Get-Item -LiteralPath $ScriptPath -ErrorAction Stop
-Start-Transcript -LiteralPath "$($ScriptItem.Directory.FullName)\log\$(Get-Date -Format 'yyyyMMdd_HHmmss')_$($ScriptItem.BaseName).log"
+try {
+    $Global:ErrorActionPreference = 'Stop'
 
-Write-Host ''
-Write-Host -ForegroundColor Green "started '$ScriptPath' ..."
-Write-Host ''
+    $ScriptPath = $MyInvocation.InvocationName
+    # Invoked wiht &
+    if ( $ScriptPath -eq '&' -and
+        $null -ne $MyInvocation.MyCommand -and
+        ! [string]::IsNullOrWhiteSpace($MyInvocation.MyCommand.Path) ) {
+        $ScriptPath = $MyInvocation.MyCommand.Path
+    }
 
-# BAT files for perl in batch wrapper
-$extensions = ( '.pl', '.pm', '.bat', '.t' )
+    $ScriptItem = Get-Item -LiteralPath $ScriptPath -ErrorAction Stop
+    Start-Transcript -LiteralPath "$($ScriptItem.Directory.FullName)\log\$(Get-Date -Format 'yyyyMMdd_HHmmss')_$($ScriptItem.BaseName).log" -ErrorAction Stop
+    $transcript = $true
 
-[hashtable] $modules = @{}
+    Write-Host ''
+    Write-Host -ForegroundColor Green "Script '$ScriptPath' started at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $ScriptStartTime )"
+    Write-Host ''
 
-$now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
-$winUser = $env:USERNAME
-$winHostName = $env:COMPUTERNAME
-$winOs = ( Get-CimInstance Win32_OperatingSystem ).Caption
-$ModuleListFilePl = $ModuleListFileTxt.Replace('.txt', '.pl')
+    # BAT files for perl in batch wrapper
+    $extensions = ( '.pl', '.pm', '.bat', '.t' )
 
-Write-Host -ForegroundColor Green '=> search for files ...'
-Write-Host -ForegroundColor Green '  => with extensions:'
-$extensions | ForEach-Object {
-    Write-Host -ForegroundColor Green "    => $_"
-}
-Write-Host -ForegroundColor Green '  => in directories:'
-$SearchPath | ForEach-Object {
-    Write-Host -ForegroundColor Green "    => $_"
-}
+    [hashtable] $modules = @{}
 
-$files = Get-ChildItem -Recurse -File -Force -LiteralPath $SearchPath | Where-Object {
-    $_.Extension -in $extensions
-}
+    $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
+    $winUser = $env:USERNAME
+    $winHostName = $env:COMPUTERNAME
+    $winOs = ( Get-CimInstance Win32_OperatingSystem ).Caption
+    $ModuleListFilePl = $ModuleListFileTxt.Replace('.txt', '.pl')
 
-Write-Host -ForegroundColor Green '=> matching files found - analyze ...'
-$files | ForEach-Object {
-    Write-Host -ForegroundColor DarkGray "=> check found file: '$($_.FullName)'"
+    Write-Host -ForegroundColor Green '=> search for files ...'
+    Write-Host -ForegroundColor Green '  => with extensions:'
+    $extensions | ForEach-Object {
+        Write-Host -ForegroundColor Green "    => $_"
+    }
+    Write-Host -ForegroundColor Green '  => in directories:'
+    $SearchPath | ForEach-Object {
+        Write-Host -ForegroundColor Green "    => $_"
+    }
 
-    $_ | Get-Content | ForEach-Object {
-        # Upper-Case defined as first character for none core / standard modules
-        # should match => 'use XYZ...ABC;' 'use XYZ...ABC (..);'  'use XYZ...ABC qw(..);' 'use XYZ...ABC qw(' 'use XYZ...ABC'
-        # ending exclude ^: needed to exclude "use C:"
-        if ( $_ -cmatch '\buse\b\s+(([A-Z][a-zA-Z0-9_]*)([:][:][a-zA-Z0-9_]+)*)[^:]' ) {
-            $text = $Matches[1]
+    $files = Get-ChildItem -Recurse -File -Force -LiteralPath $SearchPath | Where-Object {
+        $_.Extension -in $extensions
+    }
 
-            # add custom filter here - exclude own modules ?
-            if ( $true ) {
-                Write-Host -ForegroundColor Yellow "  => found module: '$text'"
-                $modules[$text] = $true
+    Write-Host -ForegroundColor Green '=> matching files found - analyze ...'
+    $files | ForEach-Object {
+        Write-Host -ForegroundColor DarkGray "=> check found file: '$($_.FullName)'"
+
+        $_ | Get-Content | ForEach-Object {
+            # Upper-Case defined as first character for none core / standard modules
+            # should match => 'use XYZ...ABC;' 'use XYZ...ABC (..);'  'use XYZ...ABC qw(..);' 'use XYZ...ABC qw(' 'use XYZ...ABC'
+            # ending exclude ^: needed to exclude "use C:"
+            if ( $_ -cmatch '\buse\b\s+(([A-Z][a-zA-Z0-9_]*)([:][:][a-zA-Z0-9_]+)*)[^:]' ) {
+                $text = $Matches[1]
+
+                # add custom filter here - exclude own modules ?
+                if ( $true ) {
+                    Write-Host -ForegroundColor Yellow "  => found module: '$text'"
+                    $modules[$text] = $true
+                }
             }
         }
     }
+
+    $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
+
+    Write-Host ''
+    Write-Host -ForegroundColor Green '=> filter unique'
+    $moduleNames = $($modules.Keys | Select-Object -Unique | Sort-Object )
+
+    Write-Host '=> create Modules use'
+    $modulesUse = $moduleNames | ForEach-Object { "use $_ qw();" }
+    Write-Host ''
+
+    Write-Host ''
+    Write-Host -ForegroundColor Green '=> Modules plain'
+    $moduleNames | ForEach-Object { "$_" }
+
+    $fileHeaders = (
+        '#',
+        '# => search for files',
+        '#  => with extensions:'
+    )
+    $fileHeaders += $extensions | ForEach-Object { "#   - $_" }
+
+    $fileHeaders += (
+        '#  => in directories:'
+    )
+    $fileHeaders += $SearchPath | ForEach-Object { "#   - $_" }
+
+    $fileHeaders += (
+        '#',
+        "# Win-User     : $winUser",
+        "# Win-Host     : $winHostName",
+        "# Win-OS       : $winOs"
+    )
+
+    $fileHeaders += (
+        '#',
+        "# search done at '$now'"
+    )
+
+    $fileHeaders += (
+        '#',
+        '# modules found:',
+        '#',
+        '' # empty line before list
+    )
+
+    $fileFooters = (
+        '', # empty line after list
+        '#',
+        '# list ended',
+        '#'
+    )
+
+    Write-Host ''
+    Write-Host -ForegroundColor Green "=> generate module list file '$ModuleListFileTxt'"
+    $fileHeaders, $moduleNames, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt
+
+    Write-Host ''
+    Write-Host -ForegroundColor Green "=> generate module compile check (perl -c) file '$ModuleListFilePl'"
+    $fileHeaders, $modulesUse, $fileFooters | Out-File -LiteralPath $ModuleListFilePl
+
+    exit 0
 }
+catch {
+    Write-Host -ForegroundColor Red "ERROR: msg: $_"
+    exit 1
+}
+finally {
+    Write-Host ''
+    Write-Host -ForegroundColor Green 'done'
+    Write-Host ''
+    $ScriptEndTime = Get-Date
+    $durationMinutes = (New-TimeSpan -Start $ScriptStartTime -End $ScriptEndTime).TotalMinutes
+    Write-Host -ForegroundColor Green "Script '$ScriptPath' ended at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $ScriptEndTime ) - duration $durationMinutes minutes"
+    Write-Host ''
 
-$now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
+    if ($transcript) {
+        Stop-Transcript
+    }
 
-Write-Host ''
-Write-Host -ForegroundColor Green '=> filter unique'
-$moduleNames = $($modules.Keys | Select-Object -Unique | Sort-Object )
-
-Write-Host '=> create Modules use'
-$modulesUse = $moduleNames | ForEach-Object { "use $_ qw();" }
-Write-Host ''
-
-Write-Host ''
-Write-Host -ForegroundColor Green '=> Modules plain'
-$moduleNames | ForEach-Object { "$_" }
-
-$fileHeaders = (
-    '#',
-    '# => search for files',
-    '#  => with extensions:'
-)
-$fileHeaders += $extensions | ForEach-Object { "#   - $_" }
-
-$fileHeaders += (
-    '#  => in directories:'
-)
-$fileHeaders += $SearchPath | ForEach-Object { "#   - $_" }
-
-$fileHeaders += (
-    '#',
-    "# Win-User     : $winUser",
-    "# Win-Host     : $winHostName",
-    "# Win-OS       : $winOs"
-)
-
-$fileHeaders += (
-    '#',
-    "# search done at '$now'"
-)
-
-$fileHeaders += (
-    '#',
-    '# modules found:',
-    '#',
-    '' # empty line before list
-)
-
-$fileFooters = (
-    '', # empty line after list
-    '#',
-    '# list ended',
-    '#'
-)
-
-Write-Host ''
-Write-Host -ForegroundColor Green "=> generate module list file '$ModuleListFileTxt'"
-$fileHeaders, $moduleNames, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt
-
-Write-Host ''
-Write-Host -ForegroundColor Green "=> generate module compile check (perl -c) file '$ModuleListFilePl'"
-$fileHeaders, $modulesUse, $fileFooters | Out-File -LiteralPath $ModuleListFilePl
-
-Write-Host ''
-Write-Host -ForegroundColor Green 'done'
-Write-Host ''
-Write-Host -ForegroundColor Green "... '$ScriptPath' ended"
-Write-Host ''
-
-Stop-Transcript
+    $Global:ErrorActionPreference = $ori_ErrorActionPreference
+}

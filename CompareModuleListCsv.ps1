@@ -67,114 +67,137 @@ param (
     [string] $CompareResultList
 )
 
-$ScriptPath = $MyInvocation.InvocationName
-# Invoked wiht &
-if ( $ScriptPath -eq '&' -and
-    $null -ne $MyInvocation.MyCommand -and
-    ! [string]::IsNullOrWhiteSpace($MyInvocation.MyCommand.Path) ) {
-    $ScriptPath = $MyInvocation.MyCommand.Path
-}
+$ScriptStartTime = Get-Date
+$ScriptPath = ''
+$transcript = $false
+$ori_ErrorActionPreference = $Global:ErrorActionPreference
 
-$ScriptItem = Get-Item -LiteralPath $ScriptPath -ErrorAction Stop
-Start-Transcript -LiteralPath "$($ScriptItem.Directory.FullName)\log\$(Get-Date -Format 'yyyyMMdd_HHmmss')_$($ScriptItem.BaseName).log"
+try {
+    $Global:ErrorActionPreference = 'Stop'
 
-Write-Host ''
-Write-Host -ForegroundColor Green "started '$ScriptPath' ..."
-Write-Host ''
+    $ScriptPath = $MyInvocation.InvocationName
+    # Invoked wiht &
+    if ( $ScriptPath -eq '&' -and
+        $null -ne $MyInvocation.MyCommand -and
+        ! [string]::IsNullOrWhiteSpace($MyInvocation.MyCommand.Path) ) {
+        $ScriptPath = $MyInvocation.MyCommand.Path
+    }
 
-[hashtable]$combinedModules = @{}
-
-$allLists = @()
-
-$lists = @{
-    "$ListA" = 'ListA'
-    "$ListB" = 'ListB'
-}
-
-$ListA, $ListB | ForEach-Object {
-    $file = $_
+    $ScriptItem = Get-Item -LiteralPath $ScriptPath -ErrorAction Stop
+    Start-Transcript -LiteralPath "$($ScriptItem.Directory.FullName)\log\$(Get-Date -Format 'yyyyMMdd_HHmmss')_$($ScriptItem.BaseName).log" -ErrorAction Stop
+    $transcript = $true
 
     Write-Host ''
-    Write-Host -ForegroundColor Green "analyze '$file' ..."
+    Write-Host -ForegroundColor Green "Script '$ScriptPath' started at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $ScriptStartTime )"
+    Write-Host ''
 
-    $lines = Get-Content -LiteralPath $file
-    $list = $lines | Where-Object { $_ -like '# *' } | ForEach-Object {
-        $t = $_.Split(';')
+    [hashtable]$combinedModules = @{}
 
-        if ([string]::IsNullOrWhiteSpace($t[0])) {
-            throw "perl title in CSV file not found - $file"
-        }
+    $allLists = @()
 
-        if ([string]::IsNullOrWhiteSpace($t[1])) {
-            throw "perl verison in CSV file not found - $file"
-        }
-
-        $t[1]
+    $lists = @{
+        "$ListA" = 'ListA'
+        "$ListB" = 'ListB'
     }
 
-    if ($null -eq $list) {
-        throw "perl info in CSV file not found - $file"
-    }
+    $ListA, $ListB | ForEach-Object {
+        $file = $_
 
-    $list = "$($lists[$file])-$list "
+        Write-Host ''
+        Write-Host -ForegroundColor Green "analyze '$file' ..."
 
-    $allLists += $list
+        $lines = Get-Content -LiteralPath $file
+        $list = $lines | Where-Object { $_ -like '# *' } | ForEach-Object {
+            $t = $_.Split(';')
 
-    # https://github.com/PowerShell/PowerShell/blob/744a53a2038056467b6ddeb2045336d79480c4c0/src/Microsoft.PowerShell.Commands.Utility/commands/utility/CsvCommands.cs#L1362
-    # ConvertFrom-Csv - ignores lines which start wiht #
-    $modules = $lines | ConvertFrom-Csv -Delimiter ';' -Header 'Module', 'Version'
+            if ([string]::IsNullOrWhiteSpace($t[0])) {
+                throw "perl title in CSV file not found - $file"
+            }
 
-    $modules | ForEach-Object {
-        $module = $_
-        if ( ! $combinedModules.ContainsKey($module.Module) ) {
-            $combinedModules[$module.Module] = @{}
+            if ([string]::IsNullOrWhiteSpace($t[1])) {
+                throw "perl verison in CSV file not found - $file"
+            }
+
+            $t[1]
         }
 
-        $combinedModules[$module.Module][$list] = $module.Version
-    }
-}
-
-Write-Host ''
-Write-Host -ForegroundColor Green 'init moudule not found in verison'
-Write-Host ''
-
-$keys = $combinedModules.Keys | Sort-Object -Unique
-$allLists | ForEach-Object {
-    $list = $_
-
-    $keys | ForEach-Object {
-        $module = $_
-        if ( ! $combinedModules.ContainsKey($module) ) {
-            # ignore already deleted
+        if ($null -eq $list) {
+            throw "perl info in CSV file not found - $file"
         }
-        elseif ( $combinedModules[$module].Count -eq 2) {
-            $moduleVersions = $combinedModules[$module].Values | Sort-Object -Unique
-            if ( @($moduleVersions).Count -eq 1 ) {
-                Write-Host -ForegroundColor Green "remove $module - version equal"
-                $combinedModules.Remove($module)
+
+        $list = "$($lists[$file])-$list "
+
+        $allLists += $list
+
+        # https://github.com/PowerShell/PowerShell/blob/744a53a2038056467b6ddeb2045336d79480c4c0/src/Microsoft.PowerShell.Commands.Utility/commands/utility/CsvCommands.cs#L1362
+        # ConvertFrom-Csv - ignores lines which start wiht #
+        $modules = $lines | ConvertFrom-Csv -Delimiter ';' -Header 'Module', 'Version'
+
+        $modules | ForEach-Object {
+            $module = $_
+            if ( ! $combinedModules.ContainsKey($module.Module) ) {
+                $combinedModules[$module.Module] = @{}
+            }
+
+            $combinedModules[$module.Module][$list] = $module.Version
+        }
+    }
+
+    Write-Host ''
+    Write-Host -ForegroundColor Green 'init moudule not found in verison'
+    Write-Host ''
+
+    $keys = $combinedModules.Keys | Sort-Object -Unique
+    $allLists | ForEach-Object {
+        $list = $_
+
+        $keys | ForEach-Object {
+            $module = $_
+            if ( ! $combinedModules.ContainsKey($module) ) {
+                # ignore already deleted
+            }
+            elseif ( $combinedModules[$module].Count -eq 2) {
+                $moduleVersions = $combinedModules[$module].Values | Sort-Object -Unique
+                if ( @($moduleVersions).Count -eq 1 ) {
+                    Write-Host -ForegroundColor Green "remove $module - version equal"
+                    $combinedModules.Remove($module)
+                }
+            }
+            elseif ( ! $combinedModules[$module].ContainsKey($list)) {
+                $combinedModules[$module][$list] = 'not-installed'
             }
         }
-        elseif ( ! $combinedModules[$module].ContainsKey($list)) {
-            $combinedModules[$module][$list] = 'not-installed'
-        }
     }
+
+    $moduleLines = $combinedModules.Keys | Sort-Object -Unique | ForEach-Object {
+        $m = $_
+        $a = $combinedModules[$m]["$($allLists[0])"]
+        $b = $combinedModules[$m]["$($allLists[1])"]
+        "$m;$a;$b"
+    }
+
+    Write-Host ''
+    Write-Host -ForegroundColor Green "write csv file $CompareResultList"
+    "Module;$($allLists[0]);$($allLists[1])" , $moduleLines | Out-File -LiteralPath $CompareResultList -Encoding default -Force -Confirm:$false -Width 999
+
+    exit 0
 }
-
-$moduleLines = $combinedModules.Keys | Sort-Object -Unique | ForEach-Object {
-    $m = $_
-    $a = $combinedModules[$m]["$($allLists[0])"]
-    $b = $combinedModules[$m]["$($allLists[1])"]
-    "$m;$a;$b"
+catch {
+    Write-Host -ForegroundColor Red "ERROR: msg: $_"
+    exit 1
 }
+finally {
+    Write-Host ''
+    Write-Host -ForegroundColor Green 'done'
+    Write-Host ''
+    $ScriptEndTime = Get-Date
+    $durationMinutes = (New-TimeSpan -Start $ScriptStartTime -End $ScriptEndTime).TotalMinutes
+    Write-Host -ForegroundColor Green "Script '$ScriptPath' ended at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $ScriptEndTime ) - duration $durationMinutes minutes"
+    Write-Host ''
 
-Write-Host ''
-Write-Host -ForegroundColor Green "write csv file $CompareResultList"
-"Module;$($allLists[0]);$($allLists[1])" , $moduleLines | Out-File -LiteralPath $CompareResultList -Encoding default -Force -Confirm:$false -Width 999
+    if ($transcript) {
+        Stop-Transcript
+    }
 
-Write-Host ''
-Write-Host -ForegroundColor Green 'done'
-Write-Host ''
-Write-Host -ForegroundColor Green "... '$ScriptPath' ended"
-Write-Host ''
-
-Stop-Transcript
+    $Global:ErrorActionPreference = $ori_ErrorActionPreference
+}
