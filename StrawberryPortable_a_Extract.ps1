@@ -74,6 +74,7 @@ param (
     [switch] $DetectSevenZip
 )
 
+$ScriptStartTime = Get-Date
 $ScriptPath = ''
 $transcript = $false
 $ori_ErrorActionPreference = $Global:ErrorActionPreference
@@ -94,7 +95,7 @@ try {
     $transcript = $true
 
     Write-Host ''
-    Write-Host -ForegroundColor Green "started '$ScriptPath' ..."
+    Write-Host -ForegroundColor Green "Script '$ScriptPath' started at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $ScriptStartTime )"
     Write-Host ''
 
     $zip = Get-Item -LiteralPath $StrawberryZip
@@ -180,7 +181,9 @@ finally {
     Write-Host ''
     Write-Host -ForegroundColor Green 'done'
     Write-Host ''
-    Write-Host -ForegroundColor Green "... '$ScriptPath' ended"
+    $ScriptEndTime = Get-Date
+    $durationMinutes = (New-TimeSpan -Start $ScriptStartTime -End $ScriptEndTime).TotalMinutes
+    Write-Host -ForegroundColor Green "Script '$ScriptPath' ended at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $ScriptEndTime ) - duration $durationMinutes minutes"
     Write-Host ''
 
     if ($transcript) {
