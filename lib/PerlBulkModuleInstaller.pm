@@ -1368,10 +1368,10 @@ sub install_modules_sequentially
         say_ex(   '==> '
                 . "installed $install_count modules from start-list in $duration_txt (hh:mm:ss) - expect remaining $remaining modules needs $expect_txt (hh:mm:ss)"
         );
-    }
 
-    dump_state_to_logfiles();
-    print_install_state_summary();
+        dump_state_to_logfiles();
+        print_install_state_summary();
+    }
 
     return;
 }
