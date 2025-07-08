@@ -38,7 +38,8 @@ my %modules_install_dont_try = ();
 
 # modules which should be installed, imported from file via -> import_module_list_from_file()
 # will not changed after init
-my %modules_to_install = ();
+# will only exported as file after init
+my %modules_to_install_from_file = ();
 
 # modules which has an update available to installed, checked with -> search_for_modules_for_available_updates()
 # will be added to %modules_need_to_install with -> generate_modules_need_to_install()
@@ -464,24 +465,23 @@ sub import_module_list_from_file
     @file_lines = map  { trim( $_ ) } @file_lines;
     @file_lines = grep { $EMPTY_STRING ne $_ && $_ !~ /^[#]/o } @file_lines;
 
-    %modules_to_install = hashify( @file_lines );
-    @file_lines         = ();
+    %modules_to_install_from_file = hashify( @file_lines );
+    @file_lines                   = ();
 
     say_ex( '' );
-    say_ex(   'wanted modules to install: '
-            . ( scalar keys %modules_to_install ) . "\n"
-            . Dumper( \%modules_to_install ) );
+    say_ex(   'modules_to_install_from_file: '
+            . ( scalar keys %modules_to_install_from_file ) . "\n"
+            . Dumper( \%modules_to_install_from_file ) );
     say_ex( '' );
 
     my $timestamp = get_timestamp_for_filename();
 
-    if ( %modules_to_install ) {
-        write_file(
-            $log_dir_path . '/' . $timestamp . '_' . 'modules_to_install_from_file.log',
-            'modules_to_install_from_file: ' . scalar( keys %modules_to_install ),
-            Dumper( \%modules_to_install ),
-        );
-    }
+    write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_to_install_from_file.log',
+        'modules_to_install_from_file: ' . scalar( keys %modules_to_install_from_file ),
+        Dumper( \%modules_to_install_from_file ),
+    );
+
     return;
 }
 
@@ -653,7 +653,7 @@ sub generate_modules_need_to_install
         }
     }
 
-    foreach my $module ( keys %modules_to_install ) {
+    foreach my $module ( keys %modules_to_install_from_file ) {
         if (   exists $modules_install_dont_try{ $module }
             || exists $modules_install_ok{ $module }
             || exists $modules_install_failed{ $module }

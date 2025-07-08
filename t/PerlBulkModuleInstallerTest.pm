@@ -160,9 +160,9 @@ sub was_module_already_tried : Test(1)
     fail();
 }
 
-sub reduce_modules_to_install : Test(1)
+sub reduce_modules_to_install_from_file : Test(1)
 {
-    local $TODO = "test reduce_modules_to_install currently unimplemented";
+    local $TODO = "test reduce_modules_to_install_from_file currently unimplemented";
     fail();
 }
 
