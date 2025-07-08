@@ -34,7 +34,8 @@ our $VERSION = '0.01';
 
 # modules which are known to fail, imported from file via -> import_module_dont_try_list_from_file()
 # will not changed after init
-my %modules_install_dont_try = ();
+# will only exported as file after init
+my %modules_install_dont_try_from_file = ();
 
 # modules which should be installed, imported from file via -> import_module_list_from_file()
 # will not changed after init
@@ -59,7 +60,7 @@ my %installed_module_version = ();
 my %modules_install_ok = ();
 
 # will be added if install FAILED -> install_single_module() / mark_module_as_failed()
-# hint: modules which are on %modules_install_dont_try will not be added as failed and ignored
+# hint: modules which are on %modules_install_dont_try_from_file will not be added as failed and ignored
 my %modules_install_failed = ();
 
 # will be added if module not found at dependency check -> fetch_dependencies_for_module() / mark_module_as_not_found()
@@ -504,24 +505,22 @@ sub import_module_dont_try_list_from_file
     @file_lines = map  { trim( $_ ) } @file_lines;
     @file_lines = grep { $EMPTY_STRING ne $_ && $_ !~ /^[#]/o } @file_lines;
 
-    %modules_install_dont_try = hashify( @file_lines );
-    @file_lines               = ();
+    %modules_install_dont_try_from_file = hashify( @file_lines );
+    @file_lines                         = ();
 
     say_ex( '' );
-    say_ex(   'dont try modules to install: '
-            . ( scalar keys %modules_install_dont_try ) . "\n"
-            . Dumper( \%modules_install_dont_try ) );
+    say_ex(   'modules_install_dont_try_from_file: '
+            . ( scalar keys %modules_install_dont_try_from_file ) . "\n"
+            . Dumper( \%modules_install_dont_try_from_file ) );
     say_ex( '' );
 
     my $timestamp = get_timestamp_for_filename();
 
-    if ( %modules_install_dont_try ) {
-        write_file(
-            $log_dir_path . '/' . $timestamp . '_' . 'import_module_dont_try_list_from_file.log',
-            'import_module_dont_try_list_from_file: ' . scalar( keys %modules_install_dont_try ),
-            Dumper( \%modules_install_dont_try ),
-        );
-    }
+    write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'import_module_dont_try_list_from_file.log',
+        'import_module_dont_try_list_from_file: ' . scalar( keys %modules_install_dont_try_from_file ),
+        Dumper( \%modules_install_dont_try_from_file ),
+    );
 
     return;
 }
@@ -562,7 +561,7 @@ sub mark_module_as_failed
         $version = undef;    # force undef if empty - param optional
     }
 
-    if ( exists $modules_install_dont_try{ $module } ) {
+    if ( exists $modules_install_dont_try_from_file{ $module } ) {
         say_ex( 'module ', $module, ' marked as dont try - so dont add to failed!' );
     }
     else {
@@ -605,8 +604,7 @@ sub was_module_already_tried
         croak 'param module empty!';
     }
 
-    if ( exists $modules_install_dont_try{ $module } ) {
-        mark_module_as_failed( $module );
+    if ( exists $modules_install_dont_try_from_file{ $module } ) {
         say_ex( 'WARN: install module - ' . $module . ' - marked dont try - abort' );
 
         return 1;
@@ -639,7 +637,7 @@ sub was_module_already_tried
 sub generate_modules_need_to_install
 {
     foreach my $module ( keys %modules_with_available_updates ) {
-        if (   exists $modules_install_dont_try{ $module }
+        if (   exists $modules_install_dont_try_from_file{ $module }
             || exists $modules_install_ok{ $module }
             || exists $modules_install_failed{ $module }
             || exists $modules_install_not_found{ $module }
@@ -654,7 +652,7 @@ sub generate_modules_need_to_install
     }
 
     foreach my $module ( keys %modules_to_install_from_file ) {
-        if (   exists $modules_install_dont_try{ $module }
+        if (   exists $modules_install_dont_try_from_file{ $module }
             || exists $modules_install_ok{ $module }
             || exists $modules_install_failed{ $module }
             || exists $modules_install_not_found{ $module }
@@ -726,14 +724,6 @@ sub dump_state_to_logfiles
     }
 
     my $timestamp = get_timestamp_for_filename();
-
-    if ( %modules_install_dont_try ) {
-        write_file(
-            $log_dir_path . '/' . $timestamp . '_' . 'modules_install_dont_try.log',
-            'modules_install_dont_try: ' . scalar( keys %modules_install_dont_try ),
-            Dumper( \%modules_install_dont_try ),
-        );
-    }
 
     if ( %modules_install_already ) {
         write_file(
