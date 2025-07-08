@@ -405,6 +405,10 @@ sub get_output_with_detached_execute_and_logfile
 {
     my ( $logfile_suffix, $logfile_title, $timeout, $show_live_output, @cmd ) = @_;
 
+    if ( is_string_empty( $log_dir_path ) ) {
+        croak 'log_dir_path empty!';
+    }
+
     if ( is_string_empty( $logfile_suffix ) ) {
         croak 'param logfile_suffix empty!';
     }
@@ -445,6 +449,10 @@ sub import_module_list_from_file
 {
     my ( $filepath ) = @_;
 
+    if ( is_string_empty( $log_dir_path ) ) {
+        croak 'log_dir_path empty!';
+    }
+
     if ( is_string_empty( $filepath ) ) {
         croak 'param filepath empty!';
     }
@@ -480,6 +488,10 @@ sub import_module_list_from_file
 sub import_module_dont_try_list_from_file
 {
     my ( $filepath ) = @_;
+
+    if ( is_string_empty( $log_dir_path ) ) {
+        croak 'log_dir_path empty!';
+    }
 
     if ( is_string_empty( $filepath ) ) {
         croak 'param filepath empty!';
@@ -710,7 +722,7 @@ sub print_install_state_summary
 sub dump_state_to_logfiles
 {
     if ( is_string_empty( $log_dir_path ) ) {
-        croak 'param filepath empty!';
+        croak 'log_dir_path empty!';
     }
 
     my $timestamp = get_timestamp_for_filename();
@@ -828,6 +840,10 @@ sub print_perl_detail_info
 
 sub search_for_installed_modules
 {
+    if ( is_string_empty( $log_dir_path ) ) {
+        croak 'log_dir_path empty!';
+    }
+
     my @cmd = ( 'cmd.exe', '/c', 'cpan', '-l', '2>&1' );
 
     my $logfile_suffix = 'installed_modules_found';
