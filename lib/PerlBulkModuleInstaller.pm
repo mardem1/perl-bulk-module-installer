@@ -1414,7 +1414,7 @@ sub install_module_with_dependencies_first_recursive
     my $hasError = install_single_module( $module );    # retval ignored - install count !
 
     if ( $hasError ) {
-        mark_module_as_failed( $module );
+
         return $hasError;
     }
 
