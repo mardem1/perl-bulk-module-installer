@@ -638,6 +638,10 @@ sub was_module_already_tried
 
 sub generate_modules_need_to_install
 {
+    if ( is_string_empty( $log_dir_path ) ) {
+        croak 'log_dir_path empty!';
+    }
+
     foreach my $module ( keys %modules_with_available_updates ) {
         if (   exists $modules_install_dont_try_from_file{ $module }
             || exists $modules_install_ok{ $module }
@@ -670,17 +674,31 @@ sub generate_modules_need_to_install
         }
     }
 
+    my $timestamp = get_timestamp_for_filename();
+
     say_ex( '' );
     say_ex(   'modules_install_already: '
             . scalar( keys %modules_install_already ) . "\n"
             . Dumper( \%modules_install_already ) );
     say_ex( '' );
 
+    write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_already.log',
+        'modules_install_already: ' . scalar( keys %modules_install_already ),
+        Dumper( \%modules_install_already ),
+    );
+
     say_ex( '' );
     say_ex(   'modules_need_to_install: '
             . scalar( keys %modules_need_to_install ) . "\n"
             . Dumper( \%modules_need_to_install ) );
     say_ex( '' );
+
+    write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_need_to_install.log',
+        'modules_need_to_install: ' . scalar( keys %modules_need_to_install ),
+        Dumper( \%modules_need_to_install ),
+    );
 
     return;
 }
@@ -756,6 +774,7 @@ sub dump_state_to_logfiles
             Dumper( \%modules_need_to_install ),
         );
     }
+
     return;
 }
 
