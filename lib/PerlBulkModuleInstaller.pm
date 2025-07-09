@@ -1149,8 +1149,6 @@ sub install_single_module
         search_for_installed_modules();
     }
 
-    print_and_log_intermediate_state();
-
     return $hasError;
 }
 
@@ -1413,8 +1411,9 @@ sub install_module_with_dependencies_first_recursive
 
     my $hasError = install_single_module( $module );    # retval ignored - install count !
 
-    if ( $hasError ) {
+    print_and_log_intermediate_state();
 
+    if ( $hasError ) {
         return $hasError;
     }
 
@@ -1430,8 +1429,6 @@ sub install_module_with_dependencies_first_recursive
 sub install_modules_sequentially
 {
     say_ex( '==> ' . 'install all modules sequentially' );
-
-    print_and_log_intermediate_state();
 
     my $start_time           = time;
     my $install_target_count = scalar( keys %modules_need_to_install );
@@ -1480,6 +1477,7 @@ sub install_modules_sequentially
         my $expect_m             = floor( ( 0.0 + ( $expect_total_seconds - ( $expect_h * 3600 ) ) ) / 60 );
         my $expect_s             = floor( $expect_total_seconds - ( $expect_h * 3600 ) - ( $expect_m * 60 ) );
         my $expect_txt           = sprintf( '%02d:%02d:%02d', $expect_h, $expect_m, $expect_s );
+
         say_ex(   '==> '
                 . "installed $install_count modules from start-list in $duration_txt (hh:mm:ss) - expect remaining $remaining modules needs $expect_txt (hh:mm:ss)"
         );
