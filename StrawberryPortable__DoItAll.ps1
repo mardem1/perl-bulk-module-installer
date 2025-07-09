@@ -122,6 +122,19 @@ try {
     # & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\SingleModuleExample.txt", "$ScriptDir\test-module-lists\SmallModuleExample.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
 
     # other lists
+
+    # ToDo: as idea for all lists ordered by module-list count size (not file size)
+    # $ModuleListFiles = Get-ChildItem -LiteralPath "$ScriptDir\test-module-lists\" -File | Where-Object { $_.Name -notlike '_*' } | ForEach-Object {
+    #     $fullName = $_.FullName
+    #     $m = Get-Content -LiteralPath $fullName | Where-Object { ! [string]::IsNullOrWhiteSpace($_) -and $_ -notlike '#*' }
+    #     $moduleCount = @($m).Count
+    #
+    #     [pscustomobject] @{
+    #         FullName     = $fullName
+    #         ModuleCount = $moduleCount
+    #     } | Write-Output
+    # } | Sort-Object -Property ModuleCount
+
     & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\perl_module_rperl.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
     & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\MojoliciusTest.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
 
