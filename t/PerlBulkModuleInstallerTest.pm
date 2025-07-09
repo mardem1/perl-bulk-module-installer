@@ -178,9 +178,9 @@ sub dump_state_to_logfiles : Test(1)
     fail();
 }
 
-sub print_install_end_summary : Test(1)
+sub print_and_log_full_summary : Test(1)
 {
-    local $TODO = "test print_install_end_summary currently unimplemented";
+    local $TODO = "test print_and_log_full_summary currently unimplemented";
     fail();
 }
 

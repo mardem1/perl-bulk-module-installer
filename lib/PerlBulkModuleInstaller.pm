@@ -759,12 +759,19 @@ sub dump_state_to_logfiles
     return;
 }
 
-sub print_install_end_summary
+sub print_and_log_full_summary
 {
+    if ( is_string_empty( $log_dir_path ) ) {
+        croak 'log_dir_path empty!';
+    }
+
+    my $timestamp = get_timestamp_for_filename();
+
     foreach ( 1 .. 10 ) {
         say_ex( '' );
     }
-    say_ex( '==> ' . 'summary' );
+
+    say_ex( '==> ' . 'full summary' );
     say_ex( '' );
 
     say_ex( '' );
@@ -773,17 +780,35 @@ sub print_install_end_summary
             . Dumper( \%modules_install_dont_try_from_file ) );
     say_ex( '' );
 
+    write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'import_module_dont_try_list_from_file.log',
+        'import_module_dont_try_list_from_file: ' . scalar( keys %modules_install_dont_try_from_file ),
+        Dumper( \%modules_install_dont_try_from_file ),
+    );
+
     say_ex( '' );
     say_ex(   'modules_to_install_from_file: '
             . scalar( keys %modules_to_install_from_file ) . "\n"
             . Dumper( \%modules_to_install_from_file ) );
     say_ex( '' );
 
+    write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_to_install_from_file.log',
+        'modules_to_install_from_file: ' . scalar( keys %modules_to_install_from_file ),
+        Dumper( \%modules_to_install_from_file ),
+    );
+
     say_ex( '' );
     say_ex(   'modules_with_available_updates: '
             . scalar( keys %modules_with_available_updates ) . "\n"
             . Dumper( \%modules_with_available_updates ) );
     say_ex( '' );
+
+    write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_with_available_updates.log',
+        'modules_with_available_updates: ' . scalar( keys %modules_with_available_updates ),
+        Dumper( \%modules_with_available_updates ),
+    );
 
     say_ex( '' );
     say_ex(   'installed_module_version: '
@@ -797,11 +822,23 @@ sub print_install_end_summary
             . Dumper( \%modules_install_already ) );
     say_ex( '' );
 
+    write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_already.log',
+        'modules_install_already: ' . scalar( keys %modules_install_already ),
+        Dumper( \%modules_install_already ),
+    );
+
     say_ex( '' );
     say_ex(   'modules_install_not_found: '
             . scalar( keys %modules_install_not_found ) . "\n"
             . Dumper( \%modules_install_not_found ) );
     say_ex( '' );
+
+    write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_not_found.log',
+        'modules_install_not_found: ' . scalar( keys %modules_install_not_found ),
+        Dumper( \%modules_install_not_found ),
+    );
 
     say_ex( '' );
     say_ex(   'modules_install_failed: '
@@ -809,15 +846,33 @@ sub print_install_end_summary
             . Dumper( \%modules_install_failed ) );
     say_ex( '' );
 
+    write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_failed.log',
+        'modules_install_failed: ' . scalar( keys %modules_install_failed ),
+        Dumper( \%modules_install_failed ),
+    );
+
     say_ex( '' );
     say_ex( 'modules_install_ok: ' . scalar( keys %modules_install_ok ) . "\n" . Dumper( \%modules_install_ok ) );
     say_ex( '' );
+
+    write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_ok.log',
+        'modules_install_ok: ' . scalar( keys %modules_install_ok ),
+        Dumper( \%modules_install_ok ),
+    );
 
     say_ex( '' );
     say_ex(   'modules_need_to_install: '
             . scalar( keys %modules_need_to_install ) . "\n"
             . Dumper( \%modules_need_to_install ) );
     say_ex( '' );
+
+    write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_need_to_install.log',
+        'modules_need_to_install: ' . scalar( keys %modules_need_to_install ),
+        Dumper( \%modules_need_to_install ),
+    );
 
     return;
 }
@@ -1532,12 +1587,10 @@ sub main
     }
 
     generate_modules_need_to_install();
-    dump_state_to_logfiles();
 
+    print_and_log_full_summary();
     install_modules_sequentially();
-
-    print_install_end_summary();
-    dump_state_to_logfiles();
+    print_and_log_full_summary();
 
     return;
 }
