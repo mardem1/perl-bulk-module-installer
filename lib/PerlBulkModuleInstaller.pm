@@ -703,39 +703,7 @@ sub generate_modules_need_to_install
     return;
 }
 
-sub print_install_state_summary
-{
-    foreach ( 1 .. 10 ) {
-        say_ex( '' );
-    }
-
-    say_ex( '==> ' . 'print_install_state_summary' );
-    say_ex( '' );
-    say_ex( '' );
-
-    say_ex(   'modules_install_not_found: '
-            . scalar( keys %modules_install_not_found ) . "\n"
-            . Dumper( \%modules_install_not_found ) );
-
-    say_ex(   'modules_install_failed: '
-            . scalar( keys %modules_install_failed ) . "\n"
-            . Dumper( \%modules_install_failed ) );
-
-    # no dumper with need and ok - not necessary as temporary state.
-
-    say_ex( 'modules_install_ok - ' . scalar( keys %modules_install_ok ) . "\n" . Dumper( \%modules_install_ok ) );
-
-    say_ex(   'modules_need_to_install left - '
-            . scalar( keys %modules_need_to_install ) . "\n"
-            . Dumper( \%modules_need_to_install ) );
-
-    say_ex( '' );
-    say_ex( '' );
-
-    return;
-}
-
-sub dump_state_to_logfiles
+sub print_and_log_intermediate_state
 {
     if ( is_string_empty( $log_dir_path ) ) {
         croak 'log_dir_path empty!';
@@ -743,7 +711,17 @@ sub dump_state_to_logfiles
 
     my $timestamp = get_timestamp_for_filename();
 
+    foreach ( 1 .. 10 ) {
+        say_ex( '' );
+    }
+
+    say_ex( '==> ' . 'print_and_log_intermediate_state' );
+    say_ex( '' );
+    say_ex( '' );
+
     if ( %modules_install_ok ) {
+        say_ex( 'modules_install_ok: ' . scalar( keys %modules_install_ok ) . "\n" . Dumper( \%modules_install_ok ) );
+
         write_file(
             $log_dir_path . '/' . $timestamp . '_' . 'modules_install_ok.log',
             'modules_install_ok: ' . scalar( keys %modules_install_ok ),
@@ -752,6 +730,10 @@ sub dump_state_to_logfiles
     }
 
     if ( %modules_install_not_found ) {
+        say_ex(   'modules_install_not_found: '
+                . scalar( keys %modules_install_not_found ) . "\n"
+                . Dumper( \%modules_install_not_found ) );
+
         write_file(
             $log_dir_path . '/' . $timestamp . '_' . 'modules_install_not_found.log',
             'modules_install_not_found: ' . scalar( keys %modules_install_not_found ),
@@ -760,6 +742,11 @@ sub dump_state_to_logfiles
     }
 
     if ( %modules_install_failed ) {
+
+        say_ex(   'modules_install_failed: '
+                . scalar( keys %modules_install_failed ) . "\n"
+                . Dumper( \%modules_install_failed ) );
+
         write_file(
             $log_dir_path . '/' . $timestamp . '_' . 'modules_install_failed.log',
             'modules_install_failed: ' . scalar( keys %modules_install_failed ),
@@ -768,12 +755,19 @@ sub dump_state_to_logfiles
     }
 
     if ( %modules_need_to_install ) {
+        say_ex(   'modules_need_to_install left: '
+                . scalar( keys %modules_need_to_install ) . "\n"
+                . Dumper( \%modules_need_to_install ) );
+
         write_file(
             $log_dir_path . '/' . $timestamp . '_' . 'modules_need_to_install.log',
             'modules_need_to_install: ' . scalar( keys %modules_need_to_install ),
             Dumper( \%modules_need_to_install ),
         );
     }
+
+    say_ex( '' );
+    say_ex( '' );
 
     return;
 }
@@ -1149,14 +1143,13 @@ sub install_single_module
     }
 
     say_ex( '==> ' . $type . ' module - ' . $module . ' ' . $action );
-    print_install_state_summary();
 
     if ( !$hasError ) {
         say_ex( '==> ' . 'after successful module install - reimport all installed modules from system' );
         search_for_installed_modules();
     }
 
-    dump_state_to_logfiles();
+    print_and_log_intermediate_state();
 
     return $hasError;
 }
@@ -1438,8 +1431,7 @@ sub install_modules_sequentially
 {
     say_ex( '==> ' . 'install all modules sequentially' );
 
-    dump_state_to_logfiles();
-    print_install_state_summary();
+    print_and_log_intermediate_state();
 
     my $start_time           = time;
     my $install_target_count = scalar( keys %modules_need_to_install );
@@ -1492,8 +1484,7 @@ sub install_modules_sequentially
                 . "installed $install_count modules from start-list in $duration_txt (hh:mm:ss) - expect remaining $remaining modules needs $expect_txt (hh:mm:ss)"
         );
 
-        dump_state_to_logfiles();
-        print_install_state_summary();
+        print_and_log_intermediate_state();
     }
 
     return;

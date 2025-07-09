@@ -166,15 +166,9 @@ sub reduce_modules_to_install_from_file : Test(1)
     fail();
 }
 
-sub print_install_state_summary : Test(1)
+sub print_and_log_intermediate_state : Test(1)
 {
-    local $TODO = "test print_install_state_summary currently unimplemented";
-    fail();
-}
-
-sub dump_state_to_logfiles : Test(1)
-{
-    local $TODO = "test dump_state_to_logfiles currently unimplemented";
+    local $TODO = "test print_and_log_intermediate_state currently unimplemented";
     fail();
 }
 
