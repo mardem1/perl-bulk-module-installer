@@ -682,8 +682,6 @@ sub generate_modules_need_to_install
             . Dumper( \%modules_need_to_install ) );
     say_ex( '' );
 
-    dump_state_to_logfiles();
-
     return;
 }
 
@@ -1534,11 +1532,11 @@ sub main
     }
 
     generate_modules_need_to_install();
+    dump_state_to_logfiles();
 
     install_modules_sequentially();
 
     print_install_end_summary();
-
     dump_state_to_logfiles();
 
     return;
