@@ -1392,6 +1392,8 @@ sub install_module_with_dependencies_first_recursive
                     $recursion--;
 
                     if ( $hasError ) {
+                        # mark module as failed, if dependent module not ok
+                        mark_module_as_failed( $module );
                         return $hasError;
                     }
                 }
