@@ -107,52 +107,53 @@ try {
     & "$ScriptDir\StrawberryPortable_c_CpanL_ListModules.ps1" -StrawberryDir $StrawberryDir -ModuleListFileTxt "$LogDir\$(Get-Date -Format 'yyyyMMdd_HHmmss')_list_before.txt" | Write-Host
 
     # it's not recommended to update module if not needed
+
     # install all Updates before ?
     # & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -OnlyAllUpdates -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt"
+
     # install all Updates in same install run ?
     # & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -AllUpdates -InstallModuleListFile "$ScriptDir\test-module-lists\CoreCarpModuleExample.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt"
 
     # install modules
-    & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\CoreCarpModuleExample.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
-    & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\SingleModuleExample.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
-    & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\SmallModuleExample.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
-    & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\MediumModuleExample.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
+    # & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\SingleModuleExample.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
 
     # direct loop ?
     # & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\SingleModuleExample.txt", "$ScriptDir\test-module-lists\SmallModuleExample.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
 
-    # other lists
+    $ModuleListFiles = Get-ChildItem -LiteralPath "$ScriptDir\test-module-lists\" -File | Where-Object { $_.Name -notlike '_*' } | Where-Object { $_.Name -like '*.txt' } | ForEach-Object {
+        $item = $_
+        $name = $item.Name
+        $fullName = $item.FullName
+        $m = Get-Content -LiteralPath $fullName | Where-Object { ! [string]::IsNullOrWhiteSpace($_) -and $_ -notlike '#*' }
+        $moduleCount = @($m).Count
 
-    # ToDo: as idea for all lists ordered by module-list count size (not file size)
-    # $ModuleListFiles = Get-ChildItem -LiteralPath "$ScriptDir\test-module-lists\" -File | Where-Object { $_.Name -notlike '_*' } | ForEach-Object {
-    #     $fullName = $_.FullName
-    #     $m = Get-Content -LiteralPath $fullName | Where-Object { ! [string]::IsNullOrWhiteSpace($_) -and $_ -notlike '#*' }
-    #     $moduleCount = @($m).Count
-    #
-    #     [pscustomobject] @{
-    #         FullName     = $fullName
-    #         ModuleCount = $moduleCount
-    #     } | Write-Output
-    # } | Sort-Object -Property ModuleCount
+        [pscustomobject] @{
+            Name        = $name
+            FullName    = $fullName
+            ModuleCount = $moduleCount
+        } | Write-Output
+    }
 
-    & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\perl_module_rperl.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
-    & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\MojoliciusTest.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
+    $ModuleListCount = @($ModuleListFiles).Count
+    $i = 0
 
-    & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\book_learning_perl.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
-    & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\book_perl_testing_a_developers_notebook.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
-    & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\book_effective_perl_512.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
-    & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\book_modern_perl_512.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
-    & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\book_intermediate_perl.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
-    & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\book_perl_best_practices.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
-    & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\perl_modules_win32.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
-    & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\book_modern_perl_522.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
-    & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\book_programming_perl.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
-    & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\book_mastering_perl.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
+    $ModuleListFiles | Sort-Object -Property ModuleCount, FullName | ForEach-Object {
+        $i++
 
-    & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\perl_critic_modules.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
-    & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\perl_modules_other.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
-    & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\ReallyLargeModuleExample.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
-    & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\perl_modules.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
+        $item = $_
+        $name = $item.Name
+        $fullName = $item.FullName
+
+        Write-Host ''
+        Write-Host -ForegroundColor Green "module installation ($i/$ModuleListCount) with list '$name' start at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+        Write-Host ''
+
+        & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$fullName" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
+
+        Write-Host ''
+        Write-Host -ForegroundColor Green "module installation ($i/$ModuleListCount) with list '$name' ended at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+        Write-Host ''
+    }
 
     & "$ScriptDir\StrawberryPortable_c_CpanL_ListModules.ps1" -StrawberryDir $StrawberryDir -ModuleListFileTxt "$LogDir\$(Get-Date -Format 'yyyyMMdd_HHmmss')_list_after_install.txt" | Write-Host
     & "$ScriptDir\StrawberryPortable_e_RemoveDefenderExclude.ps1" -StrawberryDir $StrawberryDir | Write-Host
