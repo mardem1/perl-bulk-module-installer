@@ -394,7 +394,10 @@ sub get_output_with_detached_execute
 
     $end_date = time;
 
+    my $duration_seconds = $end_date - $start_date;
+    my $duration_minutes = ( 0.0 + $duration_seconds ) / 60.0;
     say_ex( '==> ' . 'cmd ended: ' . ( join ' ', @cmd ) );
+    say_ex( '==> ' . 'Duration: ' . $duration_seconds . ' seconds => ' . $duration_minutes . ' minutes' );
 
     if ( $show_live_output ) {
         say_ex( '' );
