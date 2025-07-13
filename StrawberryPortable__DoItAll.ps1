@@ -120,7 +120,11 @@ try {
     # direct loop ?
     # & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\SingleModuleExample.txt", "$ScriptDir\test-module-lists\SmallModuleExample.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
 
-    $ModuleListFiles = Get-ChildItem -LiteralPath "$ScriptDir\test-module-lists\" -File | Where-Object { $_.Name -notlike '_*' } | Where-Object { $_.Name -like '*.txt' } | ForEach-Object {
+    $ModuleListFiles = Get-ChildItem -LiteralPath "$ScriptDir\test-module-lists\" -File | Where-Object {
+        $_.Name -like '*.txt'
+    } | Where-Object {
+        $_.Name -ne '_dont_try_modules.txt'
+    } | ForEach-Object {
         $item = $_
         $name = $item.Name
         $fullName = $item.FullName
