@@ -1375,7 +1375,8 @@ sub install_module_with_dependencies_first_recursive
     my $current_install_count = 0;
     my $new_install_count     = 0;
 
-    my $analyze_run = 1;
+    my $dependencyError = 0;
+    my $analyze_run     = 1;
     do {
         $current_install_count = scalar( keys %modules_install_ok );
         $new_install_count     = $current_install_count;
@@ -1394,9 +1395,10 @@ sub install_module_with_dependencies_first_recursive
                     $recursion--;
 
                     if ( $hasError ) {
+                        $dependencyError = 1;
                         # mark module as failed, if dependent module not ok
                         mark_module_as_failed( $module );
-                        return $hasError;
+                        # return $hasError; # continue with other dependency installations?
                     }
                 }
             }
@@ -1405,6 +1407,11 @@ sub install_module_with_dependencies_first_recursive
         $new_install_count = scalar( keys %modules_install_ok );
         $analyze_run++;
     } while ( $current_install_count != $new_install_count );
+
+    if ( $dependencyError ) {
+        say_ex( '==> ' . "can't install module -> DEPENDENCY ERROR - $module" );
+        return 1;    # hasError
+    }
 
     $current_install_count = scalar( keys %modules_install_ok );
     $new_install_count     = $current_install_count;
