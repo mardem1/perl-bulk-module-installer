@@ -1144,7 +1144,19 @@ sub install_single_module
         mark_module_as_ok( $module, 999_999 );    # newest version - so real number not relevant.
     }
 
-    say_ex( '==> ' . $type . ' module - ' . $module . ' ' . $action );
+    my $duration_seconds = $end_date - $start_date;
+    my $duration_minutes = ( 0.0 + $duration_seconds ) / 60.0;
+
+    say_ex(   '==> '
+            . $type
+            . ' module - '
+            . $module . ' '
+            . $action . ' - '
+            . 'Duration: '
+            . $duration_seconds
+            . ' seconds => '
+            . $duration_minutes
+            . ' minutes' );
 
     if ( !$hasError ) {
         say_ex( '==> ' . 'after successful module install - reimport all installed modules from system' );
