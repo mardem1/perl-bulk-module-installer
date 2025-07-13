@@ -1384,7 +1384,7 @@ sub install_module_with_dependencies_first_recursive
         if ( defined $dep_ref ) {
             my %dep = %{ $dep_ref };
             if ( %dep ) {
-                foreach my $dep_module ( keys %dep ) {
+                foreach my $dep_module ( sort keys %dep ) {
                     say_ex( '==> ' . "install required dependency - '$dep_module' - for - '$module'" );
                     # only here - not at entry and every return.
                     $recursion++;
@@ -1434,7 +1434,7 @@ sub install_modules_sequentially
     my $check_i              = 0;
 
     my $module = q{};
-    $module = ( keys %modules_need_to_install )[ 0 ];
+    $module = ( sort keys %modules_need_to_install )[ 0 ];
 
     while ( $module ) {
         $check_i++;
@@ -1459,7 +1459,7 @@ sub install_modules_sequentially
         say_ex( '==> ' . "... handle install list module - ($check_i - $remaining) - $module done" );
 
         $remaining = scalar( keys %modules_need_to_install );
-        $module    = ( keys %modules_need_to_install )[ 0 ];
+        $module    = ( sort keys %modules_need_to_install )[ 0 ];
 
         my $now_time      = time;
         my $install_count = $install_target_count - $remaining;
