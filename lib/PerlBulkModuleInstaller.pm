@@ -563,13 +563,14 @@ sub mark_module_as_failed
         $version = undef;    # force undef if empty - param optional
     }
 
-    if ( exists $modules_install_dont_try_from_file{ $module } ) {
-        say_ex( 'module ', $module, ' marked as dont try - so dont add to failed!' );
-    }
-    else {
-        say_ex( 'add ', $module, ' to modules_install_failed' );
-        $modules_install_failed{ $module } = $version;
-    }
+    # better mark as failed, so we can see it was on install list and checked
+    # if ( exists $modules_install_dont_try_from_file{ $module } ) {
+    #     say_ex( 'module ', $module, ' marked as dont try - so dont add to failed!' );
+    # }
+    # else {
+    say_ex( 'add ', $module, ' to modules_install_failed' );
+    $modules_install_failed{ $module } = $version;
+    # }
 
     say_ex( 'remove ', $module, ' from modules_need_to_install' );
     delete $modules_need_to_install{ $module };    # remove module - don't care if failed - no retry of failed
@@ -606,12 +607,6 @@ sub was_module_already_tried
         croak 'param module empty!';
     }
 
-    if ( exists $modules_install_dont_try_from_file{ $module } ) {
-        say_ex( 'WARN: install module - ' . $module . ' - marked dont try - abort' );
-
-        return 1;
-    }
-
     if ( exists $modules_install_ok{ $module } ) {
         say_ex( 'WARN: install module - ' . $module . ' - already ok - abort' );
 
@@ -626,6 +621,13 @@ sub was_module_already_tried
 
     if ( exists $modules_install_not_found{ $module } ) {
         say_ex( 'WARN: install module - ' . $module . ' - already mot found - abort' );
+
+        return 1;
+    }
+
+    if ( exists $modules_install_dont_try_from_file{ $module } ) {
+        mark_module_as_failed();    # mark failed
+        say_ex( 'WARN: install module - ' . $module . ' - marked dont try - abort' );
 
         return 1;
     }
