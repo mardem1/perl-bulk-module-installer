@@ -22,8 +22,15 @@ Path to ZIP, if not given generated based on Strawberry infos above and in BuilD
 
 .PARAMETER StrawberryDir
 
-
 Path in which the zip will be extracted, if not given generated based on Strawberry infos above and in BuilDir
+
+.PARAMETER PbmiDir
+
+Path to perl-bulk-module-installer directory, generated if empty
+
+.PARAMETER LogDir
+
+Path to log directory, generated if empty
 
 .NOTES
 
@@ -100,7 +107,14 @@ param (
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ ! [string]::IsNullOrWhiteSpace($_) })]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Container -IsValid })]
-    [string] $StrawberryDir = "$BuildDir\$StrawberryZipBaseName"
+    [string] $StrawberryDir = "$BuildDir\$StrawberryZipBaseName",
+
+    [Parameter(Mandatory = $false)]
+    [string] $PbmiDir = '', # based on Script-Dir if empty
+
+    [Parameter(Mandatory = $false)]
+    [string] $LogDir = ''  # based on Pbmi-Dir if empty
+
 )
 
 $ScriptStartTime = Get-Date
@@ -121,9 +135,23 @@ try {
 
     $ScriptItem = Get-Item -LiteralPath $ScriptPath -ErrorAction Stop
     $ScriptDir = $ScriptItem.Directory.FullName
-    $PbmiDir = "$ScriptDir"
 
-    $LogDir = "$PbmiDir\log"
+    if ( [string]::IsNullOrWhiteSpace($PbmiDir) ) {
+        $PbmiDir = "$ScriptDir"
+    }
+    elseif ( ! ( Test-Path -LiteralPath "$PbmiDir\InstallCpanModules.pl" -PathType Leaf) ) {
+        Write-Host -ForegroundColor Red 'ERROR: perl-bulk-module-installer (InstallCpanModules) not found!'
+        exit 1
+    }
+
+    if ( [string]::IsNullOrWhiteSpace($LogDir) ) {
+        $LogDir = "$PbmiDir\log"
+    }
+    elseif ( ! ( Test-Path -LiteralPath "$LogDir" -PathType Container -IsValid) ) {
+        Write-Host -ForegroundColor Red 'ERROR: LogDir not valid!'
+        exit 1
+    }
+
     Start-Transcript -LiteralPath "$LogDir\$(Get-Date -Format 'yyyyMMdd_HHmmss')_$($ScriptItem.BaseName).log"
     $transcript = $true
 
