@@ -40,6 +40,10 @@ Path which contains the module install/dont-try lists, generated if empty
 
 Path for the Dont-Try-List, generated if empty
 
+.PARAMETER InstallListFilePath
+
+Explicit List-File for installation, if not given, all files in ModuleListsDirPath (except DontTryListFilePath) will be used.
+
 .NOTES
 
 BUG REPORTS
@@ -127,7 +131,10 @@ param (
     [string] $ModuleListsDirPath = '',  # based on Pbmi-Dir if empty
 
     [Parameter(Mandatory = $false)]
-    [string] $DontTryListFilePath = '' # based on ModuleListsDirPath if empty
+    [string] $DontTryListFilePath = '', # based on ModuleListsDirPath if empty
+
+    [Parameter(Mandatory = $false)]
+    [string] $InstallListFilePath = '' # unused if empty
 )
 
 $ScriptStartTime = Get-Date
@@ -209,6 +216,12 @@ try {
         throw "dont-try list file $DontTryListFilePath not found"
     }
 
+    if ( ![string]::IsNullOrWhiteSpace($InstallListFilePath) ) {
+        if ( !( Test-Path -LiteralPath $InstallListFilePath -PathType Leaf ) ) {
+            throw "install list file $InstallListFilePath not found"
+        }
+    }
+
     & "$PbmiDir\StrawberryPortable_a_Extract.ps1" -StrawberryZip $StrawberryZip -Destination $StrawberryDir | Write-Host
     & "$PbmiDir\StrawberryPortable_b_AddDefenderExclude.ps1" -StrawberryDir $StrawberryDir | Write-Host
     & "$PbmiDir\StrawberryPortable_c_CpanL_ListModules.ps1" -StrawberryDir $StrawberryDir -ModuleListFileTxt "$LogDir\$(Get-Date -Format 'yyyyMMdd_HHmmss')_list_before.txt" | Write-Host
@@ -227,7 +240,14 @@ try {
     # direct loop ?
     # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ModuleListsDirPath\SingleModuleExample.txt", "$ModuleListsDirPath\SmallModuleExample.txt" -DontTryModuleListFile "$DontTryListFilePath" | Write-Host
 
-    $ModuleListFiles = Get-ChildItem -LiteralPath "$ModuleListsDirPath\" -File | Where-Object {
+    if (![string]::IsNullOrWhiteSpace($InstallListFilePath)) {
+        $tmpList = Get-Item -LiteralPath "$InstallListFilePath"
+    }
+    else {
+        $tmpList = Get-ChildItem -LiteralPath "$ModuleListsDirPath\" -File
+    }
+
+    $ModuleListFiles = $tmpList | Where-Object {
         $_.Name -like '*.txt'
     } | Where-Object {
         $_.FullName -ne $DontTryListFilePath
@@ -246,6 +266,10 @@ try {
     }
 
     $ModuleListCount = @($ModuleListFiles).Count
+    if ( 0 -eq $ModuleListCount -or !$ModuleListFiles ) {
+        throw 'no useable install list-file found'
+    }
+
     $i = 0
 
     $ModuleListFiles | Sort-Object -Property ModuleCount, FullName | ForEach-Object {
