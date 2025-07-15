@@ -280,14 +280,28 @@ try {
         $name = $item.Name
         $fullName = $item.FullName
 
+        # Workaround ?
+
         Write-Host ''
-        Write-Host -ForegroundColor Green "module installation ($i/$ModuleListCount) with list '$name' start at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+        Write-Host -ForegroundColor Green "module installation ($i/$ModuleListCount) with list '$name' (1/2) start at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
         Write-Host ''
 
         & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$fullName" -DontTryModuleListFile "$DontTryListFilePath" | Write-Host
 
         Write-Host ''
-        Write-Host -ForegroundColor Green "module installation ($i/$ModuleListCount) with list '$name' ended at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+        Write-Host -ForegroundColor Green "module installation ($i/$ModuleListCount) with list '$name' (1/2) ended at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+        Write-Host ''
+
+        # ToDo: use of updated core-modules need #2 run to detect change ?
+
+        Write-Host ''
+        Write-Host -ForegroundColor Green "module installation ($i/$ModuleListCount) with list '$name' (2/2) start at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+        Write-Host ''
+
+        & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$fullName" -DontTryModuleListFile "$DontTryListFilePath" | Write-Host
+
+        Write-Host ''
+        Write-Host -ForegroundColor Green "module installation ($i/$ModuleListCount) with list '$name' (2/2) ended at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
         Write-Host ''
     }
 
