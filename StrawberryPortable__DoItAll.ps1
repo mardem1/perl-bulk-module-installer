@@ -95,7 +95,8 @@ try {
     # strawberry-perl-5.38.4.1-64bit-portable
     # strawberry-perl-5.40.2.1-64bit-portable
 
-    $portableBaseName = 'strawberry-perl-5.24.4.1-64bit-portable'
+    $StrawberryVersionNumber = '5.24.4.1'
+    $portableBaseName = "strawberry-perl-$($StrawberryVersionNumber)-64bit-portable"
     $perlBuildDir = 'C:\perl-build'
 
     $StrawberryZip = "$perlBuildDir\$portableBaseName.zip"
