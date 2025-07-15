@@ -47,7 +47,10 @@ param (
     [Parameter(Mandatory = $true, Position = 0)]
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Container })]
-    [ValidateScript({ $_ -like '*strawberry*portable*' })]
+    # [ValidateScript({ $_ -like '*strawberry*portable*' })]
+    # better test perl.exe location, path name not the point
+    [ValidateScript({ $_ -like '*strawberry*' })]
+    [ValidateScript({ Test-Path -LiteralPath "$_\perl\bin\perl.exe" -PathType Leaf })]
     [ValidateScript({ $_ -notlike '*\' })]
     [string] $StrawberryDir,
 
