@@ -97,10 +97,10 @@ try {
 
     $StrawberryVersionNumber = '5.24.4.1'
     $StrawberryZipBaseName = "strawberry-perl-$($StrawberryVersionNumber)-64bit-portable"
-    $perlBuildDir = 'C:\perl-build'
+    $BuildDir = 'C:\perl-build'
 
-    $StrawberryZip = "$perlBuildDir\$StrawberryZipBaseName.zip"
-    $StrawberryDir = "$perlBuildDir\$StrawberryZipBaseName"
+    $StrawberryZip = "$BuildDir\$StrawberryZipBaseName.zip"
+    $StrawberryDir = "$BuildDir\$StrawberryZipBaseName"
 
     if ( !( Test-Path -LiteralPath $StrawberryZip ) ) {
         throw "zip source $StrawberryZip not found"
