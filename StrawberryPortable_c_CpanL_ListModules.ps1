@@ -124,7 +124,12 @@ try {
         "# Win-User        : $winUser",
         "# Win-Host        : $winHostName",
         "# Win-OS          : $winOs",
-        '#',
+        '#'
+    )
+
+    # INFO: add custom header here ?
+
+    $fileHeaders += (
         "# search done at  : '$now'",
         '#',
         '# modules found:',
