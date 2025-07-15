@@ -105,6 +105,8 @@ try {
     $perlInfo | Write-Host -ForegroundColor Green
     Write-Host ''
 
+    $ModuleListFileCsv = $ModuleListFileTxt.Replace('.txt', '.csv')
+
     $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
     $winUser = $env:USERNAME
     $winHostName = $env:COMPUTERNAME
@@ -242,7 +244,6 @@ try {
     $fileHeaders, $moduleNames, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt -Encoding default -Force -Confirm:$false -Width 999
     Write-Host ''
 
-    $ModuleListFileCsv = $ModuleListFileTxt.Replace('.txt', '.csv')
     Write-Host -ForegroundColor Green "write csv file $ModuleListFileCsv"
 
     $moduleLines = $moduleNames | ForEach-Object {
