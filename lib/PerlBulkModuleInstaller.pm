@@ -1217,6 +1217,7 @@ sub fetch_dependencies_for_module
 
     my %dependencies = ();
 
+# eg: STDOUT: "==> Found dependencies: HTTP::Daemon, HTTP::Message, LWP, Module::Load, XML::Parser, Test::More, Scalar::Util"
     my @dependencie_lines =
         grep { $_ =~ /Found dependencies: /io } @output;
 
@@ -1227,6 +1228,32 @@ sub fetch_dependencies_for_module
                 $module_name = trim( $module_name );
                 $dependencies{ $module_name } = undef;
             }
+        }
+    }
+
+# eg: STDOUT: "Configuring ExtUtils-MakeMaker-7.76 ... ! Installing the dependencies failed: Installed version (7.34) of ExtUtils::MakeMaker is not in range '7.56'"
+# don't know why --showdeps shows "Installing the dependencies failed" but it does? And module not in following module list, so check and add extra.
+    my @failed_dependencie_lines =
+        grep { $_ =~ /Installing the dependencies failed: Installed version/io } @output;
+
+    foreach my $line ( @failed_dependencie_lines ) {
+        if ( $line
+            =~ /Configuring .+ \.\.\. ! Installing the dependencies failed: Installed version \(.+\) of (.+) is not in range '(.+)'/io
+            )
+        {
+            my $module_name  = trim( $1 );
+            my $need_version = trim( $2 );
+
+            if ( $EMPTY_STRING eq $module_name ) {
+                say_ex( 'WARN: dependency line analyze failed: ' . $line );
+                next;
+            }
+
+            if ( $EMPTY_STRING eq $need_version ) {
+                $need_version = undef;
+            }
+
+            $dependencies{ $module_name } = $need_version;
         }
     }
 
