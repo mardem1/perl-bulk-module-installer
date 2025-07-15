@@ -112,7 +112,7 @@ param (
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ ! [string]::IsNullOrWhiteSpace($_) })]
-    [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf -IsValid })]
+    [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
     [string] $StrawberryZip = "$BuildDir\$StrawberryZipBaseName.zip",
 
     [Parameter(Mandatory = $false)]
