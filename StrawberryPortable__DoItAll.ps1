@@ -32,6 +32,10 @@ Path to perl-bulk-module-installer directory, generated if empty
 
 Path to log directory, generated if empty
 
+.PARAMETER ModuleListsDirPath
+
+Path which contains the module install/dont-try lists, generated if empty
+
 .NOTES
 
 BUG REPORTS
@@ -113,8 +117,10 @@ param (
     [string] $PbmiDir = '', # based on Script-Dir if empty
 
     [Parameter(Mandatory = $false)]
-    [string] $LogDir = ''  # based on Pbmi-Dir if empty
+    [string] $LogDir = '',  # based on Pbmi-Dir if empty
 
+    [Parameter(Mandatory = $false)]
+    [string] $ModuleListsDirPath = '' # based on Pbmi-Dir if empty
 )
 
 $ScriptStartTime = Get-Date
@@ -180,12 +186,15 @@ try {
         throw "extraction target $StrawberryDir already exists"
     }
 
-    $moduleListDirPath = "$PbmiDir\test-module-lists"
-    if ( !( Test-Path -LiteralPath $moduleListDirPath -PathType Container ) ) {
-        throw "list dir $moduleListDirPath not found"
+    if ( [string]::IsNullOrWhiteSpace($ModuleListsDirPath) ) {
+        $ModuleListsDirPath = "$PbmiDir\test-module-lists"
     }
 
-    $dontTryListFilePath = "$moduleListDirPath\_dont_try_modules.txt"
+    if ( !( Test-Path -LiteralPath $ModuleListsDirPath -PathType Container ) ) {
+        throw "list dir $ModuleListsDirPath not found"
+    }
+
+    $dontTryListFilePath = "$ModuleListsDirPath\_dont_try_modules.txt"
     if ( !( Test-Path -LiteralPath $dontTryListFilePath -PathType Leaf ) ) {
         throw "dont-try list file $dontTryListFilePath not found"
     }
@@ -200,15 +209,15 @@ try {
     # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -OnlyAllUpdates -DontTryModuleListFile "$dontTryListFilePath"
 
     # install all Updates in same install run ?
-    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -AllUpdates -InstallModuleListFile "$moduleListDirPath\CoreCarpModuleExample.txt" -DontTryModuleListFile "$dontTryListFilePath"
+    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -AllUpdates -InstallModuleListFile "$ModuleListsDirPath\CoreCarpModuleExample.txt" -DontTryModuleListFile "$dontTryListFilePath"
 
     # install modules
-    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$moduleListDirPath\SingleModuleExample.txt" -DontTryModuleListFile "$dontTryListFilePath" | Write-Host
+    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ModuleListsDirPath\SingleModuleExample.txt" -DontTryModuleListFile "$dontTryListFilePath" | Write-Host
 
     # direct loop ?
-    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$moduleListDirPath\SingleModuleExample.txt", "$moduleListDirPath\SmallModuleExample.txt" -DontTryModuleListFile "$dontTryListFilePath" | Write-Host
+    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ModuleListsDirPath\SingleModuleExample.txt", "$ModuleListsDirPath\SmallModuleExample.txt" -DontTryModuleListFile "$dontTryListFilePath" | Write-Host
 
-    $ModuleListFiles = Get-ChildItem -LiteralPath "$moduleListDirPath\" -File | Where-Object {
+    $ModuleListFiles = Get-ChildItem -LiteralPath "$ModuleListsDirPath\" -File | Where-Object {
         $_.Name -like '*.txt'
     } | Where-Object {
         $_.FullName -ne $dontTryListFilePath
