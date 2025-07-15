@@ -4,6 +4,27 @@
 
 extract strawberry portable, install module and package again as 7z
 
+.PARAMETER StrawberryVersionNumber
+
+Version-Number eg. 5.14.4.1
+
+.PARAMETER StrawberryZipBaseName
+
+Full basename for ZIP file if not given generated via Version-Number
+
+.PARAMETER BuildDir
+
+Basedir of all Operations - search for ZIP and Sub-Folder for extraction
+
+.PARAMETER StrawberryZip
+
+Path to ZIP, if not given generated based on Strawberry infos above and in BuilDir
+
+.PARAMETER StrawberryDir
+
+
+Path in which the zip will be extracted, if not given generated based on Strawberry infos above and in BuilDir
+
 .NOTES
 
 BUG REPORTS
@@ -35,7 +56,52 @@ FOR A PARTICULAR PURPOSE.
 #>
 
 [CmdletBinding()]
-param ()
+param (
+    # strawberry-perl-5.14.4.1-64bit-portable
+    # strawberry-perl-5.16.3.1-64bit-portable
+    # strawberry-perl-5.18.4.1-64bit-portable
+    # strawberry-perl-5.20.3.3-64bit-portable
+    # strawberry-perl-5.22.3.1-64bit-portable
+
+    # strawberry-perl-5.24.4.1-64bit-portable
+    # strawberry-perl-5.26.3.1-64bit-portable
+    # strawberry-perl-5.28.2.1-64bit-portable
+    # strawberry-perl-5.30.3.1-64bit-portable
+    # strawberry-perl-5.32.1.1-64bit-portable
+
+    # strawberry-perl-5.34.3.1-64bit-portable
+    # strawberry-perl-5.36.3.1-64bit-portable
+    # strawberry-perl-5.38.4.1-64bit-portable
+    # strawberry-perl-5.40.2.1-64bit-portable
+
+    [Parameter(Mandatory = $false)]
+    [ValidateNotNullOrEmpty()]
+    [ValidateScript({ ! [string]::IsNullOrWhiteSpace($_) })]
+    [string] $StrawberryVersionNumber = '5.24.4.1',
+
+    [Parameter(Mandatory = $false)]
+    [ValidateNotNullOrEmpty()]
+    [ValidateScript({ ! [string]::IsNullOrWhiteSpace($_) })]
+    [string] $StrawberryZipBaseName = "strawberry-perl-$($StrawberryVersionNumber)-64bit-portable",
+
+    [Parameter(Mandatory = $false)]
+    [ValidateNotNullOrEmpty()]
+    [ValidateScript({ ! [string]::IsNullOrWhiteSpace($_) })]
+    [ValidateScript({ Test-Path -LiteralPath $_ -PathType Container -IsValid })]
+    [string] $BuildDir = 'C:\perl-build',
+
+    [Parameter(Mandatory = $false)]
+    [ValidateNotNullOrEmpty()]
+    [ValidateScript({ ! [string]::IsNullOrWhiteSpace($_) })]
+    [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf -IsValid })]
+    [string] $StrawberryZip = "$BuildDir\$StrawberryZipBaseName.zip",
+
+    [Parameter(Mandatory = $false)]
+    [ValidateNotNullOrEmpty()]
+    [ValidateScript({ ! [string]::IsNullOrWhiteSpace($_) })]
+    [ValidateScript({ Test-Path -LiteralPath $_ -PathType Container -IsValid })]
+    [string] $StrawberryDir = "$BuildDir\$StrawberryZipBaseName"
+)
 
 $ScriptStartTime = Get-Date
 $ScriptPath = ''
@@ -77,30 +143,6 @@ try {
         Write-Host -ForegroundColor Red 'ERROR: perl-bulk-module-installer (InstallCpanModules) not found!'
         exit 1
     }
-
-    # strawberry-perl-5.14.4.1-64bit-portable
-    # strawberry-perl-5.16.3.1-64bit-portable
-    # strawberry-perl-5.18.4.1-64bit-portable
-    # strawberry-perl-5.20.3.3-64bit-portable
-    # strawberry-perl-5.22.3.1-64bit-portable
-
-    # strawberry-perl-5.24.4.1-64bit-portable
-    # strawberry-perl-5.26.3.1-64bit-portable
-    # strawberry-perl-5.28.2.1-64bit-portable
-    # strawberry-perl-5.30.3.1-64bit-portable
-    # strawberry-perl-5.32.1.1-64bit-portable
-
-    # strawberry-perl-5.34.3.1-64bit-portable
-    # strawberry-perl-5.36.3.1-64bit-portable
-    # strawberry-perl-5.38.4.1-64bit-portable
-    # strawberry-perl-5.40.2.1-64bit-portable
-
-    $StrawberryVersionNumber = '5.24.4.1'
-    $StrawberryZipBaseName = "strawberry-perl-$($StrawberryVersionNumber)-64bit-portable"
-    $BuildDir = 'C:\perl-build'
-
-    $StrawberryZip = "$BuildDir\$StrawberryZipBaseName.zip"
-    $StrawberryDir = "$BuildDir\$StrawberryZipBaseName"
 
     if ( !( Test-Path -LiteralPath $StrawberryZip ) ) {
         throw "zip source $StrawberryZip not found"
