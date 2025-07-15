@@ -244,15 +244,15 @@ try {
     $fileHeaders, $moduleNames, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt -Encoding default -Force -Confirm:$false -Width 999
     Write-Host ''
 
-    Write-Host -ForegroundColor Green "write csv file $ModuleListFileCsv"
-
     $moduleLines = $moduleNames | ForEach-Object {
         $m = $_
         $v = $modules[$m]
         "$m;$v"
     }
 
+    Write-Host -ForegroundColor Green "write csv file $ModuleListFileCsv"
     "# installed_modules_found;$perlVersion", $moduleLines | Out-File -LiteralPath $ModuleListFileCsv -Encoding default -Force -Confirm:$false -Width 999
+    Write-Host ''
 
     exit 0
 }
