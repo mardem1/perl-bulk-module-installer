@@ -109,6 +109,11 @@ try {
         throw "extraction target $StrawberryDir already exists"
     }
 
+    $moduleListDirPath = "$PbmiDir\test-module-lists"
+    if ( !( Test-Path -LiteralPath $moduleListDirPath -PathType Container ) ) {
+        throw "list dir $moduleListDirPath not found"
+    }
+
     & "$PbmiDir\StrawberryPortable_a_Extract.ps1" -StrawberryZip $StrawberryZip -Destination $StrawberryDir | Write-Host
     & "$PbmiDir\StrawberryPortable_b_AddDefenderExclude.ps1" -StrawberryDir $StrawberryDir | Write-Host
     & "$PbmiDir\StrawberryPortable_c_CpanL_ListModules.ps1" -StrawberryDir $StrawberryDir -ModuleListFileTxt "$LogDir\$(Get-Date -Format 'yyyyMMdd_HHmmss')_list_before.txt" | Write-Host
@@ -116,18 +121,18 @@ try {
     # it's not recommended to update module if not needed
 
     # install all Updates before ?
-    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -OnlyAllUpdates -DontTryModuleListFile "$PbmiDir\test-module-lists\_dont_try_modules.txt"
+    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -OnlyAllUpdates -DontTryModuleListFile "$moduleListDirPath\_dont_try_modules.txt"
 
     # install all Updates in same install run ?
-    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -AllUpdates -InstallModuleListFile "$PbmiDir\test-module-lists\CoreCarpModuleExample.txt" -DontTryModuleListFile "$PbmiDir\test-module-lists\_dont_try_modules.txt"
+    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -AllUpdates -InstallModuleListFile "$moduleListDirPath\CoreCarpModuleExample.txt" -DontTryModuleListFile "$moduleListDirPath\_dont_try_modules.txt"
 
     # install modules
-    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$PbmiDir\test-module-lists\SingleModuleExample.txt" -DontTryModuleListFile "$PbmiDir\test-module-lists\_dont_try_modules.txt" | Write-Host
+    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$moduleListDirPath\SingleModuleExample.txt" -DontTryModuleListFile "$moduleListDirPath\_dont_try_modules.txt" | Write-Host
 
     # direct loop ?
-    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$PbmiDir\test-module-lists\SingleModuleExample.txt", "$PbmiDir\test-module-lists\SmallModuleExample.txt" -DontTryModuleListFile "$PbmiDir\test-module-lists\_dont_try_modules.txt" | Write-Host
+    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$moduleListDirPath\SingleModuleExample.txt", "$moduleListDirPath\SmallModuleExample.txt" -DontTryModuleListFile "$moduleListDirPath\_dont_try_modules.txt" | Write-Host
 
-    $ModuleListFiles = Get-ChildItem -LiteralPath "$PbmiDir\test-module-lists\" -File | Where-Object {
+    $ModuleListFiles = Get-ChildItem -LiteralPath "$moduleListDirPath\" -File | Where-Object {
         $_.Name -like '*.txt'
     } | Where-Object {
         $_.Name -ne '_dont_try_modules.txt'
@@ -159,7 +164,7 @@ try {
         Write-Host -ForegroundColor Green "module installation ($i/$ModuleListCount) with list '$name' start at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
         Write-Host ''
 
-        & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$fullName" -DontTryModuleListFile "$PbmiDir\test-module-lists\_dont_try_modules.txt" | Write-Host
+        & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$fullName" -DontTryModuleListFile "$moduleListDirPath\_dont_try_modules.txt" | Write-Host
 
         Write-Host ''
         Write-Host -ForegroundColor Green "module installation ($i/$ModuleListCount) with list '$name' ended at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
