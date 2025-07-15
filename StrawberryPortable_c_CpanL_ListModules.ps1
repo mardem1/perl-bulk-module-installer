@@ -106,6 +106,7 @@ try {
     Write-Host ''
 
     $ModuleListFileCsv = $ModuleListFileTxt.Replace('.txt', '.csv')
+    $ModuleExportLog = $ModuleListFileTxt.Replace('.txt', '.log')
 
     $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
     $winUser = $env:USERNAME
@@ -238,11 +239,14 @@ try {
 
     Write-Host ''
     Write-Host -ForegroundColor Green "=> found modules: $($moduleNames.Count)"
-    Write-Host ''
 
+    Write-Host ''
+    Write-Host -ForegroundColor Green "write log file $ModuleExportLog"
+    $generatedList | Out-File -LiteralPath $ModuleExportLog -Encoding default -Force -Confirm:$false -Width 999
+
+    Write-Host ''
     Write-Host -ForegroundColor Green "write list file $ModuleListFileTxt"
     $fileHeaders, $moduleNames, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt -Encoding default -Force -Confirm:$false -Width 999
-    Write-Host ''
 
     $moduleLines = $moduleNames | ForEach-Object {
         $m = $_
@@ -250,10 +254,11 @@ try {
         "$m;$v"
     }
 
+    Write-Host ''
     Write-Host -ForegroundColor Green "write csv file $ModuleListFileCsv"
     "# installed_modules_found;$perlVersion", $moduleLines | Out-File -LiteralPath $ModuleListFileCsv -Encoding default -Force -Confirm:$false -Width 999
-    Write-Host ''
 
+    Write-Host ''
     exit 0
 }
 catch {
