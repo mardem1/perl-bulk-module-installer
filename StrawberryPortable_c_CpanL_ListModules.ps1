@@ -240,23 +240,41 @@ try {
     Write-Host ''
     Write-Host -ForegroundColor Green "=> found modules: $($moduleNames.Count)"
 
-    Write-Host ''
-    Write-Host -ForegroundColor Green "write log file $ModuleExportLog"
-    $generatedList | Out-File -LiteralPath $ModuleExportLog -Encoding default -Force -Confirm:$false -Width 999
+    if ( ! $moduleNames ) {
+        if ( Test-Path -LiteralPath $ModuleExportLog ) {
+            Write-Host "remove log file $ModuleExportLog"
+            Remove-Item -LiteralPath $ModuleExportLog
+        }
 
-    Write-Host ''
-    Write-Host -ForegroundColor Green "write list file $ModuleListFileTxt"
-    $fileHeaders, $moduleNames, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt -Encoding default -Force -Confirm:$false -Width 999
+        if ( Test-Path -LiteralPath $ModuleListFileTxt ) {
+            Write-Host "remove txt file $ModuleListFileTxt"
+            Remove-Item -LiteralPath $ModuleListFileTxt
+        }
 
-    $moduleLines = $moduleNames | ForEach-Object {
-        $m = $_
-        $v = $modules[$m]
-        "$m;$v"
+        if ( Test-Path -LiteralPath $ModuleListFileCsv ) {
+            Write-Host "remove csv file $ModuleListFileCsv"
+            Remove-Item -LiteralPath $ModuleListFileCsv
+        }
     }
+    else {
+        Write-Host ''
+        Write-Host -ForegroundColor Green "write log file $ModuleExportLog"
+        $generatedList | Out-File -LiteralPath $ModuleExportLog -Encoding default -Force -Confirm:$false -Width 999
 
-    Write-Host ''
-    Write-Host -ForegroundColor Green "write csv file $ModuleListFileCsv"
-    "# installed_modules_found;$perlVersion", $moduleLines | Out-File -LiteralPath $ModuleListFileCsv -Encoding default -Force -Confirm:$false -Width 999
+        Write-Host ''
+        Write-Host -ForegroundColor Green "write list file $ModuleListFileTxt"
+        $fileHeaders, $moduleNames, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt -Encoding default -Force -Confirm:$false -Width 999
+
+        $moduleLines = $moduleNames | ForEach-Object {
+            $m = $_
+            $v = $modules[$m]
+            "$m;$v"
+        }
+
+        Write-Host ''
+        Write-Host -ForegroundColor Green "write csv file $ModuleListFileCsv"
+        "# installed_modules_found;$perlVersion", $moduleLines | Out-File -LiteralPath $ModuleListFileCsv -Encoding default -Force -Confirm:$false -Width 999
+    }
 
     Write-Host ''
     exit 0
