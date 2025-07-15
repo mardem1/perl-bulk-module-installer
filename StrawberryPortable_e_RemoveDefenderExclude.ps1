@@ -1,4 +1,5 @@
-﻿<#
+﻿
+<#
 
 .SYNOPSIS
 
@@ -86,7 +87,7 @@ try {
 
     ( Get-MpPreference ).ExclusionPath | ForEach-Object { $_ } | Where-Object {
         # if none set $null given ? why
-        ! [string]::IsNullOrWhiteSpace($_) -and (
+        ! [string]::IsNullOrWhiteSpace( $_ ) -and (
             $_ -eq $StrawberryDir `
                 -or $_.StartsWith($StrawberryDir) )
     } | ForEach-Object {
@@ -95,7 +96,7 @@ try {
     }
 
     ( Get-MpPreference ).ExclusionProcess | Where-Object {
-        ! [string]::IsNullOrWhiteSpace($_) -and `
+        ! [string]::IsNullOrWhiteSpace( $_ ) -and `
             $_.StartsWith($StrawberryDir)
     } | ForEach-Object {
         Write-Host "remove defender exclude process '$_'"

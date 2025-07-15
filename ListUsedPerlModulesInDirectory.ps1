@@ -1,4 +1,5 @@
-﻿<#
+﻿
+<#
 
 .SYNOPSIS
 
@@ -64,12 +65,8 @@ param (
 
     [Parameter(Mandatory = $true, Position = 1)]
     [ValidateNotNullOrEmpty()]
-    [ValidateScript({
-            Test-Path -LiteralPath $_ -PathType Leaf -IsValid
-        })]
-    [ValidateScript({
-            $_ -like '*.txt'
-        })]
+    [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf -IsValid })]
+    [ValidateScript({ $_ -like '*.txt' })]
     [string] $ModuleListFileTxt
 )
 

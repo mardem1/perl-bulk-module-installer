@@ -1,4 +1,5 @@
-﻿<#
+﻿
+<#
 
 .SYNOPSIS
 
@@ -101,7 +102,7 @@ try {
     $perlVersion = & $perlexe -e 'print "$^V"' | Out-String # = eg. 5.40.2
     # perl -MConfig -e "print $Config{archname}" = MSWin32-x64-multi-thread
 
-    $perlInfoList = $perlInfo.Split("`n") | Where-Object { ! [string]::IsNullOrWhiteSpace($_) } | ForEach-Object { $_.Trim() } | ForEach-Object { "$_" }
+    $perlInfoList = $perlInfo.Split("`n") | Where-Object { ! [string]::IsNullOrWhiteSpace( $_ ) } | ForEach-Object { $_.Trim() } | ForEach-Object { "$_" }
     $perlInfo | Write-Host -ForegroundColor Green
     Write-Host ''
 

@@ -1,4 +1,4 @@
-
+﻿
 $portableBaseName = 'strawberry-perl-5.40.2.1-64bit-portable'
 $baseDir = 'C:\perl-build'
 

@@ -1,4 +1,5 @@
-﻿<#
+﻿
+<#
 
 .SYNOPSIS
 
@@ -95,30 +96,30 @@ param (
 
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
-    [ValidateScript({ ! [string]::IsNullOrWhiteSpace($_) })]
+    [ValidateScript({ ! [string]::IsNullOrWhiteSpace( $_ ) })]
     [ValidateScript({ $_ -match '^5[.]\d+[.]\d+[.]\d+$' })]
     [string] $StrawberryVersionNumber = '5.24.4.1',
 
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
-    [ValidateScript({ ! [string]::IsNullOrWhiteSpace($_) })]
+    [ValidateScript({ ! [string]::IsNullOrWhiteSpace( $_ ) })]
     [string] $StrawberryZipBaseName = "strawberry-perl-$($StrawberryVersionNumber)-64bit-portable",
 
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
-    [ValidateScript({ ! [string]::IsNullOrWhiteSpace($_) })]
+    [ValidateScript({ ! [string]::IsNullOrWhiteSpace( $_ ) })]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Container -IsValid })]
     [string] $BuildDir = 'C:\perl-build',
 
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
-    [ValidateScript({ ! [string]::IsNullOrWhiteSpace($_) })]
+    [ValidateScript({ ! [string]::IsNullOrWhiteSpace( $_ ) })]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
     [string] $StrawberryZip = "$BuildDir\$StrawberryZipBaseName.zip",
 
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
-    [ValidateScript({ ! [string]::IsNullOrWhiteSpace($_) })]
+    [ValidateScript({ ! [string]::IsNullOrWhiteSpace( $_ ) })]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Container -IsValid })]
     [string] $StrawberryDir = "$BuildDir\$StrawberryZipBaseName",
 
@@ -256,7 +257,7 @@ try {
         $item = $_
         $name = $item.Name
         $fullName = $item.FullName
-        $m = Get-Content -LiteralPath $fullName | Where-Object { ! [string]::IsNullOrWhiteSpace($_) -and $_ -notlike '#*' }
+        $m = Get-Content -LiteralPath $fullName | Where-Object { ! [string]::IsNullOrWhiteSpace( $_ ) -and $_ -notlike '#*' }
         $moduleCount = @($m).Count
 
         [pscustomobject] @{
