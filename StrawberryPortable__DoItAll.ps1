@@ -96,6 +96,7 @@ param (
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ ! [string]::IsNullOrWhiteSpace($_) })]
+    [ValidateScript({ $_ -match '^5[.]\d+[.]\d+[.]\d+$' })]
     [string] $StrawberryVersionNumber = '5.24.4.1',
 
     [Parameter(Mandatory = $false)]
