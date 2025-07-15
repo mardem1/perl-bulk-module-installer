@@ -55,7 +55,9 @@ try {
 
     $ScriptItem = Get-Item -LiteralPath $ScriptPath -ErrorAction Stop
     $ScriptDir = $ScriptItem.Directory.FullName
-    $LogDir = "$ScriptDir\log"
+    $PbmiDir = "$ScriptDir"
+
+    $LogDir = "$PbmiDir\log"
     Start-Transcript -LiteralPath "$LogDir\$(Get-Date -Format 'yyyyMMdd_HHmmss')_$($ScriptItem.BaseName).log"
     $transcript = $true
 
@@ -68,6 +70,11 @@ try {
     Write-Host ''
     if ( ! $hasAdmin ) {
         Write-Host -ForegroundColor Red 'ERROR: admin required for defender config!'
+        exit 1
+    }
+
+    if ( ! ( Test-Path -LiteralPath "$PbmiDir\InstallCpanModules.pl" -PathType Leaf) ) {
+        Write-Host -ForegroundColor Red 'ERROR: perl-bulk-module-installer (InstallCpanModules) not found!'
         exit 1
     }
 
@@ -102,25 +109,25 @@ try {
         throw "extraction target $StrawberryDir already exists"
     }
 
-    & "$ScriptDir\StrawberryPortable_a_Extract.ps1" -StrawberryZip $StrawberryZip -Destination $StrawberryDir | Write-Host
-    & "$ScriptDir\StrawberryPortable_b_AddDefenderExclude.ps1" -StrawberryDir $StrawberryDir | Write-Host
-    & "$ScriptDir\StrawberryPortable_c_CpanL_ListModules.ps1" -StrawberryDir $StrawberryDir -ModuleListFileTxt "$LogDir\$(Get-Date -Format 'yyyyMMdd_HHmmss')_list_before.txt" | Write-Host
+    & "$PbmiDir\StrawberryPortable_a_Extract.ps1" -StrawberryZip $StrawberryZip -Destination $StrawberryDir | Write-Host
+    & "$PbmiDir\StrawberryPortable_b_AddDefenderExclude.ps1" -StrawberryDir $StrawberryDir | Write-Host
+    & "$PbmiDir\StrawberryPortable_c_CpanL_ListModules.ps1" -StrawberryDir $StrawberryDir -ModuleListFileTxt "$LogDir\$(Get-Date -Format 'yyyyMMdd_HHmmss')_list_before.txt" | Write-Host
 
     # it's not recommended to update module if not needed
 
     # install all Updates before ?
-    # & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -OnlyAllUpdates -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt"
+    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -OnlyAllUpdates -DontTryModuleListFile "$PbmiDir\test-module-lists\_dont_try_modules.txt"
 
     # install all Updates in same install run ?
-    # & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -AllUpdates -InstallModuleListFile "$ScriptDir\test-module-lists\CoreCarpModuleExample.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt"
+    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -AllUpdates -InstallModuleListFile "$PbmiDir\test-module-lists\CoreCarpModuleExample.txt" -DontTryModuleListFile "$PbmiDir\test-module-lists\_dont_try_modules.txt"
 
     # install modules
-    # & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\SingleModuleExample.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
+    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$PbmiDir\test-module-lists\SingleModuleExample.txt" -DontTryModuleListFile "$PbmiDir\test-module-lists\_dont_try_modules.txt" | Write-Host
 
     # direct loop ?
-    # & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ScriptDir\test-module-lists\SingleModuleExample.txt", "$ScriptDir\test-module-lists\SmallModuleExample.txt" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
+    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$PbmiDir\test-module-lists\SingleModuleExample.txt", "$PbmiDir\test-module-lists\SmallModuleExample.txt" -DontTryModuleListFile "$PbmiDir\test-module-lists\_dont_try_modules.txt" | Write-Host
 
-    $ModuleListFiles = Get-ChildItem -LiteralPath "$ScriptDir\test-module-lists\" -File | Where-Object {
+    $ModuleListFiles = Get-ChildItem -LiteralPath "$PbmiDir\test-module-lists\" -File | Where-Object {
         $_.Name -like '*.txt'
     } | Where-Object {
         $_.Name -ne '_dont_try_modules.txt'
@@ -152,19 +159,19 @@ try {
         Write-Host -ForegroundColor Green "module installation ($i/$ModuleListCount) with list '$name' start at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
         Write-Host ''
 
-        & "$ScriptDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$fullName" -DontTryModuleListFile "$ScriptDir\test-module-lists\_dont_try_modules.txt" | Write-Host
+        & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$fullName" -DontTryModuleListFile "$PbmiDir\test-module-lists\_dont_try_modules.txt" | Write-Host
 
         Write-Host ''
         Write-Host -ForegroundColor Green "module installation ($i/$ModuleListCount) with list '$name' ended at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
         Write-Host ''
     }
 
-    & "$ScriptDir\StrawberryPortable_c_CpanL_ListModules.ps1" -StrawberryDir $StrawberryDir -ModuleListFileTxt "$LogDir\$(Get-Date -Format 'yyyyMMdd_HHmmss')_list_after_install.txt" | Write-Host
-    & "$ScriptDir\StrawberryPortable_e_RemoveDefenderExclude.ps1" -StrawberryDir $StrawberryDir | Write-Host
-    & "$ScriptDir\StrawberryPortable_f_RunDefenderScan.ps1" -StrawberryDir $StrawberryDir | Write-Host
-    & "$ScriptDir\StrawberryPortable_g_Optimize.ps1" -StrawberryDir $StrawberryDir | Write-Host
-    & "$ScriptDir\StrawberryPortable_c_CpanL_ListModules.ps1" -StrawberryDir $StrawberryDir -ModuleListFileTxt "$LogDir\$(Get-Date -Format 'yyyyMMdd_HHmmss')_list_after_optimize.txt" | Write-Host
-    & "$ScriptDir\StrawberryPortable_h_Package.ps1" -StrawberryDir $StrawberryDir -DetectSevenZip -Use7zFormat | Write-Host
+    & "$PbmiDir\StrawberryPortable_c_CpanL_ListModules.ps1" -StrawberryDir $StrawberryDir -ModuleListFileTxt "$LogDir\$(Get-Date -Format 'yyyyMMdd_HHmmss')_list_after_install.txt" | Write-Host
+    & "$PbmiDir\StrawberryPortable_e_RemoveDefenderExclude.ps1" -StrawberryDir $StrawberryDir | Write-Host
+    & "$PbmiDir\StrawberryPortable_f_RunDefenderScan.ps1" -StrawberryDir $StrawberryDir | Write-Host
+    & "$PbmiDir\StrawberryPortable_g_Optimize.ps1" -StrawberryDir $StrawberryDir | Write-Host
+    & "$PbmiDir\StrawberryPortable_c_CpanL_ListModules.ps1" -StrawberryDir $StrawberryDir -ModuleListFileTxt "$LogDir\$(Get-Date -Format 'yyyyMMdd_HHmmss')_list_after_optimize.txt" | Write-Host
+    & "$PbmiDir\StrawberryPortable_h_Package.ps1" -StrawberryDir $StrawberryDir -DetectSevenZip -Use7zFormat | Write-Host
 
     exit 0
 }
