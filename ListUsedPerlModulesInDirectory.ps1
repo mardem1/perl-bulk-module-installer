@@ -194,13 +194,26 @@ try {
         '#'
     )
 
-    Write-Host ''
-    Write-Host -ForegroundColor Green "=> generate module list file '$ModuleListFileTxt'"
-    $fileHeaders, $moduleNames, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt
+    if ( ! $moduleNames ) {
+        if ( Test-Path -LiteralPath $ModuleListFileTxt ) {
+            Write-Host "remove txt file $ModuleListFileTxt"
+            Remove-Item -LiteralPath $ModuleListFileTxt
+        }
 
-    Write-Host ''
-    Write-Host -ForegroundColor Green "=> generate module compile check (perl -c) file '$ModuleListFilePl'"
-    $fileHeaders, $modulesUse, $fileFooters | Out-File -LiteralPath $ModuleListFilePl
+        if ( Test-Path -LiteralPath $ModuleListFilePl ) {
+            Write-Host "remove pl file $ModuleListFilePl"
+            Remove-Item -LiteralPath $ModuleListFilePl
+        }
+    }
+    else {
+        Write-Host ''
+        Write-Host -ForegroundColor Green "=> generate module list file '$ModuleListFileTxt'"
+        $fileHeaders, $moduleNames, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt
+
+        Write-Host ''
+        Write-Host -ForegroundColor Green "=> generate module compile check (perl -c) file '$ModuleListFilePl'"
+        $fileHeaders, $modulesUse, $fileFooters | Out-File -LiteralPath $ModuleListFilePl
+    }
 
     exit 0
 }
