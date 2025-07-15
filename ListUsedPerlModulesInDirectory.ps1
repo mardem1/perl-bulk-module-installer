@@ -118,7 +118,7 @@ try {
         Write-Host -ForegroundColor Green "    => $_"
     }
 
-    $files = Get-ChildItem -Recurse -File -Force -LiteralPath $SearchPath | Where-Object {
+    $files = Get-ChildItem -Recurse -File -Force -LiteralPath $SearchPath -ErrorAction Continue | Where-Object {
         $_.Extension -in $extensions
     }
 
