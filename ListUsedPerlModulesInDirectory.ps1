@@ -120,6 +120,9 @@ try {
 
     $files = Get-ChildItem -Recurse -File -Force -LiteralPath $SearchPath -ErrorAction Continue | Where-Object {
         $_.Extension -in $extensions
+    } | Where-Object {
+        $true
+        # INFO: add custom filter here - exclude ?
     }
 
     Write-Host -ForegroundColor Green '=> matching files found - analyze ...'
@@ -133,7 +136,7 @@ try {
             if ( $_ -cmatch '\buse\b\s+(([A-Z][a-zA-Z0-9_]*)([:][:][a-zA-Z0-9_]+)*)[^:]' ) {
                 $text = $Matches[1]
 
-                # add custom filter here - exclude own modules ?
+                # INFO: add custom filter here - exclude own modules ?
                 if ( $true ) {
                     Write-Host -ForegroundColor Yellow "  => found module: '$text'"
                     $modules[$text] = $true
