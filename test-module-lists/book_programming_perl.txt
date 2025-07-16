@@ -161,7 +161,7 @@ Win32::OLE::Variant
 Win32::PerfLib
 Win32::Pipe
 Win32::Process
-Win32::Security
+Win32::Security::Raw
 Win32::Semaphore
 Win32::Service
 Win32::Sound

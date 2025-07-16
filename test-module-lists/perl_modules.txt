@@ -686,7 +686,7 @@ Win32::Process::User
 Win32::Registry
 Win32::Resources
 Win32::SearchPath
-Win32::Security
+Win32::Security::Raw
 Win32::Semaphore
 Win32::Service
 Win32::ServiceManager
