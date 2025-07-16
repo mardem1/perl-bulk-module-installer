@@ -257,7 +257,7 @@ try {
         $item = $_
         $name = $item.Name
         $fullName = $item.FullName
-        $m = Get-Content -LiteralPath $fullName | Where-Object { ! [string]::IsNullOrWhiteSpace( $_ ) -and $_ -notlike '#*' }
+        $m = Get-Content -LiteralPath $fullName | Where-Object { ! [string]::IsNullOrWhiteSpace( $_ ) -and $_ -notlike '#*' } | Sort-Object -Unique
         $moduleCount = @($m).Count
 
         [pscustomobject] @{
