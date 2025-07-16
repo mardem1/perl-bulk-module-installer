@@ -183,7 +183,8 @@ try {
     Write-Host -ForegroundColor Green 'sort an prepare csv'
     Write-Host ''
 
-    $moduleLines = $moduleNames | Sort-Object -Unique | ForEach-Object {
+    # workaround ?
+    $moduleLines = $moduleNames | Sort-Object -Unique | Sort-Object -CaseSensitive | ForEach-Object {
         $m = $_
         $a = $combinedModules[$m]['ListA']
         $b = $combinedModules[$m]['ListB']
