@@ -96,7 +96,7 @@ try {
 
     $allLists = @()
 
-    $lists = @{
+    $fileToShortName = @{
         "$ListA" = 'ListA'
         "$ListB" = 'ListB'
     }
@@ -126,7 +126,7 @@ try {
             throw "perl info in CSV file not found - $file"
         }
 
-        $list = "$($lists[$file])-$list "
+        $list = "$($fileToShortName[$file])-$list "
 
         $allLists += $list
 
