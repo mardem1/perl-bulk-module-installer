@@ -94,8 +94,6 @@ try {
 
     [hashtable]$combinedModules = @{}
 
-    $allLists = @()
-
     $fileToShortName = @{
         "$ListA" = 'ListA'
         "$ListB" = 'ListB'
@@ -106,18 +104,24 @@ try {
         'ListB' = "$ListB"
     }
 
+    $shortNameVersionInfo = @{
+        'ListA' = ''
+        'ListB' = ''
+    }
+
     $ListA, $ListB | ForEach-Object {
         $file = $_
+        $shotName = $fileToShortName[$file]
 
         Write-Host ''
         Write-Host -ForegroundColor Green "analyze '$file' ..."
-
         $lines = Get-Content -LiteralPath $file
-        $list = $lines | Where-Object { $_ -like '# *' } | ForEach-Object {
+
+        $perlVerison = $lines | Where-Object { $_ -like '# *' } | ForEach-Object {
             $t = $_.Split(';')
 
             if ([string]::IsNullOrWhiteSpace($t[0])) {
-                throw "perl title in CSV file not found - $file"
+               throw "perl title in CSV file not found - $file"
             }
 
             if ([string]::IsNullOrWhiteSpace($t[1])) {
@@ -127,13 +131,11 @@ try {
             $t[1]
         }
 
-        if ($null -eq $list) {
+        if ($null -eq $perlVerison) {
             throw "perl info in CSV file not found - $file"
         }
 
-        $list = "$($fileToShortName[$file])-$list "
-
-        $allLists += $list
+        $shortNameVersionInfo[$shotName] = $perlVerison
 
         # https://github.com/PowerShell/PowerShell/blob/744a53a2038056467b6ddeb2045336d79480c4c0/src/Microsoft.PowerShell.Commands.Utility/commands/utility/CsvCommands.cs#L1362
         # ConvertFrom-Csv - ignores lines which start wiht #
@@ -145,7 +147,7 @@ try {
                 $combinedModules[$module.Module] = @{}
             }
 
-            $combinedModules[$module.Module][$list] = $module.Version
+            $combinedModules[$module.Module][$shotName] = $module.Version
         }
     }
 
@@ -153,11 +155,11 @@ try {
     Write-Host -ForegroundColor Green 'init moudule not found in verison'
     Write-Host ''
 
-    $keys = $combinedModules.Keys | Sort-Object -Unique
-    $allLists | ForEach-Object {
-        $list = $_
+    $moduleNames = $combinedModules.Keys | Sort-Object -Unique
+    $shortNameVersionInfo.Keys | ForEach-Object {
+        $shotName = $_
 
-        $keys | ForEach-Object {
+        $moduleNames | ForEach-Object {
             $module = $_
             if ( ! $combinedModules.ContainsKey($module) ) {
                 # ignore already deleted
@@ -169,22 +171,22 @@ try {
                     $combinedModules.Remove($module)
                 }
             }
-            elseif ( ! $combinedModules[$module].ContainsKey($list)) {
-                $combinedModules[$module][$list] = 'not-installed'
+            elseif ( ! $combinedModules[$module].ContainsKey($shotName)) {
+                $combinedModules[$module][$shotName] = 'not-installed'
             }
         }
     }
 
     $moduleLines = $combinedModules.Keys | Sort-Object -Unique | ForEach-Object {
         $m = $_
-        $a = $combinedModules[$m]["$($allLists[0])"]
-        $b = $combinedModules[$m]["$($allLists[1])"]
+        $a = $combinedModules[$m]['ListA']
+        $b = $combinedModules[$m]['ListB']
         "$m;$a;$b"
     }
 
     Write-Host ''
     Write-Host -ForegroundColor Green "write csv file $CompareResultList"
-    "Module;$($allLists[0]);$($allLists[1])" , $moduleLines | Out-File -LiteralPath $CompareResultList -Encoding default -Force -Confirm:$false -Width 999
+"Module;ListA-$($shortNameVersionInfo['ListA']);ListB-$($shortNameVersionInfo['ListB'])" , $moduleLines | Out-File -LiteralPath $CompareResultList -Encoding default -Force -Confirm:$false -Width 999
 
     exit 0
 }
