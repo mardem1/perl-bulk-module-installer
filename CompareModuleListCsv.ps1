@@ -114,29 +114,32 @@ try {
         $shotName = $fileToShortName[$file]
 
         Write-Host ''
-        Write-Host -ForegroundColor Green "analyze '$file' ..."
-        $lines = Get-Content -LiteralPath $file
+        Write-Host -ForegroundColor Green "load $shotName '$file'"
+        $lines = Get-Content -LiteralPath $file -ErrorAction Stop
 
+        Write-Host -ForegroundColor Green 'analyze perl version'
         $perlVerison = $lines | Where-Object { $_ -like '# *' } | ForEach-Object {
             $t = $_.Split(';')
 
             if ([string]::IsNullOrWhiteSpace($t[0])) {
-               throw "perl title in CSV file not found - $file"
+                throw 'perl title in CSV file not found'
             }
 
             if ([string]::IsNullOrWhiteSpace($t[1])) {
-                throw "perl verison in CSV file not found - $file"
+                throw 'perl verison in CSV file not found'
             }
 
             $t[1]
         }
 
         if ($null -eq $perlVerison) {
-            throw "perl info in CSV file not found - $file"
+            throw 'perl info in CSV file not found'
         }
 
+        Write-Host -ForegroundColor Green "perl info detected: $perlVerison"
         $shortNameVersionInfo[$shotName] = $perlVerison
 
+        Write-Host -ForegroundColor Green 'analyze module infos'
         # https://github.com/PowerShell/PowerShell/blob/744a53a2038056467b6ddeb2045336d79480c4c0/src/Microsoft.PowerShell.Commands.Utility/commands/utility/CsvCommands.cs#L1362
         # ConvertFrom-Csv - ignores lines which start wiht #
         $modules = $lines | ConvertFrom-Csv -Delimiter ';' -Header 'Module', 'Version'
@@ -149,10 +152,12 @@ try {
 
             $combinedModules[$module.Module][$shotName] = $module.Version
         }
+
+        Write-Host -ForegroundColor Green "$shotName '$file' completed"
     }
 
     Write-Host ''
-    Write-Host -ForegroundColor Green 'init moudule not found in verison'
+    Write-Host -ForegroundColor Green 'init moudules not found in verison'
     Write-Host ''
 
     $moduleNames = $combinedModules.Keys | Sort-Object -Unique
@@ -177,6 +182,10 @@ try {
         }
     }
 
+    Write-Host ''
+    Write-Host -ForegroundColor Green 'sort an prepare csv'
+    Write-Host ''
+
     $moduleLines = $combinedModules.Keys | Sort-Object -Unique | ForEach-Object {
         $m = $_
         $a = $combinedModules[$m]['ListA']
@@ -186,7 +195,7 @@ try {
 
     Write-Host ''
     Write-Host -ForegroundColor Green "write csv file $CompareResultList"
-"Module;ListA-$($shortNameVersionInfo['ListA']);ListB-$($shortNameVersionInfo['ListB'])" , $moduleLines | Out-File -LiteralPath $CompareResultList -Encoding default -Force -Confirm:$false -Width 999
+    "Module;ListA-$($shortNameVersionInfo['ListA']);ListB-$($shortNameVersionInfo['ListB'])" , $moduleLines | Out-File -LiteralPath $CompareResultList -Encoding default -Force -Confirm:$false -Width 999
 
     exit 0
 }
