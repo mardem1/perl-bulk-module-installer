@@ -157,27 +157,24 @@ try {
     }
 
     Write-Host ''
-    Write-Host -ForegroundColor Green 'init moudules not found in verison'
+    Write-Host -ForegroundColor Green 'init moudules not found or empty in verison'
     Write-Host ''
 
-    $moduleNames = $combinedModules.Keys | Sort-Object -Unique
-    $shortNameVersionInfo.Keys | ForEach-Object {
-        $shotName = $_
+    $version_not_installed = 'not-installed'
+    $version_not_defined = 'undef' # saved by export
 
-        $moduleNames | ForEach-Object {
-            $module = $_
-            if ( ! $combinedModules.ContainsKey($module) ) {
-                # ignore already deleted
+    $moduleNames = $combinedModules.Keys
+    $moduleNames | ForEach-Object {
+        $module = $_
+
+        $shortNameToFile.Keys | ForEach-Object {
+            $shotName = $_
+            if ( ! $combinedModules[$module].ContainsKey($shotName)) {
+                $combinedModules[$module][$shotName] = $version_not_installed
             }
-            elseif ( $combinedModules[$module].Count -eq 2) {
-                $moduleVersions = $combinedModules[$module].Values | Sort-Object -Unique
-                if ( @($moduleVersions).Count -eq 1 ) {
-                    Write-Host -ForegroundColor Green "remove $module - version equal"
-                    $combinedModules.Remove($module)
-                }
-            }
-            elseif ( ! $combinedModules[$module].ContainsKey($shotName)) {
-                $combinedModules[$module][$shotName] = 'not-installed'
+            elseif ( '' -eq $combinedModules[$module][$shotName] ) {
+                # should not be needed but be safe
+                $combinedModules[$module][$shotName] = $version_not_defined
             }
         }
     }
@@ -186,7 +183,7 @@ try {
     Write-Host -ForegroundColor Green 'sort an prepare csv'
     Write-Host ''
 
-    $moduleLines = $combinedModules.Keys | Sort-Object -Unique | ForEach-Object {
+    $moduleLines = $moduleNames | Sort-Object -Unique | ForEach-Object {
         $m = $_
         $a = $combinedModules[$m]['ListA']
         $b = $combinedModules[$m]['ListB']
