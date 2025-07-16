@@ -101,6 +101,11 @@ try {
         "$ListB" = 'ListB'
     }
 
+    $shortNameToFile = @{
+        'ListA' = "$ListA"
+        'ListB' = "$ListB"
+    }
+
     $ListA, $ListB | ForEach-Object {
         $file = $_
 
