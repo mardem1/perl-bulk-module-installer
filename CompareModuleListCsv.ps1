@@ -183,8 +183,139 @@ try {
     Write-Host -ForegroundColor Green 'sort an prepare csv'
     Write-Host ''
 
-    # workaround ?
-    $moduleLines = $moduleNames | Sort-Object -Unique | Sort-Object -CaseSensitive | ForEach-Object {
+    # Sorting:
+    # 10 | not-installed | not-installed
+    # 20 | any version   | not-installed (removed)
+    # 30 | undef | undef
+    # 40 | v* | undef
+    # 50 | vU | vL (downgraded-lower?)
+    # 60 | vE | vE (equal)
+    # 70 | vL | vU (updated)
+    # 80 | undef | v*
+    # 90 | not-installed | any version (new)
+
+    $moduleLines = $combinedModules.Keys | Sort-Object -Unique -CaseSensitive -Property {
+        $m = $_
+        $a = $combinedModules[$m]['ListA'] # old
+        $b = $combinedModules[$m]['ListB'] # new
+
+        if ( $version_not_installed -eq $a ) {
+            if ( $version_not_installed -eq $b ) {
+                # 10 | not-installed | not-installed
+                10
+            }
+            else {
+                # 90 | not-installed | any version (new)
+                90
+            }
+        }
+        else {
+            if ( $version_not_installed -eq $b ) {
+                # 20 | any version   | not-installed (removed)
+                20
+            }
+            else {
+                # changed installed versions ?
+                if ( $version_not_defined -eq $a ) {
+                    if ( $version_not_defined -eq $b ) {
+                        # 30 | undef | undef
+                        30
+                    }
+                    else {
+                        # 80 | undef | v*
+                        80
+                    }
+                }
+                else {
+                    if ( $version_not_defined -eq $b ) {
+                        # 40 | v* | undef
+                        40
+                    }
+                    else {
+                        # version number diff
+                        $version_a = $null
+                        $version_b = $null
+
+                        try {
+                            # if starting wiht v remove it & if ending wiht _0123 remove -> v5.4.3_21 -> 5.4.3
+                            $t = [string] (($a -replace '^v', '') -replace '_\d+$', '')
+                            $dotCount = ([regex]::Matches($t, '\.' )).Count
+                            if (  $dotCount -gt 3 ) {
+                                # to long version more than 4 sections
+                                # keep new() exception
+                            }
+                            elseif ($dotCount -lt 1 ) {
+                                # only number no .
+                                $t = "$($t).0" # [version]::new()  needs 2a
+                            }
+
+                            $version_a = [version]::new($t)
+                        }
+                        catch {
+                            Write-Host -ForegroundColor Red "ERROR: can't parse Version '$m' -> '$a' - $_"
+                        }
+
+                        try {
+                            # if starting wiht v remove it & if ending wiht _0123 remove -> v5.4.3_21 -> 5.4.3
+                            $t = [string] (($b -replace '^v', '') -replace '_\d+$', '')
+                            $dotCount = ([regex]::Matches($t, '\.' )).Count
+                            if (  $dotCount -gt 3 ) {
+                                # to long version more than 4 sections
+                                # keep new() exception
+                            }
+                            elseif ($dotCount -lt 1 ) {
+                                # only number no .
+                                $t = "$($t).0" # [version]::new()  needs 2a
+                            }
+
+                            $version_b = [version]::new($t)
+                        }
+                        catch {
+                            Write-Host -ForegroundColor Red "ERROR: can't parse Version '$m' -> '$b' - $_"
+                        }
+
+
+                        if ( $null -eq $version_a) {
+                            if ( $null -eq $version_b) {
+                                # TODO: what to do ?
+
+                                # 60 | vE | vE (equal) - Both unknowd = Equal :)
+                                60
+                            }
+                            else {
+                                # TODO: what to do ?
+                                # 70 | vL | vU (updated) - new known => Newer :)
+                                30
+                            }
+                        }
+                        else {
+                            if ( $null -eq $version_b) {
+                                # TODO: what to do ?
+                                # 50 | vU | vL (downgraded-lower?)    - new unknowd => Lower :)
+                                50
+                            }
+                            else {
+                                if ( $version_a -lt $version_b) {
+                                    # 70 | vL | vU (updated)
+                                    30
+                                }
+                                elseif ( $version_a -gt $version_b) {
+                                    # 50 | vU | vL (downgraded-lower?)
+                                    50
+                                }
+                                else {
+                                    # 60 | vE | vE (equal)
+                                    60
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }, {
+        $_
+    } | ForEach-Object {
         $m = $_
         $a = $combinedModules[$m]['ListA']
         $b = $combinedModules[$m]['ListB']
