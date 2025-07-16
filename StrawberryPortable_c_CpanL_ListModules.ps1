@@ -204,14 +204,38 @@ try {
                 $version_v = $null
 
                 try {
-                    $version_m = [version]::new($modules[$m] -replace '^v', '') # if starting wiht v remove it
+                    # if starting wiht v remove it & if ending wiht _0123 remove -> v5.4.3_21 -> 5.4.3
+                    $t = [string] (($modules[$m] -replace '^v', '') -replace '_\d+$', '')
+                    $dotCount = ([regex]::Matches($t, '\.' )).Count
+                    if(  $dotCount -gt 3 ) {
+                        # to long version more than 4 sections
+                        # keep new() exception
+                    }
+                    elseif($dotCount -lt 1 ) {
+                        # only number no .
+                        $t = "$($t).0" # [version]::new()  needs 2a
+                    }
+
+                    $version_m = [version]::new($t)
                 }
                 catch {
                     Write-Host -ForegroundColor Red "ERROR: can't parse Version $($modules[$m]) - $_"
                 }
 
                 try {
-                    $version_v = [version]::new($v -replace '^v', '')
+                    # if starting wiht v remove it & if ending wiht _0123 remove -> v5.4.3_21 -> 5.4.3
+                    $t = [string] (($v -replace '^v', '') -replace '_\d+$', '')
+                    $dotCount = ([regex]::Matches($t, '\.' )).Count
+                    if(  $dotCount -gt 3 ) {
+                        # to long version more than 4 sections
+                        # keep new() exception
+                    }
+                    elseif($dotCount -lt 1 ) {
+                        # only number no .
+                        $t = "$($t).0" # [version]::new()  needs 2a
+                    }
+
+                    $version_v = [version]::new($t)
                 }
                 catch {
                     Write-Host -ForegroundColor Red "ERROR: can't parse Version $($v) - $_"
