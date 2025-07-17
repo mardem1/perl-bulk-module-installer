@@ -7,11 +7,11 @@ Compare two module list files (CSV) an generate a result CSV
 
 .PARAMETER ListA
 
-First list
+First list (old list)
 
 .PARAMETER ListB
 
-Second list
+Second list (new list)
 
 .PARAMETER CompareResultList
 
@@ -53,13 +53,13 @@ param (
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
     [ValidateScript({ $_ -like '*.csv' })]
-    [string] $ListA,
+    [string] $ListA, # old
 
     [Parameter(Mandatory = $true, Position = 0)]
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
     [ValidateScript({ $_ -like '*.csv' })]
-    [string] $ListB,
+    [string] $ListB, # new
 
     [Parameter(Mandatory = $true, Position = 0)]
     [ValidateNotNullOrEmpty()]
