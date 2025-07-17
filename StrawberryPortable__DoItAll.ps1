@@ -225,7 +225,13 @@ try {
     }
 
     & "$PbmiDir\StrawberryPortable_a_Extract.ps1" -StrawberryZip $StrawberryZip -Destination $StrawberryDir | Write-Host
+
+
     & "$PbmiDir\StrawberryPortable_b_AddDefenderExclude.ps1" -StrawberryDir $StrawberryDir | Write-Host
+
+    # elevate ?
+    # Start-Process -Verb RunAs -FilePath "$(Get-Process -PID $PID | Select-Object -ExpandProperty Path)" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PbmiDir\StrawberryPortable_b_AddDefenderExclude.ps1`" -StrawberryDir `"$StrawberryDir`""
+
     & "$PbmiDir\StrawberryPortable_c_CpanL_ListModules.ps1" -StrawberryDir $StrawberryDir -ModuleListFileTxt "$LogDir\$(Get-Date -Format 'yyyyMMdd_HHmmss')_list_before.txt" | Write-Host
 
     # it's not recommended to update module if not needed
