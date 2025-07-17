@@ -1,0 +1,109 @@
+Module::CPANTS::Analyse
+
+# installation failed if process eg "cmd.exe /c cpanm -force --verbose --no-interactive Module::CPANTS::Analyse" started with ADMIN / ELEVATION
+# powershell start perl/cpan without elevation token?
+
+# https://www.cpantesters.org/dist/Module-CPANTS-Analyse/1.02.html
+# https://metacpan.org/release/ISHIGAKI/Module-CPANTS-Analyse-1.02/source/t/analyse/manifest.t#L82
+# https://metacpan.org/dist/Archive-Any-Lite/source/lib/Archive/Any/Lite.pm#L130
+
+# https://www.cpantesters.org/dist/Module-CPANTS-Analyse/1.02.html
+
+# 2025-07-17_20-21-30 # ==> install module - Module::CPANTS::Analyse install-failed - Duration: 8 seconds => 0.133333333333333 minutes
+# 2025-07-17_20-21-22 # ================================================================================
+# 2025-07-17_20-21-22 #
+# 2025-07-17_20-21-22 # ==> start cmd: cmd.exe /c cpanm --verbose --no-interactive Module::CPANTS::Analyse 2>&1
+# 2025-07-17_20-21-22 # pid: 8072
+# 2025-07-17_20-21-22 # close chld_in
+# 2025-07-17_20-21-22 # read output ...
+# 2025-07-17_20-21-23 # STDOUT: cpanm (App::cpanminus) 1.7048 on perl 5.038004 built for MSWin32-x64-multi-thread
+# 2025-07-17_20-21-23 # STDOUT: Work directory is C:\PERL-B~1\STRAWB~3.1-6\data/.cpanm/work/1752776483.644
+# 2025-07-17_20-21-23 # STDOUT: You have make C:\perl-build\strawberry-perl-5.38.4.1-64bit-portable\c\bin\gmake.exe
+# 2025-07-17_20-21-23 # STDOUT: You have LWP 6.78
+# 2025-07-17_20-21-23 # STDOUT: Falling back to Archive::Tar 3.04
+# 2025-07-17_20-21-23 # STDOUT: Searching Module::CPANTS::Analyse () on cpanmetadb ...
+# 2025-07-17_20-21-23 # STDOUT: Unpacking Module-CPANTS-Analyse-1.02.tar.gz
+# 2025-07-17_20-21-23 # STDOUT: Entering Module-CPANTS-Analyse-1.02
+# 2025-07-17_20-21-23 # STDOUT: Checking configure dependencies from META.json
+# 2025-07-17_20-21-23 # STDOUT: Checking if you have ExtUtils::MakeMaker::CPANfile 0.09 ... Yes (0.09)
+# 2025-07-17_20-21-23 # STDOUT: Running Makefile.PL
+# 2025-07-17_20-21-23 # STDOUT: --> Working on Module::CPANTS::Analyse
+# 2025-07-17_20-21-23 # STDOUT: Fetching http://www.cpan.org/authors/id/I/IS/ISHIGAKI/Module-CPANTS-Analyse-1.02.tar.gz ... OK
+# 2025-07-17_20-21-24 # STDOUT: Configuring Module-CPANTS-Analyse-1.02 ... Checking if your kit is complete...
+# 2025-07-17_20-21-24 # STDOUT: Looks good
+# 2025-07-17_20-21-24 # STDOUT: Generating a gmake-style Makefile
+# 2025-07-17_20-21-24 # STDOUT: Writing Makefile for Module::CPANTS::Analyse
+# 2025-07-17_20-21-24 # STDOUT: Writing MYMETA.yml and MYMETA.json
+# 2025-07-17_20-21-24 # STDOUT: Checking dependencies from MYMETA.json ...
+# 2025-07-17_20-21-24 # STDOUT: Checking if you have Parse::Distname 0 ... Yes (0.05)
+# 2025-07-17_20-21-24 # STDOUT: Checking if you have version 0.73 ... Yes (0.9933)
+# 2025-07-17_20-21-24 # STDOUT: Checking if you have File::Find::Object v0.2.1 ... Yes (0.3.9)
+# 2025-07-17_20-21-24 # STDOUT: Checking if you have Software::License 0.103012 ... Yes (0.104007)
+# 2025-07-17_20-21-24 # STDOUT: Checking if you have List::Util 1.33 ... Yes (1.69)
+# 2025-07-17_20-21-24 # STDOUT: Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.76)
+# 2025-07-17_20-21-24 # STDOUT: Checking if you have Test::More 0.88 ... Yes (1.302214)
+# 2025-07-17_20-21-24 # STDOUT: Checking if you have Archive::Tar 1.76 ... Yes (3.04)
+# 2025-07-17_20-21-24 # STDOUT: Checking if you have Test::FailWarnings 0 ... Yes (0.008)
+# 2025-07-17_20-21-24 # STDOUT: Checking if you have CPAN::Meta::Validator 2.133380 ... Yes (2.150010)
+# 2025-07-17_20-21-24 # STDOUT: Checking if you have Archive::Any::Lite 0.06 ... Yes (0.11)
+# 2025-07-17_20-21-24 # STDOUT: Checking if you have Cwd 0 ... Yes (3.89)
+# 2025-07-17_20-21-24 # STDOUT: Checking if you have Data::Binary 0 ... Yes (0.01)
+# 2025-07-17_20-21-24 # STDOUT: Checking if you have Array::Diff 0.04 ... Yes (0.09)
+# 2025-07-17_20-21-24 # STDOUT: Checking if you have Class::Accessor 0.19 ... Yes (0.51)
+# 2025-07-17_20-21-24 # STDOUT: Checking if you have JSON::PP 0 ... Yes (4.16)
+# 2025-07-17_20-21-24 # STDOUT: Checking if you have Text::Balanced 0 ... Yes (2.06)
+# 2025-07-17_20-21-24 # STDOUT: Checking if you have Perl::PrereqScanner::NotQuiteLite 0.9901 ... Yes (0.9917)
+# 2025-07-17_20-21-24 # STDOUT: Checking if you have CPAN::Meta::YAML 0.008 ... Yes (0.020)
+# 2025-07-17_20-21-24 # STDOUT: Checking if you have Module::Find 0 ... Yes (0.17)
+# 2025-07-17_20-21-24 # STDOUT: OK
+# 2025-07-17_20-21-25 # STDOUT: Building and testing Module-CPANTS-Analyse-1.02 ... cp lib/Module/CPANTS/Kwalitee/License.pm blib\lib\Module\CPANTS\Kwalitee\License.pm
+# 2025-07-17_20-21-25 # STDOUT: cp lib/Module/CPANTS/Kwalitee/Distname.pm blib\lib\Module\CPANTS\Kwalitee\Distname.pm
+# 2025-07-17_20-21-25 # STDOUT: cp lib/Module/CPANTS/Kwalitee/Manifest.pm blib\lib\Module\CPANTS\Kwalitee\Manifest.pm
+# 2025-07-17_20-21-25 # STDOUT: cp lib/Module/CPANTS/Kwalitee/FindModules.pm blib\lib\Module\CPANTS\Kwalitee\FindModules.pm
+# 2025-07-17_20-21-25 # STDOUT: cp lib/Module/CPANTS/Kwalitee/BrokenInstaller.pm blib\lib\Module\CPANTS\Kwalitee\BrokenInstaller.pm
+# 2025-07-17_20-21-25 # STDOUT: cp lib/Module/CPANTS/Analyse.pm blib\lib\Module\CPANTS\Analyse.pm
+# 2025-07-17_20-21-25 # STDOUT: cp lib/Module/CPANTS/Kwalitee/Distros.pm blib\lib\Module\CPANTS\Kwalitee\Distros.pm
+# 2025-07-17_20-21-25 # STDOUT: cp lib/Module/CPANTS/Kwalitee/CpantsErrors.pm blib\lib\Module\CPANTS\Kwalitee\CpantsErrors.pm
+# 2025-07-17_20-21-25 # STDOUT: cp lib/Module/CPANTS/Kwalitee/Files.pm blib\lib\Module\CPANTS\Kwalitee\Files.pm
+# 2025-07-17_20-21-25 # STDOUT: cp lib/Module/CPANTS/Kwalitee.pm blib\lib\Module\CPANTS\Kwalitee.pm
+# 2025-07-17_20-21-25 # STDOUT: cp lib/Module/CPANTS/Kwalitee/MetaYML.pm blib\lib\Module\CPANTS\Kwalitee\MetaYML.pm
+# 2025-07-17_20-21-25 # STDOUT: cp lib/Module/CPANTS/Kwalitee/NeedsCompiler.pm blib\lib\Module\CPANTS\Kwalitee\NeedsCompiler.pm
+# 2025-07-17_20-21-25 # STDOUT: cp lib/Module/CPANTS/Kwalitee/Version.pm blib\lib\Module\CPANTS\Kwalitee\Version.pm
+# 2025-07-17_20-21-25 # STDOUT: cp lib/Module/CPANTS/Kwalitee/Pod.pm blib\lib\Module\CPANTS\Kwalitee\Pod.pm
+# 2025-07-17_20-21-25 # STDOUT: cp lib/Module/CPANTS/Kwalitee/Uses.pm blib\lib\Module\CPANTS\Kwalitee\Uses.pm
+# 2025-07-17_20-21-25 # STDOUT: cp lib/Module/CPANTS/Kwalitee/Repackageable.pm blib\lib\Module\CPANTS\Kwalitee\Repackageable.pm
+# 2025-07-17_20-21-25 # STDOUT: cp lib/Module/CPANTS/Kwalitee/Prereq.pm blib\lib\Module\CPANTS\Kwalitee\Prereq.pm
+# 2025-07-17_20-21-25 # STDOUT: cp lib/Module/CPANTS/Kwalitee/Signature.pm blib\lib\Module\CPANTS\Kwalitee\Signature.pm
+# 2025-07-17_20-21-25 # STDOUT: "C:\perl-build\strawberry-perl-5.38.4.1-64bit-portable\perl\bin\perl.exe" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib\lib', 'blib\arch')" t/*.t t/*/*.t
+# 2025-07-17_20-21-26 # STDOUT: t/00_load.t .............. ok
+# 2025-07-17_20-21-26 # STDOUT: t/05_testdir.t ........... ok
+# 2025-07-17_20-21-27 # STDOUT: t/05_testfile.t .......... ok
+# 2025-07-17_20-21-28 # STDOUT: Making symbolic link 'C:\Users\root\AppData\Local\Temp\PXZ3f4hjaA\Module-CPANTS-Analyse-Test-0.01\MANIFEST.lnk' to 'C:\Users\root\AppData\Local\Temp\wQEtfHY9f9\MANIFEST' failed at C:/perl-build/strawberry-perl-5.38.4.1-64bit-portable/perl/site/lib/Archive/Any/Lite.pm line 130.
+# 2025-07-17_20-21-28 # STDOUT:
+# 2025-07-17_20-21-28 # STDOUT: #   Failed test 'symlinks not listed in MANIFEST is not ignored for a non-local distribution'
+# 2025-07-17_20-21-28 # STDOUT: #   at t/analyse/manifest.t line 84.
+# 2025-07-17_20-21-28 # STDOUT: # Looks like you failed 1 test of 14.
+# 2025-07-17_20-21-28 # STDOUT: t/analyse/manifest.t .....
+# 2025-07-17_20-21-28 # STDOUT: Dubious, test returned 1 (wstat 256, 0x100)
+# 2025-07-17_20-21-28 # STDOUT: Failed 1/14 subtests
+# 2025-07-17_20-21-28 # STDOUT: t/analyse/pod.t .......... ok
+# 2025-07-17_20-21-29 # STDOUT: t/analyse/uses.t ......... ok
+# 2025-07-17_20-21-29 # STDOUT: t/older_test_kwalitee.t .. ok
+# 2025-07-17_20-21-30 # STDOUT: t/x_cpants.t ............. ok
+# 2025-07-17_20-21-30 # STDOUT:
+# 2025-07-17_20-21-30 # STDOUT: Test Summary Report
+# 2025-07-17_20-21-30 # STDOUT: -------------------
+# 2025-07-17_20-21-30 # STDOUT: t/analyse/manifest.t   (Wstat: 256 (exited 1) Tests: 14 Failed: 1)
+# 2025-07-17_20-21-30 # STDOUT: Failed test:  13
+# 2025-07-17_20-21-30 # STDOUT: Non-zero exit status: 1
+# 2025-07-17_20-21-30 # STDOUT: Files=8, Tests=54,  5 wallclock secs ( 0.09 usr +  0.02 sys =  0.11 CPU)
+# 2025-07-17_20-21-30 # STDOUT: Result: FAIL
+# 2025-07-17_20-21-30 # STDOUT: Failed 1/8 test programs. 1/54 subtests failed.
+# 2025-07-17_20-21-30 # STDOUT: gmake: *** [makefile:938: test_dynamic] Error 255
+# 2025-07-17_20-21-30 # STDOUT: ! Installing Module::CPANTS::Analyse failed. See C:\PERL-B~1\STRAWB~3.1-6\data\.cpanm\work\1752776483.644\build.log for details. Retry with --force to force install it.
+# 2025-07-17_20-21-30 # STDOUT: FAIL
+# 2025-07-17_20-21-30 # close chld_out
+# 2025-07-17_20-21-30 # wait for exit...
+# 2025-07-17_20-21-30 # $child_exit_status: 1
+# 2025-07-17_20-21-30 # ==> cmd ended: cmd.exe /c cpanm --verbose --no-interactive Module::CPANTS::Analyse 2>&1
+# 2025-07-17_20-21-30 # ==> Duration: 8 seconds => 0.133333333333333 minutes
