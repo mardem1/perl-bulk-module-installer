@@ -126,7 +126,8 @@ try {
 
     Write-Host -ForegroundColor Green '=> matching files found - analyze ...'
     $files | ForEach-Object {
-        Write-Host -ForegroundColor DarkGray "=> check found file: '$($_.FullName)'"
+        $FullName = $_.FullName
+        Write-Host -ForegroundColor DarkGray "=> check found file: '$FullName'"
 
         $_ | Get-Content | ForEach-Object {
             # Upper-Case defined as first character for none core / standard modules
@@ -182,7 +183,7 @@ try {
         "# search done at '$now'"
     )
 
-    $fileHeaders += (
+    $modulesHeaders = (
         '#',
         '# modules found:',
         '#',
@@ -198,23 +199,23 @@ try {
 
     if ( ! $moduleNames ) {
         if ( Test-Path -LiteralPath $ModuleListFileTxt ) {
-            Write-Host "remove txt file $ModuleListFileTxt"
+            Write-Host "remove modules txt file $ModuleListFileTxt"
             Remove-Item -LiteralPath $ModuleListFileTxt
         }
 
         if ( Test-Path -LiteralPath $ModuleListFilePl ) {
-            Write-Host "remove pl file $ModuleListFilePl"
+            Write-Host "remove modules pl file $ModuleListFilePl"
             Remove-Item -LiteralPath $ModuleListFilePl
         }
     }
     else {
         Write-Host ''
         Write-Host -ForegroundColor Green "=> generate module list file '$ModuleListFileTxt'"
-        $fileHeaders, $moduleNames, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt
+        $fileHeaders, $modulesHeaders, $moduleNames, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt
 
         Write-Host ''
         Write-Host -ForegroundColor Green "=> generate module compile check (perl -c) file '$ModuleListFilePl'"
-        $fileHeaders, $modulesUse, $fileFooters | Out-File -LiteralPath $ModuleListFilePl
+        $fileHeaders, $modulesHeaders, $modulesUse, $fileFooters | Out-File -LiteralPath $ModuleListFilePl
     }
 
     exit 0
