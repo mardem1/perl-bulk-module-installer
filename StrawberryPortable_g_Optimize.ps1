@@ -23,6 +23,10 @@ From:
 To:
 * "lib"
 
+.PARAMETER RemoveBuildTools
+
+Removes strawberry perl package build tools, not needed only to run perl without module installations.
+
 .NOTES
 
 BUG REPORTS
@@ -62,7 +66,9 @@ param (
     [ValidateScript({ $_ -notlike '*\' })]
     [string] $StrawberryDir,
 
-    [switch] $MergeLibs
+    [switch] $MergeLibs,
+
+    [switch] $RemoveBuildTools
 )
 
 $ScriptStartTime = Get-Date
@@ -144,6 +150,61 @@ try {
             Write-Host -ForegroundColor Green "copy and remove '$ms32Dir' ($dirCount dirs, $fileCount files)"
             Copy-Item -Recurse -Path "$ms32Dir\*" -Destination "$perlDir\lib\" -Force -Confirm:$false -ErrorAction Stop
             Remove-Item -Path "$ms32Dir" -Recurse -Force -Confirm:$false -ErrorAction Stop
+        }
+    }
+
+    if ( ! $RemoveBuildTools ) {
+        Write-Host ''
+        Write-Host -ForegroundColor Green 'NO RemoveBuildTools given - SKIP'
+    }
+    else {
+        Write-Host ''
+        Write-Host -ForegroundColor Green 'remove strawberry perl module build tools'
+
+        Write-Host ''
+        $cDir = "$StrawberryDir\c"
+        if ( ! ( Test-Path -LiteralPath $cDir ) ) {
+            Write-Host -ForegroundColor Green "no C found '$cDir' -> SKIP"
+        }
+        else {
+            Write-Host -ForegroundColor Green "C found '$cDir' -> clean it"
+            Get-ChildItem -LiteralPath $cDir -Directory | Where-Object {
+                $_.Name -ne 'bin'
+            } | ForEach-Object {
+                $sname = $_.Name
+                $sfullname = $_.FullName
+
+                Write-Host "subdir $sname clean"
+                Get-ChildItem -LiteralPath $sfullname -Recurse -File | ForEach-Object {
+                    $fullname = $_.FullName
+                    Write-Host "remove file: '$fullname'"
+                    Remove-Item -LiteralPath $fullname -Force
+                }
+                Get-ChildItem -LiteralPath $sfullname -Recurse | Sort-Object -Property FullName -Descending | ForEach-Object {
+                    $fullname = $_.FullName
+                    Write-Host "remove dir: '$fullname'"
+                    Remove-Item -LiteralPath $fullname -Force -Recurse
+                }
+
+                Write-Host "remove dir: '$sfullname'"
+                Remove-Item -LiteralPath $sfullname -Force -Recurse
+            }
+        }
+
+        Write-Host ''
+        $cbinDir = "$StrawberryDir\c\bin"
+        if ( ! ( Test-Path -LiteralPath $cbinDir ) ) {
+            Write-Host -ForegroundColor Green "no C-BIN found '$cbinDir' -> SKIP"
+        }
+        else {
+            Write-Host -ForegroundColor Green "C-BIN found '$cbinDir' -> clean it"
+            Get-ChildItem -LiteralPath $cbinDir -Recurse -File | Where-Object {
+                $_.Name -notlike '*-config' -and $_.Extension -ne '.dll'
+            } | ForEach-Object {
+                $fullname = $_.FullName
+                Write-Host "remove: '$fullname'"
+                Remove-Item -LiteralPath $fullname -Force
+            }
         }
     }
 
