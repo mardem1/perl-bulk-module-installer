@@ -9,6 +9,18 @@ Removes CPAN-Cache data and merge perl lib dirs for performance
 
 Path to Strawberry directory for zipping
 
+.PARAMETER NoMerge
+
+Disable merge of additional-libs in mail-lib-dir
+
+From:
+* "site/lib/MSWin32-x64-multi-thread"
+* "site/lib"
+* "vendor/lib"
+
+To:
+* "lib"
+
 .NOTES
 
 BUG REPORTS
