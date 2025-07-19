@@ -104,6 +104,7 @@ try {
     $winHostName = $env:COMPUTERNAME
     $winOs = ( Get-CimInstance Win32_OperatingSystem ).Caption
     $ModuleListFilePl = $ModuleListFileTxt.Replace('.txt', '.pl')
+    $PerlFilesListFileTxt = $ModuleListFileTxt.Replace('.txt', '.perlfiles.txt')
 
     Write-Host -ForegroundColor Green '=> search for files ...'
     Write-Host -ForegroundColor Green '  => with extensions:'
@@ -140,6 +141,10 @@ try {
                 if ( $true ) {
                     Write-Host -ForegroundColor Yellow "  => found module: '$text'"
                     $modules[$text] = $true
+                    if ( ! $foundPerlFiles.ContainsKey( $FullName ) ) {
+                        Write-Host -ForegroundColor Yellow "  => add new perl file with used module: '$FullName'"
+                        $foundPerlFiles[$FullName] = $null # add
+                    }
                 }
             }
         }
@@ -158,6 +163,14 @@ try {
     Write-Host ''
     Write-Host -ForegroundColor Green '=> Modules plain'
     $moduleNames | ForEach-Object { "$_" }
+
+    Write-Host ''
+    Write-Host -ForegroundColor Green '=> filter unique files'
+    $perlFilePaths = $($foundPerlFiles.Keys | Select-Object -Unique | Sort-Object )
+
+    Write-Host ''
+    Write-Host -ForegroundColor Green '=> Perl-Files'
+    $perlFilePaths | ForEach-Object { "$_" }
 
     $fileHeaders = (
         '#',
@@ -190,6 +203,13 @@ try {
         '' # empty line before list
     )
 
+    $perlFilesHeaders = (
+        '#',
+        '# found in perl files:',
+        '#',
+        '' # empty line before list
+    )
+
     $fileFooters = (
         '', # empty line after list
         '#',
@@ -207,6 +227,11 @@ try {
             Write-Host "remove modules pl file $ModuleListFilePl"
             Remove-Item -LiteralPath $ModuleListFilePl
         }
+
+        if ( Test-Path -LiteralPath $PerlFilesListFileTxt ) {
+            Write-Host "remove perlfiles txt file $PerlFilesListFileTxt"
+            Remove-Item -LiteralPath $PerlFilesListFileTxt
+        }
     }
     else {
         Write-Host ''
@@ -216,6 +241,10 @@ try {
         Write-Host ''
         Write-Host -ForegroundColor Green "=> generate module compile check (perl -c) file '$ModuleListFilePl'"
         $fileHeaders, $modulesHeaders, $modulesUse, $fileFooters | Out-File -LiteralPath $ModuleListFilePl
+
+        Write-Host ''
+        Write-Host -ForegroundColor Green "=> generate perl files list file '$PerlFilesListFileTxt'"
+        $fileHeaders, $perlFilesHeaders, $perlFilePaths, $fileFooters | Out-File -LiteralPath $PerlFilesListFileTxt
     }
 
     exit 0
