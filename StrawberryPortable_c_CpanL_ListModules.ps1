@@ -207,11 +207,11 @@ try {
                     # if starting wiht v remove it & if ending wiht _0123 remove -> v5.4.3_21 -> 5.4.3
                     $t = [string] (($modules[$m] -replace '^v', '') -replace '_\d+$', '')
                     $dotCount = ([regex]::Matches($t, '\.' )).Count
-                    if(  $dotCount -gt 3 ) {
+                    if (  $dotCount -gt 3 ) {
                         # to long version more than 4 sections
                         # keep new() exception
                     }
-                    elseif($dotCount -lt 1 ) {
+                    elseif ($dotCount -lt 1 ) {
                         # only number no .
                         $t = "$($t).0" # [version]::new()  needs 2a
                     }
@@ -226,11 +226,11 @@ try {
                     # if starting wiht v remove it & if ending wiht _0123 remove -> v5.4.3_21 -> 5.4.3
                     $t = [string] (($v -replace '^v', '') -replace '_\d+$', '')
                     $dotCount = ([regex]::Matches($t, '\.' )).Count
-                    if(  $dotCount -gt 3 ) {
+                    if (  $dotCount -gt 3 ) {
                         # to long version more than 4 sections
                         # keep new() exception
                     }
-                    elseif($dotCount -lt 1 ) {
+                    elseif ($dotCount -lt 1 ) {
                         # only number no .
                         $t = "$($t).0" # [version]::new()  needs 2a
                     }

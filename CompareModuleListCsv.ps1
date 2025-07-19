@@ -274,7 +274,6 @@ try {
                             Write-Host -ForegroundColor Red "ERROR: can't parse Version '$m' -> '$b' - $_"
                         }
 
-
                         if ( $null -eq $version_a) {
                             if ( $null -eq $version_b) {
                                 # TODO: what to do ?

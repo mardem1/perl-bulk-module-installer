@@ -103,6 +103,8 @@ param (
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ ! [string]::IsNullOrWhiteSpace( $_ ) })]
+    [ValidateScript({ $_ -like '*strawberry*' })]
+    [ValidateScript({ $_ -notlike '*\' })]
     [string] $StrawberryZipBaseName = "strawberry-perl-$($StrawberryVersionNumber)-64bit-portable",
 
     [Parameter(Mandatory = $false)]
