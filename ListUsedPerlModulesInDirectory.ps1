@@ -98,6 +98,7 @@ try {
     $extensions = ( '.pl', '.pm', '.bat', '.t' )
 
     [hashtable] $modules = @{}
+    [hashtable] $foundPerlFiles = @{}
 
     $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
     $winUser = $env:USERNAME
