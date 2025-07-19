@@ -21,6 +21,10 @@ Optional auto detect 7z path
 
 Optional pack as 7z instead of zip
 
+.PARAMETER RemoveStrawberryDirOnFinish
+
+removes packaged dir
+
 .NOTES
 
 BUG REPORTS
@@ -73,7 +77,11 @@ param (
 
     [Parameter(ParameterSetName = 'SevenZipPath')]
     [Parameter(ParameterSetName = 'DetectSevenZip')]
-    [switch] $Use7zFormat
+    [switch] $Use7zFormat,
+
+    [Parameter(ParameterSetName = 'SevenZipPath')]
+    [Parameter(ParameterSetName = 'DetectSevenZip')]
+    [switch] $RemoveStrawberryDirOnFinish
 )
 
 $ScriptStartTime = Get-Date
@@ -184,6 +192,14 @@ try {
         $zipEndTime = Get-Date
         Write-Host "zip end time $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $zipEndTime )"
         Write-Host "zip duration $( (New-TimeSpan -Start $zipStartTIme -End $zipEndTime).TotalSeconds )"
+
+        if (! $RemoveStrawberryDirOnFinish ) {
+            Write-Host -ForegroundColor Green "no RemoveStrawberryDirOnFinish keep '$StrawberryDir'"
+        }
+        else {
+            Write-Host -ForegroundColor Green "RemoveStrawberryDirOnFinish remove '$StrawberryDir'"
+            Remove-Item -LiteralPath $StrawberryDir -Recurse -Force -Confirm:$false -ErrorAction Stop
+        }
 
         exit 0
     }

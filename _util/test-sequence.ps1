@@ -12,7 +12,7 @@ $baseDir = 'C:\perl-build'
 & "$baseDir\perl-bulk-module-installer\StrawberryPortable_e_RemoveDefenderExclude.ps1" -StrawberryDir "$baseDir\$portableBaseName"
 & "$baseDir\perl-bulk-module-installer\StrawberryPortable_f_RunDefenderScan.ps1" -StrawberryDir "$baseDir\$portableBaseName"
 & "$baseDir\perl-bulk-module-installer\StrawberryPortable_g_Optimize.ps1" -StrawberryDir "$baseDir\$portableBaseName" -MergeLibs -RemoveBuildTools
-& "$baseDir\perl-bulk-module-installer\StrawberryPortable_h_Package.ps1" -StrawberryDir "$baseDir\$portableBaseName"
+& "$baseDir\perl-bulk-module-installer\StrawberryPortable_h_Package.ps1" -StrawberryDir "$baseDir\$portableBaseName" -RemoveStrawberryDirOnFinish
 
 & "$baseDir\perl-bulk-module-installer\StrawberryPortable_c_CpanL_ListModules.ps1" -StrawberryDir "$baseDir\strawberry-perl-5.24.4.1-64bit-portable" -ModuleListFileTxt "$baseDir\perl-bulk-module-installer\log\_list_5.24.4.1.txt"
 & "$baseDir\perl-bulk-module-installer\StrawberryPortable_c_CpanL_ListModules.ps1" -StrawberryDir "$baseDir\strawberry-perl-5.26.3.1-64bit-portable" -ModuleListFileTxt "$baseDir\perl-bulk-module-installer\log\_list_5.26.3.1.txt"
