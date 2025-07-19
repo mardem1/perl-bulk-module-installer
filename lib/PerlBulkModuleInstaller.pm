@@ -645,8 +645,11 @@ sub generate_modules_need_to_install
     }
 
     foreach my $module ( keys %modules_with_available_updates ) {
-        if (   exists $modules_install_dont_try_from_file{ $module }
-            || exists $modules_install_ok{ $module }
+        if ( exists $modules_install_dont_try_from_file{ $module } ) {
+            say_ex( 'WARN: update module - ' . $module . ' - marked dont try - FLAG FAILED' );
+            $modules_install_failed{ $module } = undef;
+        }
+        elsif (exists $modules_install_ok{ $module }
             || exists $modules_install_failed{ $module }
             || exists $modules_install_not_found{ $module }
             || exists $modules_need_to_install{ $module } )
@@ -660,8 +663,11 @@ sub generate_modules_need_to_install
     }
 
     foreach my $module ( keys %modules_to_install_from_file ) {
-        if (   exists $modules_install_dont_try_from_file{ $module }
-            || exists $modules_install_ok{ $module }
+        if ( exists $modules_install_dont_try_from_file{ $module } ) {
+            say_ex( 'WARN: install module (from list) - ' . $module . ' - marked dont try - FLAG FAILED' );
+            $modules_install_failed{ $module } = undef;
+        }
+        elsif (exists $modules_install_ok{ $module }
             || exists $modules_install_failed{ $module }
             || exists $modules_install_not_found{ $module }
             || exists $modules_need_to_install{ $module } )
@@ -688,6 +694,18 @@ sub generate_modules_need_to_install
         $log_dir_path . '/' . $timestamp . '_' . 'modules_install_already.log',
         'modules_install_already: ' . scalar( keys %modules_install_already ),
         Dumper( \%modules_install_already ),
+    );
+
+    say_ex( '' );
+    say_ex(   '%modules_install_failed: '
+            . scalar( keys %modules_install_failed ) . "\n"
+            . Dumper( \%modules_install_failed ) );
+    say_ex( '' );
+
+    write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'modules_install_failed.log',
+        'modules_install_failed: ' . scalar( keys %modules_install_failed ),
+        Dumper( \%modules_install_failed ),
     );
 
     say_ex( '' );
