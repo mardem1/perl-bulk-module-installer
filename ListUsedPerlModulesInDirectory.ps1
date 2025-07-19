@@ -118,6 +118,8 @@ try {
     $files = Get-ChildItem -Recurse -File -Force -LiteralPath $SearchPath -ErrorAction Continue | Where-Object {
         $_.Extension -in $extensions
     } | Where-Object {
+        $_.FullName -ne $ModuleListFilePl # exclude self generated list
+    } | Where-Object {
         $true
         # INFO: add custom filter here - exclude ?
     }
