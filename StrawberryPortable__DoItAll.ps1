@@ -315,7 +315,7 @@ try {
     & "$PbmiDir\StrawberryPortable_c_CpanL_ListModules.ps1" -StrawberryDir $StrawberryDir -ModuleListFileTxt "$LogDir\$(Get-Date -Format 'yyyyMMdd_HHmmss')_list_after_install.txt" | Write-Host
     & "$PbmiDir\StrawberryPortable_e_RemoveDefenderExclude.ps1" -StrawberryDir $StrawberryDir | Write-Host
     & "$PbmiDir\StrawberryPortable_f_RunDefenderScan.ps1" -StrawberryDir $StrawberryDir | Write-Host
-    & "$PbmiDir\StrawberryPortable_g_Optimize.ps1" -StrawberryDir $StrawberryDir | Write-Host
+    & "$PbmiDir\StrawberryPortable_g_Optimize.ps1" -StrawberryDir $StrawberryDir -MergeLibs | Write-Host
     & "$PbmiDir\StrawberryPortable_c_CpanL_ListModules.ps1" -StrawberryDir $StrawberryDir -ModuleListFileTxt "$LogDir\$(Get-Date -Format 'yyyyMMdd_HHmmss')_list_after_optimize.txt" | Write-Host
     & "$PbmiDir\StrawberryPortable_h_Package.ps1" -StrawberryDir $StrawberryDir -DetectSevenZip -Use7zFormat | Write-Host
 

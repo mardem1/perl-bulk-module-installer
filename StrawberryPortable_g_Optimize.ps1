@@ -3,15 +3,17 @@
 
 .SYNOPSIS
 
-Removes CPAN-Cache data and merge perl lib dirs for performance
+Removes CPAN-Cache data and merge perl lib dirs for performance.
 
 .PARAMETER StrawberryDir
 
 Path to Strawberry directory for zipping
 
-.PARAMETER NoMerge
+.PARAMETER MergeLibs
 
-Disable merge of additional-libs in mail-lib-dir
+Merge of additional-libs in single main-lib-dir
+
+Windows is sensitive for file-access, so reduce lib search-path for better performance
 
 From:
 * "site/lib/MSWin32-x64-multi-thread"
@@ -60,7 +62,7 @@ param (
     [ValidateScript({ $_ -notlike '*\' })]
     [string] $StrawberryDir,
 
-    [switch] $NoMerge
+    [switch] $MergeLibs
 )
 
 $ScriptStartTime = Get-Date
@@ -97,9 +99,9 @@ try {
         Remove-Item -Recurse -Force -LiteralPath $cpanCacheDir
     }
 
-    if ( $NoMerge ) {
+    if ( ! $MergeLibs ) {
         Write-Host ''
-        Write-Host -ForegroundColor Green 'NoMerge given - SKIP'
+        Write-Host -ForegroundColor Green 'NO MergeLibs given - SKIP'
     }
     else {
         #
