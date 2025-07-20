@@ -158,6 +158,9 @@ try {
     Write-Host -ForegroundColor Green '=> check modules ...'
     [hashtable] $modules = @{}
 
+    $version_not_installed = 'not-installed'
+    $version_not_defined = 'undef' # saved by export
+
     $generatedList | ForEach-Object {
         ( $_ | Out-String ).Trim( )
     } | Where-Object {
@@ -176,7 +179,7 @@ try {
             $v = $Matches[2]
             $v = "$v".Trim()
             if ( '' -eq $v ) {
-                $v = 'undef'; # as perl verison
+                $v = $version_not_defined # as perl verison
             }
 
             # some moule wrong listed - end with : ? => ignore?
@@ -189,18 +192,18 @@ try {
                 # Write-Host  "    => unknown module save it - '$m'"
                 $modules[$m] = $v
             }
-            elseif ( 'undef' -eq $modules[$m] -and 'undef' -eq $v ) {
+            elseif ( $version_not_defined -eq $modules[$m] -and $version_not_defined -eq $v ) {
                 # Write-Host  "    => both modules undefined number, do nothing - '$m'"
             }
-            elseif ( 'undef' -ne $modules[$m] -and 'undef' -eq $v ) {
+            elseif ( $version_not_defined -ne $modules[$m] -and $version_not_defined -eq $v ) {
                 # Write-Host  "    => already known number, keep it - '$m'"
             }
-            elseif ( 'undef' -eq $modules[$m] -and 'undef' -ne $v ) {
+            elseif ( $version_not_defined -eq $modules[$m] -and $version_not_defined -ne $v ) {
                 # Write-Host  "    => replace undefined with defined version number - '$m'"
                 $modules[$m] = $v
             }
             else {
-                # elseif ( 'undef' -ne $modules[$m] -and 'undef' -ne $v ) {
+                # elseif ( $version_not_defined -ne $modules[$m] -and $version_not_defined -ne $v ) {
                 $version_m = $null
                 $version_v = $null
 
