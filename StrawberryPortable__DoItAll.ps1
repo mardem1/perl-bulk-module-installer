@@ -227,6 +227,8 @@ try {
         }
     }
 
+    Set-Location -LiteralPath "$PbmiDir"
+
     & "$PbmiDir\StrawberryPortable_a_Extract.ps1" -StrawberryZip $StrawberryZip -Destination $StrawberryDir | Write-Host
 
     & "$PbmiDir\StrawberryPortable_b_AddDefenderExclude.ps1" -StrawberryDir $StrawberryDir | Write-Host
@@ -235,6 +237,8 @@ try {
     # Start-Process -Verb RunAs -FilePath "$(Get-Process -PID $PID | Select-Object -ExpandProperty Path)" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PbmiDir\StrawberryPortable_b_AddDefenderExclude.ps1`" -StrawberryDir `"$StrawberryDir`""
 
     & "$PbmiDir\StrawberryPortable_c_CpanL_ListModules.ps1" -StrawberryDir $StrawberryDir -ModuleListFileTxt "$LogDir\$(Get-Date -Format 'yyyyMMdd_HHmmss')_list_before.txt" | Write-Host
+
+    Set-Location -LiteralPath "$PbmiDir"
 
     # it's not recommended to update module if not needed
 
@@ -313,6 +317,8 @@ try {
         Write-Host -ForegroundColor Green "module installation ($i/$ModuleListCount) with list '$name' (2/2) ended at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
         Write-Host ''
     }
+
+    Set-Location -LiteralPath "$PbmiDir"
 
     & "$PbmiDir\StrawberryPortable_c_CpanL_ListModules.ps1" -StrawberryDir $StrawberryDir -ModuleListFileTxt "$LogDir\$(Get-Date -Format 'yyyyMMdd_HHmmss')_list_after_install.txt" | Write-Host
     & "$PbmiDir\StrawberryPortable_e_RemoveDefenderExclude.ps1" -StrawberryDir $StrawberryDir | Write-Host
