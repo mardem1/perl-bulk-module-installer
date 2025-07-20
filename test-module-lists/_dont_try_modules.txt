@@ -123,6 +123,7 @@ Color::Conversions
 CPAN::Checksums
 CPAN::Mini::Inject
 CPAN::YACSmoke
+# OS unsupported
 Crypt::OpenSSL::CA
 Crypt::PBKDF2
 Crypt::Random
