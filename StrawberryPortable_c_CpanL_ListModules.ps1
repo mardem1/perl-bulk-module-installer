@@ -66,6 +66,7 @@ $ScriptStartTime = Get-Date
 $ScriptPath = ''
 $transcript = $false
 $ori_ErrorActionPreference = $Global:ErrorActionPreference
+$ori_Location = (Get-Location ).Path
 
 try {
     $Global:ErrorActionPreference = 'Stop'
@@ -321,6 +322,10 @@ finally {
     $durationMinutes = (New-TimeSpan -Start $ScriptStartTime -End $ScriptEndTime).TotalMinutes
     Write-Host -ForegroundColor Green "Script '$ScriptPath' ended at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $ScriptEndTime ) - duration $durationMinutes minutes"
     Write-Host ''
+
+    if ( $ori_Location -ne (Get-Location ).Path) {
+        Set-Location $ori_Location
+    }
 
     if ($transcript) {
         Stop-Transcript
