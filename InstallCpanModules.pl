@@ -36,9 +36,9 @@ __END__
 
 =head1 NAME
 
-InstallCpanModules.pl [ --all-updates ] filepath_install [ filepath_dont_try ]
+InstallCpanModules.pl [ --all-updates ] filepath_install [ filepath_dont_try  [ filepath_no_tests ] ]
 
-InstallCpanModules.pl --only-all-updates [ filepath_dont_try ]
+InstallCpanModules.pl --only-all-updates [ filepath_dont_try  [ filepath_no_tests ] ]
 
 =head1 DESCRIPTION
 
@@ -52,6 +52,11 @@ details can be found in the C<README.md>
 =item C<filepath_dont_try>
 
 Filepath to a text file which contains Perl-Module-Names (eg. Perl::Critic) which will not be installed.
+One Name per Line, # marks a comment line, Linux-Line-Ends preferred but all work's.
+
+=item C<filepath_no_tests>
+
+Filepath to a text file which contains Perl-Module-Names (eg. Perl::Critic) which will be installed without execution of tests.
 One Name per Line, # marks a comment line, Linux-Line-Ends preferred but all work's.
 
 =item C<filepath_install>

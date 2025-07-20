@@ -22,6 +22,11 @@ install. One Name per Line, # marks a comment line Linux-Line-Ends preferred but
 Filepath to a text file which contains Perl-Module-Names (eg. Perl::Critic) which will not be installed.
 One Name per Line, # marks a comment line, Linux-Line-Ends preferred but all work's.
 
+.PARAMETER NoTestsModuleListFile
+
+Filepath to a text file which contains Perl-Module-Names (eg. Perl::Critic) which will be installed without execution of tests.
+One Name per Line, # marks a comment line, Linux-Line-Ends preferred but all work's.
+
 .PARAMETER OnlyAllUpdates
 
 Only update installed modules, no modules from a given filelist will be
@@ -67,8 +72,10 @@ FOR A PARTICULAR PURPOSE.
 
 [CmdletBinding()]
 param (
-    [Parameter(ParameterSetName = 'Standard', Mandatory = $true, Position = 0)]
-    [Parameter(ParameterSetName = 'OnlyAllUpdates', Mandatory = $true, Position = 0)]
+    [Parameter(ParameterSetName = 'StandardA', Mandatory = $true, Position = 0)]
+    [Parameter(ParameterSetName = 'StandardB', Mandatory = $true, Position = 0)]
+    [Parameter(ParameterSetName = 'OnlyAllUpdatesA', Mandatory = $true, Position = 0)]
+    [Parameter(ParameterSetName = 'OnlyAllUpdatesB', Mandatory = $true, Position = 0)]
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Container })]
     # [ValidateScript({ $_ -like '*strawberry*portable*' })]
@@ -78,7 +85,8 @@ param (
     [ValidateScript({ $_ -notlike '*\' })]
     [string] $StrawberryDir,
 
-    [Parameter(ParameterSetName = 'Standard', Mandatory = $true, Position = 1)]
+    [Parameter(ParameterSetName = 'StandardA', Mandatory = $true, Position = 1)]
+    [Parameter(ParameterSetName = 'StandardB', Mandatory = $true, Position = 1)]
     [ValidateNotNullOrEmpty()]
     [ValidateScript({
             $notFound = $false
@@ -97,17 +105,27 @@ param (
         })]
     [string[]] $InstallModuleListFile,
 
-    [Parameter(ParameterSetName = 'Standard', Mandatory = $false, Position = 2)]
-    [Parameter(ParameterSetName = 'OnlyAllUpdates', Mandatory = $false, Position = 1)]
+    [Parameter(ParameterSetName = 'StandardA', Mandatory = $false, Position = 2)]
+    [Parameter(ParameterSetName = 'StandardB', Mandatory = $true, Position = 2)]
+    [Parameter(ParameterSetName = 'OnlyAllUpdatesA', Mandatory = $false, Position = 1)]
+    [Parameter(ParameterSetName = 'OnlyAllUpdatesB', Mandatory = $true, Position = 1)]
     [ValidateNotNullOrEmpty()]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
     [ValidateScript({ $_ -like '*.txt' })]
     [string] $DontTryModuleListFile,
 
-    [Parameter(ParameterSetName = 'OnlyAllUpdates')]
+    [Parameter(ParameterSetName = 'StandardB', Mandatory = $false, Position = 3)]
+    [Parameter(ParameterSetName = 'OnlyAllUpdatesB', Mandatory = $false, Position = 2)]
+    [ValidateNotNullOrEmpty()]
+    [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
+    [ValidateScript({ $_ -like '*.txt' })]
+    [string] $NoTestsModuleListFile,
+
+    [Parameter(ParameterSetName = 'OnlyAllUpdatesA')]
+    [Parameter(ParameterSetName = 'OnlyAllUpdatesB')]
     [switch] $OnlyAllUpdates,
 
-    [Parameter(ParameterSetName = 'Standard')]
+    [Parameter(ParameterSetName = 'StandardB')]
     [switch] $AllUpdates
 )
 
@@ -159,16 +177,23 @@ try {
 
     0..25 | ForEach-Object { Write-Host '' }
 
+    # TODO: replace with Start-Process and created ARGV
+
     if ( $OnlyAllUpdates) {
         if ( [string]::IsNullOrWhiteSpace($DontTryModuleListFile)) {
             Write-Host -ForegroundColor Green "start '$InstallCpanModules' with --only-all-updates"
             Write-Host ''
             & $perlexe $InstallCpanModules '--only-all-updates' | Write-Host
         }
-        else {
-            Write-Host -ForegroundColor Green "start '$InstallCpanModules' with --only-all-updates and $DontTryModuleListFile"
+        if ( [string]::IsNullOrWhiteSpace($NoTestsModuleListFile)) {
+            Write-Host -ForegroundColor Green "start '$InstallCpanModules' with --only-all-updates and '$DontTryModuleListFile'"
             Write-Host ''
             & $perlexe $InstallCpanModules '--only-all-updates' $DontTryModuleListFile | Write-Host
+        }
+        else {
+            Write-Host -ForegroundColor Green "start '$InstallCpanModules' with --only-all-updates and '$DontTryModuleListFile' and '$NoTestsModuleListFile'"
+            Write-Host ''
+            & $perlexe $InstallCpanModules '--only-all-updates' $DontTryModuleListFile $NoTestsModuleListFile | Write-Host
         }
 
         if (0 -ne $LASTEXITCODE) {
@@ -180,34 +205,38 @@ try {
         $InstallModuleListFile | ForEach-Object {
             $listfile = $_
 
-            $tmp = ''
-
             if ( $AllUpdates ) {
-                $tmp += ' and --all-updates'
-            }
-
-            if ( ! [string]::IsNullOrWhiteSpace($DontTryModuleListFile)) {
-                $tmp += " and $DontTryModuleListFile"
-            }
-
-            Write-Host -ForegroundColor Green "start '$InstallCpanModules' with '$listfile'$tmp"
-            Write-Host ''
-
-            # TODO: replace with Start-Process and created ARGV
-            if ( [string]::IsNullOrWhiteSpace($DontTryModuleListFile)) {
-                if ( $AllUpdates ) {
-                    & $perlexe $InstallCpanModules '--all-updates' $listfile | Write-Host
+                if ( [string]::IsNullOrWhiteSpace($DontTryModuleListFile)) {
+                    Write-Host -ForegroundColor Green "start '$InstallCpanModules' with -all-updates and '$listfile'"
+                    Write-Host ''
+                    & $perlexe $InstallCpanModules '-all-updates' $listfile | Write-Host
+                }
+                if ( [string]::IsNullOrWhiteSpace($NoTestsModuleListFile)) {
+                    Write-Host -ForegroundColor Green "start '$InstallCpanModules' with -all-updates and '$listfile' and '$DontTryModuleListFile'"
+                    Write-Host ''
+                    & $perlexe $InstallCpanModules '-all-updates' $listfile $DontTryModuleListFile | Write-Host
                 }
                 else {
-                    & $perlexe $InstallCpanModules $listfile | Write-Host
+                    Write-Host -ForegroundColor Green "start '$InstallCpanModules' with -all-updates and '$listfile' and '$DontTryModuleListFile' and '$NoTestsModuleListFile'"
+                    Write-Host ''
+                    & $perlexe $InstallCpanModules '-all-updates' $listfile $DontTryModuleListFile $NoTestsModuleListFile | Write-Host
                 }
             }
             else {
-                if ( $AllUpdates ) {
-                    & $perlexe $InstallCpanModules '--all-updates' $listfile $DontTryModuleListFile | Write-Host
+                if ( [string]::IsNullOrWhiteSpace($DontTryModuleListFile)) {
+                    Write-Host -ForegroundColor Green "start '$InstallCpanModules' with '$listfile'"
+                    Write-Host ''
+                    & $perlexe $InstallCpanModules $listfile | Write-Host
+                }
+                if ( [string]::IsNullOrWhiteSpace($NoTestsModuleListFile)) {
+                    Write-Host -ForegroundColor Green "start '$InstallCpanModules' with '$listfile' and '$DontTryModuleListFile'"
+                    Write-Host ''
+                    & $perlexe $InstallCpanModules $listfile $DontTryModuleListFile | Write-Host
                 }
                 else {
-                    & $perlexe $InstallCpanModules $listfile $DontTryModuleListFile | Write-Host
+                    Write-Host -ForegroundColor Green "start '$InstallCpanModules' with '$listfile' and '$DontTryModuleListFile' and '$NoTestsModuleListFile'"
+                    Write-Host ''
+                    & $perlexe $InstallCpanModules $listfile $DontTryModuleListFile $NoTestsModuleListFile | Write-Host
                 }
             }
 

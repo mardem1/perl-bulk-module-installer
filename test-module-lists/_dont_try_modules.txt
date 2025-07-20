@@ -225,7 +225,6 @@ MooseX::Param::Validate
 MooseX::POE
 MooX::Log::Any
 Net::EmptyPort
-Net::Nslookup
 Net::proto
 Net::Server
 Net::Server::Daemonize

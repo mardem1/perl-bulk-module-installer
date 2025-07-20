@@ -41,6 +41,10 @@ Path which contains the module install/dont-try lists, generated if empty
 
 Path for the Dont-Try-List, generated if empty
 
+.PARAMETER NoTestsListFilePath
+
+Path for the No-Tests-List, generated if empty
+
 .PARAMETER InstallListFilePath
 
 Explicit List-File for installation, if not given, all files in ModuleListsDirPath (except DontTryListFilePath) will be used.
@@ -99,6 +103,8 @@ param (
     [ValidateScript({ ! [string]::IsNullOrWhiteSpace( $_ ) })]
     [ValidateScript({ $_ -match '^5[.]\d+[.]\d+[.]\d+$' })]
     [string] $StrawberryVersionNumber = '5.24.4.1',
+    # [string] $StrawberryVersionNumber =  '5.32.1.1',
+    # [string] $StrawberryVersionNumber =  '5.40.2.1',
 
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
@@ -135,10 +141,17 @@ param (
     [string] $ModuleListsDirPath = '',  # based on Pbmi-Dir if empty
 
     [Parameter(Mandatory = $false)]
-    [string] $DontTryListFilePath = '', # based on ModuleListsDirPath if empty
+    # [string] $DontTryListFilePath = '', # based on ModuleListsDirPath if empty
+    [string] $DontTryListFilePath = 'C:\perl-build\perl-bulk-module-installer\test-module-lists\_dont_try_modules.txt', # based on ModuleListsDirPath if empty
 
     [Parameter(Mandatory = $false)]
-    [string] $InstallListFilePath = '' # unused if empty
+    # [string] $NoTestsListFilePath = '', # based on ModuleListsDirPath if empty
+    [string] $NoTestsListFilePath = 'C:\perl-build\perl-bulk-module-installer\test-module-lists\_no_tests_modules.txt', # based on ModuleListsDirPath if empty
+
+    [Parameter(Mandatory = $false)]
+    # [string] $InstallListFilePath = '' # unused if empty
+    [string] $InstallListFilePath = 'C:\perl-build\perl-bulk-module-installer\test-module-lists\Net_Nslookup.txt' # unused if empty
+    # [string] $InstallListFilePath = 'C:\perl-build\perl-bulk-module-installer\test-module-lists\Module_CPANTS_Analyse.txt' # unused if empty
 )
 
 $ScriptStartTime = Get-Date
@@ -221,6 +234,14 @@ try {
         throw "dont-try list file $DontTryListFilePath not found"
     }
 
+    if ( [string]::IsNullOrWhiteSpace($NoTestsListFilePath) ) {
+        $NoTestsListFilePath = "$ModuleListsDirPath\_dont_try_modules.txt"
+    }
+
+    if ( !( Test-Path -LiteralPath $NoTestsListFilePath -PathType Leaf ) ) {
+        throw "dont-try list file $NoTestsListFilePath not found"
+    }
+
     if ( ![string]::IsNullOrWhiteSpace($InstallListFilePath) ) {
         if ( !( Test-Path -LiteralPath $InstallListFilePath -PathType Leaf ) ) {
             throw "install list file $InstallListFilePath not found"
@@ -245,16 +266,16 @@ try {
     # it's not recommended to update module if not needed
 
     # install all Updates before ?
-    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -OnlyAllUpdates -DontTryModuleListFile "$DontTryListFilePath"
+    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -OnlyAllUpdates -DontTryModuleListFile "$DontTryListFilePath" -NoTestsModuleListFile "$NoTestsListFilePath" | Write-Host
 
     # install all Updates in same install run ?
-    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -AllUpdates -InstallModuleListFile "$ModuleListsDirPath\CoreCarpModuleExample.txt" -DontTryModuleListFile "$DontTryListFilePath"
+    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -AllUpdates -InstallModuleListFile "$ModuleListsDirPath\CoreCarpModuleExample.txt" -DontTryModuleListFile "$DontTryListFilePath" -NoTestsModuleListFile "$NoTestsListFilePath" | Write-Host
 
     # install modules
-    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ModuleListsDirPath\SingleModuleExample.txt" -DontTryModuleListFile "$DontTryListFilePath" | Write-Host
+    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ModuleListsDirPath\SingleModuleExample.txt" -DontTryModuleListFile "$DontTryListFilePath" -NoTestsModuleListFile "$NoTestsListFilePath"| Write-Host
 
     # direct loop ?
-    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ModuleListsDirPath\SingleModuleExample.txt", "$ModuleListsDirPath\SmallModuleExample.txt" -DontTryModuleListFile "$DontTryListFilePath" | Write-Host
+    # & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$ModuleListsDirPath\SingleModuleExample.txt", "$ModuleListsDirPath\SmallModuleExample.txt" -DontTryModuleListFile "$DontTryListFilePath" -NoTestsModuleListFile "$NoTestsListFilePath"| Write-Host
 
     if (![string]::IsNullOrWhiteSpace($InstallListFilePath)) {
         $tmpList = Get-Item -LiteralPath "$InstallListFilePath"
@@ -301,7 +322,7 @@ try {
         Write-Host -ForegroundColor Green "module installation ($i/$ModuleListCount) with list '$name' (1/2) start at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
         Write-Host ''
 
-        & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$fullName" -DontTryModuleListFile "$DontTryListFilePath" | Write-Host
+        & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$fullName" -DontTryModuleListFile "$DontTryListFilePath" -NoTestsModuleListFile "$NoTestsListFilePath" | Write-Host
 
         Write-Host ''
         Write-Host -ForegroundColor Green "module installation ($i/$ModuleListCount) with list '$name' (1/2) ended at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
@@ -313,7 +334,7 @@ try {
         Write-Host -ForegroundColor Green "module installation ($i/$ModuleListCount) with list '$name' (2/2) start at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
         Write-Host ''
 
-        & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$fullName" -DontTryModuleListFile "$DontTryListFilePath" | Write-Host
+        & "$PbmiDir\StrawberryPortable_d_InstallModules.ps1" -StrawberryDir $StrawberryDir -InstallModuleListFile "$fullName" -DontTryModuleListFile "$DontTryListFilePath" -NoTestsModuleListFile "$NoTestsListFilePath" | Write-Host
 
         Write-Host ''
         Write-Host -ForegroundColor Green "module installation ($i/$ModuleListCount) with list '$name' (2/2) ended at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"

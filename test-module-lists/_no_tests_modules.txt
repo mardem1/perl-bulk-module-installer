@@ -1,0 +1,4 @@
+# test fail because of external dependencies which are currently wrong - dns names, ip addresses
+Net::Nslookup
+# test fail if execution with admin privileges
+Module::CPANTS::Analyse

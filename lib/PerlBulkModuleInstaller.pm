@@ -37,6 +37,11 @@ our $VERSION = '0.01';
 # will only exported as file after init
 my %modules_install_dont_try_from_file = ();
 
+# modules which are known to have failed tests but are OK, so no test execution, imported from file via -> import_module_no_tests_list_from_file()
+# will not changed after init
+# will only exported as file after init
+my %modules_install_not_tests_from_file = ();
+
 # modules which should be installed, imported from file via -> import_module_list_from_file()
 # will not changed after init
 # will only exported as file after init
@@ -530,6 +535,45 @@ sub import_module_dont_try_list_from_file
     return;
 }
 
+sub import_module_no_tests_list_from_file
+{
+    my ( $filepath ) = @_;
+
+    if ( is_string_empty( $log_dir_path ) ) {
+        croak 'log_dir_path empty!';
+    }
+
+    if ( is_string_empty( $filepath ) ) {
+        croak 'param filepath empty!';
+    }
+
+    say_ex( '==> ' . 'import module no tests list file: ' . $filepath );
+
+    my @file_lines = read_file( $filepath );
+
+    @file_lines = map  { trim( $_ ) } @file_lines;
+    @file_lines = grep { $EMPTY_STRING ne $_ && $_ !~ /^[#]/o } @file_lines;
+
+    %modules_install_not_tests_from_file = hashify( @file_lines );
+    @file_lines                          = ();
+
+    say_ex( '' );
+    say_ex(   'modules_install_not_tests_from_file: '
+            . ( scalar keys %modules_install_not_tests_from_file ) . "\n"
+            . Dumper( \%modules_install_not_tests_from_file ) );
+    say_ex( '' );
+
+    my $timestamp = get_timestamp_for_filename();
+
+    write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'import_modules_install_not_tests_from_file.log',
+        'import_modules_install_not_tests_from_file: ' . scalar( keys %modules_install_not_tests_from_file ),
+        Dumper( \%modules_install_not_tests_from_file ),
+    );
+
+    return;
+}
+
 sub mark_module_as_ok
 {
     my ( $module, $version ) = @_;
@@ -697,7 +741,7 @@ sub generate_modules_need_to_install
     );
 
     say_ex( '' );
-    say_ex(   '%modules_install_failed: '
+    say_ex(   'modules_install_failed: '
             . scalar( keys %modules_install_failed ) . "\n"
             . Dumper( \%modules_install_failed ) );
     say_ex( '' );
@@ -817,6 +861,18 @@ sub print_and_log_full_summary
         $log_dir_path . '/' . $timestamp . '_' . 'import_module_dont_try_list_from_file.log',
         'import_module_dont_try_list_from_file: ' . scalar( keys %modules_install_dont_try_from_file ),
         Dumper( \%modules_install_dont_try_from_file ),
+    );
+
+    say_ex( '' );
+    say_ex(   'modules_install_not_tests_from_file: '
+            . scalar( keys %modules_install_not_tests_from_file ) . "\n"
+            . Dumper( \%modules_install_not_tests_from_file ) );
+    say_ex( '' );
+
+    write_file(
+        $log_dir_path . '/' . $timestamp . '_' . 'import_modules_install_not_tests_from_file.log',
+        'import_modules_install_not_tests_from_file: ' . scalar( keys %modules_install_not_tests_from_file ),
+        Dumper( \%modules_install_not_tests_from_file ),
     );
 
     say_ex( '' );
@@ -1123,18 +1179,24 @@ sub install_single_module
 
     my $module_n = module_name_for_fs( $module );
 
+    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive' );
+
     my $type = 'install';
     if ( exists $installed_module_version{ $module } ) {
         $type = 'update';
     }
 
+    if ( exists $modules_install_not_tests_from_file{ $module } ) {
+        $type .= '_notests';
+        push( @cmd, ( '--notest' ) );
+    }
+
+    push( @cmd, ( $module, '2>&1' ) );
+
     say_ex( '==> ' . $type . ' module - ' . $module );
 
     my $logfile_suffix = 'install_module__' . $module_n . '__' . $type;
     my $logfile_title  = 'install_module -> ' . $module . ' -> ' . $type;
-
-    # for update force not needed
-    my @cmd = ( 'cmd.exe', '/c', 'cpanm', '--verbose', '--no-interactive', $module, '2>&1' );
 
     my ( $start_date, $end_date, $child_exit_status, @output ) =
         get_output_with_detached_execute_and_logfile( $logfile_suffix, $logfile_title,
@@ -1557,13 +1619,15 @@ sub install_modules_sequentially
 
 sub handle_main_arguments
 {
-    my ( $arg1, $arg2, $arg3 ) = @_;
+    my ( $arg1, $arg2, $arg3, $arg4 ) = @_;
     $arg1 = trim( $arg1 );
     $arg2 = trim( $arg2 );
     $arg3 = trim( $arg3 );
+    $arg4 = trim( $arg4 );
 
     my $filepath_install  = $EMPTY_STRING;
     my $filepath_dont_try = $EMPTY_STRING;
+    my $filepath_no_tests = $EMPTY_STRING;
     my $only_all_updates  = $FALSE;
     my $all_updates       = $FALSE;
 
@@ -1575,6 +1639,10 @@ sub handle_main_arguments
         }
 
         if ( !is_string_empty( $arg3 ) ) {
+            $filepath_no_tests = $arg3;
+        }
+
+        if ( !is_string_empty( $arg4 ) ) {
             croak 'wrong parameter set';
         }
     }
@@ -1589,6 +1657,10 @@ sub handle_main_arguments
         if ( !is_string_empty( $arg3 ) ) {
             $filepath_dont_try = $arg3;
         }
+
+        if ( !is_string_empty( $arg4 ) ) {
+            $filepath_no_tests = $arg4;
+        }
     }
     elsif ( is_string_empty( $arg1 ) ) {
         croak 'wrong parameter set';
@@ -1599,17 +1671,23 @@ sub handle_main_arguments
         if ( !is_string_empty( $arg2 ) ) {
             $filepath_dont_try = $arg2;
         }
+
+        if ( !is_string_empty( $arg3 ) ) {
+            $filepath_no_tests = $arg3;
+        }
     }
 
     $filepath_install  = trim( $filepath_install );
     $filepath_dont_try = trim( $filepath_dont_try );
+    $filepath_no_tests = trim( $filepath_no_tests );
 
-    say_ex( '==> ' . 'filepath_install: ' . $filepath_install );
-    say_ex( '==> ' . 'filepath_dont_try: ' . $filepath_dont_try );
-    say_ex( '==> ' . 'only_all_updates: ' . ( $only_all_updates ? '1' : '0' ) );
-    say_ex( '==> ' . 'all_updates: ' . ( $all_updates           ? '1' : '0' ) );
+    say_ex( '==> ' . 'filepath_install  : ' . $filepath_install );
+    say_ex( '==> ' . 'filepath_dont_try : ' . $filepath_dont_try );
+    say_ex( '==> ' . 'filepath_no_tests : ' . $filepath_no_tests );
+    say_ex( '==> ' . 'only_all_updates  : ' . ( $only_all_updates ? '1' : '0' ) );
+    say_ex( '==> ' . 'all_updates       : ' . ( $all_updates      ? '1' : '0' ) );
 
-    return ( $filepath_install, $filepath_dont_try, $only_all_updates, $all_updates );
+    return ( $filepath_install, $filepath_dont_try, $filepath_no_tests, $only_all_updates, $all_updates );
 }
 
 sub init_log_dir_path
@@ -1630,7 +1708,8 @@ sub init_log_dir_path
 
 sub main
 {
-    my ( $filepath_install, $filepath_dont_try, $only_all_updates, $all_updates ) = handle_main_arguments( @_ );
+    my ( $filepath_install, $filepath_dont_try, $filepath_no_tests, $only_all_updates, $all_updates ) =
+        handle_main_arguments( @_ );
 
     init_log_dir_path();
 
@@ -1648,8 +1727,11 @@ sub main
     }
 
     if ( !is_string_empty( $filepath_dont_try ) ) {
-        # mark modules as failed, some to old to build, other not for windows ...
         import_module_dont_try_list_from_file( $filepath_dont_try );
+    }
+
+    if ( !is_string_empty( $filepath_no_tests ) ) {
+        import_module_no_tests_list_from_file( $filepath_no_tests );
     }
 
     search_for_installed_modules();
