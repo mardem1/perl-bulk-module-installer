@@ -213,7 +213,7 @@ try {
 
                 if ( "$($modules[$m])" -eq "$v" ) {
                     # fast check
-                    Write-Host "    => known module equal (1)'$m' $($modules[$m]) vs. $v"
+                    Write-Host "    => known module equal (1) '$m' $($modules[$m]) vs. $v"
                 }
                 elseif ( $aIsDouble -and $bIsDouble ) {
                     # both double value
