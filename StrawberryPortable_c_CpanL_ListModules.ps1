@@ -303,10 +303,10 @@ try {
 
     $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewd finished search
 
-    $allModuleNames = $($modules.Keys | Select-Object -Unique -CaseInsensitive | Sort-Object )
+    $allModuleNames = $($modules.Keys | Select-Object | Sort-Object )
 
     # for module list txt files reduce to Upper-Case start - see above
-    $ucModuleNames = $($modules.Keys | Where-Object { $_ -cmatch '^[A-Z]' } | Select-Object -Unique -CaseInsensitive | Sort-Object )
+    $ucModuleNames = $($modules.Keys | Where-Object { $_ -cmatch '^[A-Z]' } | Select-Object | Sort-Object )
 
     # 0..10 | ForEach-Object { Write-Host '' }
     # Write-Host -ForegroundColor Green '=> found modules:'
