@@ -182,10 +182,10 @@ try {
                 $v = $version_not_defined # as perl verison
             }
 
-            # some moule wrong listed - end with : ? => ignore?
-            # if ( $m -match '^\d' -or $m -like ':*' ) {
+            # some modules wrong listed - end with : ? => ignore?
             # Upper-Case defined as first character for none core / standard modules
-            if ( $line -notmatch '^(([A-Z][a-zA-Z0-9_]*)([:][:][a-zA-Z0-9_]+)*)[^:]' ) {
+            # but we need all modules for dependency check here so also lower case start allowed
+            if ( $line -notmatch '^(([a-zA-Z][a-zA-Z0-9_]*)([:][:][a-zA-Z0-9_]+)*)[^:]' ) {
                 Write-Host -ForegroundColor Red "    => ignore - no match '$m'"
             }
             elseif ( ! $modules.ContainsKey($m) ) {
@@ -303,27 +303,24 @@ try {
 
     $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewd finished search
 
-    $moduleNames = $($modules.Keys | Select-Object -Unique | Sort-Object )
+    $allModuleNames = $($modules.Keys | Select-Object -Unique -CaseInsensitive | Sort-Object )
+
+    # for module list txt files reduce to Upper-Case start - see above
+    $ucModuleNames = $($modules.Keys | Where-Object { $_ -cmatch '^[A-Z]' } | Select-Object -Unique -CaseInsensitive | Sort-Object )
 
     # 0..10 | ForEach-Object { Write-Host '' }
     # Write-Host -ForegroundColor Green '=> found modules:'
-    # $moduleNames | Write-Host
+    # allModuleNames | Write-Host
     # 0..10 | ForEach-Object { Write-Host '' }
 
     Write-Host ''
-    Write-Host -ForegroundColor Green "=> found modules: $($moduleNames.Count)"
+    Write-Host -ForegroundColor Green "=> found modules: $($modules.Count)"
 
-    if ( ! $moduleNames ) {
-        if ( Test-Path -LiteralPath $ModuleExportLog ) {
+    if ( ! $allModuleNames ) {
+        if (Test-Path -LiteralPath $ModuleExportLog) {
             Write-Host "remove log file $ModuleExportLog"
             Remove-Item -LiteralPath $ModuleExportLog
         }
-
-        if ( Test-Path -LiteralPath $ModuleListFileTxt ) {
-            Write-Host "remove txt file $ModuleListFileTxt"
-            Remove-Item -LiteralPath $ModuleListFileTxt
-        }
-
         if ( Test-Path -LiteralPath $ModuleListFileCsv ) {
             Write-Host "remove csv file $ModuleListFileCsv"
             Remove-Item -LiteralPath $ModuleListFileCsv
@@ -334,11 +331,7 @@ try {
         Write-Host -ForegroundColor Green "write log file $ModuleExportLog"
         $generatedList | Out-File -LiteralPath $ModuleExportLog -Encoding default -Force -Confirm:$false -Width 999
 
-        Write-Host ''
-        Write-Host -ForegroundColor Green "write list file $ModuleListFileTxt"
-        $fileHeaders, $moduleNames, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt -Encoding default -Force -Confirm:$false -Width 999
-
-        $moduleLines = $moduleNames | ForEach-Object {
+        $moduleLines = $allModuleNames | ForEach-Object {
             $m = $_
             $v = $modules[$m]
             "$m;$v"
@@ -347,6 +340,19 @@ try {
         Write-Host ''
         Write-Host -ForegroundColor Green "write csv file $ModuleListFileCsv"
         "# installed_modules_found;$perlVersion", $moduleLines | Out-File -LiteralPath $ModuleListFileCsv -Encoding default -Force -Confirm:$false -Width 999
+    }
+
+    if ( ! $ucModuleNames ) {
+        if ( Test-Path -LiteralPath $ModuleListFileTxt ) {
+            Write-Host "remove txt file $ModuleListFileTxt"
+            Remove-Item -LiteralPath $ModuleListFileTxt
+        }
+    }
+    else {
+
+        Write-Host ''
+        Write-Host -ForegroundColor Green "write list file $ModuleListFileTxt"
+        $fileHeaders, $ucModuleNames, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt -Encoding default -Force -Confirm:$false -Width 999
     }
 
     Write-Host ''

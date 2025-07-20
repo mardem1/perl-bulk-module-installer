@@ -1086,14 +1086,8 @@ sub search_for_installed_modules
 
     my $timestamp = get_timestamp_for_filename( $start_date );
 
-    # for module list txt and csv files reduce to Upper-Case start - see above
-    my @moduleNames = grep { $_ =~ /^[A-Z]/o } sort keys %found_module_version;
-
-    write_file( $log_dir_path . '/' . $timestamp . '_' . $logfile_suffix . '.txt',
-        "# $logfile_title $^V", @moduleNames );
-
-    my @moduleCsvLines = ();
-    foreach my $name ( @moduleNames ) {
+    my @moduleCsvLines = ();    # csv contains all
+    foreach my $name ( sort keys %found_module_version ) {
         my $version = $found_module_version{ $name } // 'undef';
         push @moduleCsvLines, "$name;$version";
     }
@@ -1103,7 +1097,12 @@ sub search_for_installed_modules
         @moduleCsvLines
     );
 
-    # import found modules to install modules
+    # for module list txt files reduce to Upper-Case start - see above
+    my @moduleNames = grep { $_ =~ /^[A-Z]/o } sort keys %found_module_version;
+    write_file( $log_dir_path . '/' . $timestamp . '_' . $logfile_suffix . '.txt',
+        "# $logfile_title $^V", @moduleNames );
+
+    # import all found modules to install modules
     foreach my $name ( keys %found_module_version ) {
         $installed_module_version{ $name } = $found_module_version{ $name };
     }
