@@ -154,7 +154,8 @@ try {
 
     $InstallCpanModules = "$($ScriptItem.Directory.FullName)\InstallCpanModules.pl"
 
-    Set-Location -LiteralPath "($ScriptItem.Directory.FullName)"
+    Write-Host "Set-Location $($ScriptItem.Directory.FullName)"
+    Set-Location -LiteralPath "$($ScriptItem.Directory.FullName)"
 
     0..25 | ForEach-Object { Write-Host '' }
 
@@ -226,6 +227,11 @@ catch {
     exit 1
 }
 finally {
+    if ( $ori_Location -ne (Get-Location ).Path) {
+        Write-Host "Set-Location $ori_Location"
+        Set-Location $ori_Location
+    }
+
     Write-Host ''
     Write-Host -ForegroundColor Green 'done'
     Write-Host ''
@@ -233,10 +239,6 @@ finally {
     $durationMinutes = (New-TimeSpan -Start $ScriptStartTime -End $ScriptEndTime).TotalMinutes
     Write-Host -ForegroundColor Green "Script '$ScriptPath' ended at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $ScriptEndTime ) - duration $durationMinutes minutes"
     Write-Host ''
-
-    if ( $ori_Location -ne (Get-Location ).Path) {
-        Set-Location $ori_Location
-    }
 
     if ($transcript) {
         Stop-Transcript
