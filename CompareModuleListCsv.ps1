@@ -195,6 +195,18 @@ try {
     $compare_value_80_undef_v = 80 # | undef | v*
     $compare_value_90_new = 90 # | not-installed | any version (new)
 
+    $compare_text = @{
+        "$compare_value_10_not_installed" = 'not installed'
+        "$compare_value_20_removed"       = 'removed'
+        "$compare_value_30_undef"         = 'undefined'
+        "$compare_value_40_v_undef"       = 'defined to undefined'
+        "$compare_value_50_downgrade"     = 'downgraded'
+        "$compare_value_60_same"          = 'equal'
+        "$compare_value_70_update"        = 'updated'
+        "$compare_value_80_undef_v"       = 'undefined to defined'
+        "$compare_value_90_new"           = 'added'
+    }
+
     $moduleLines = $combinedModules.Keys | ForEach-Object {
         $m = $_
         $a = $combinedModules[$m]['ListA'] # old
@@ -311,12 +323,13 @@ try {
         $a = $combinedModules[$m]['ListA']
         $b = $combinedModules[$m]['ListB']
         $c = $combinedModules[$m]['CompareValue']
-        "$m;$a;$b;$c"
+        $txt = $compare_text["$($combinedModules[$m]['CompareValue'])"]
+        "$m;$a;$b;$txt;$c"
     }
 
     Write-Host ''
     Write-Host -ForegroundColor Green "write csv file $CompareResultList"
-    "Module;ListA-$($shortNameVersionInfo['ListA']);ListB-$($shortNameVersionInfo['ListB']);CompareValue" , $moduleLines | Out-File -LiteralPath $CompareResultList -Encoding default -Force -Confirm:$false -Width 999
+    "Module;ListA-$($shortNameVersionInfo['ListA']);ListB-$($shortNameVersionInfo['ListB']);CompareText;CompareValue" , $moduleLines | Out-File -LiteralPath $CompareResultList -Encoding default -Force -Confirm:$false -Width 999
 
     exit 0
 }
