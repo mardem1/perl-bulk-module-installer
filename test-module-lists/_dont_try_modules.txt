@@ -120,7 +120,6 @@ CHI
 Code::Statistics
 Code::TidyAll
 Color::Conversions
-Config::JSON
 CPAN::Checksums
 CPAN::Mini::Inject
 CPAN::YACSmoke
