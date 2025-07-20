@@ -389,6 +389,9 @@ Win32::Script
 Win32::Unicode
 Win32API::Const
 Win32API::Resources
+# https://metacpan.org/release/SZBALINT/WWW-Curl-4.17/source/README.Win32
+WWW::Curl
+# https://metacpan.org/release/SZBALINT/WWW-Curl-4.17/source/README.Win32
 WWW::Curl::Easy
 WWW::Mechanize::TreeBuilder
 WWW::Selenium
