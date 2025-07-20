@@ -68,6 +68,180 @@ param (
     [string] $CompareResultList
 )
 
+# Sorting:
+$compare_value_10_not_installed = 10 # | not-installed | not-installed
+$compare_value_20_removed = 20 # | any version   | not-installed (removed)
+$compare_value_30_undef = 30 # | undef | undef
+$compare_value_40_v_undef = 40 # | v* | undef
+$compare_value_50_downgrade = 50 # | vU | vL (downgraded-lower?)
+$compare_value_60_same = 60 # | vE | vE (equal)
+$compare_value_70_update = 70 # | vL | vU (updated)
+$compare_value_80_undef_v = 80 # | undef | v*
+$compare_value_90_new = 90 # | not-installed | any version (new)
+
+$compare_text = @{
+    "$compare_value_10_not_installed" = 'not installed'
+    "$compare_value_20_removed"       = 'removed'
+    "$compare_value_30_undef"         = 'undefined'
+    "$compare_value_40_v_undef"       = 'defined to undefined'
+    "$compare_value_50_downgrade"     = 'downgraded'
+    "$compare_value_60_same"          = 'equal'
+    "$compare_value_70_update"        = 'updated'
+    "$compare_value_80_undef_v"       = 'undefined to defined'
+    "$compare_value_90_new"           = 'added'
+}
+
+$version_not_installed = 'not-installed'
+$version_not_defined = 'undef' # saved by export
+
+function Compare-PerlModuleVersion {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true, Position = 0)]
+        [ValidateScript({ ! [string]::IsNullOrWhiteSpace(( $_ )) })]
+        [string] $ModuleName,
+
+        [Parameter(Mandatory = $true, Position = 1)]
+        [ValidateScript({ ! [string]::IsNullOrWhiteSpace(( $_ )) })]
+        [ValidateScript({
+                $_ -eq $version_not_installed -or
+                $_ -eq $version_not_defined -or
+                $_ -match '^[v]?\d+(\.\d+){0,4}(_.+)?$'
+                # 1
+                # v1
+                # 1.0
+                # v1.0
+                # 1_alpha
+                # v1_alpha
+                # 0.904.0
+                # v0.904.0
+            })]
+        [string] $VersionA,
+
+        [Parameter(Mandatory = $true, Position = 2)]
+        [ValidateScript({ ! [string]::IsNullOrWhiteSpace(( $_ )) })]
+        [ValidateScript({
+                $_ -eq $version_not_installed -or
+                $_ -eq $version_not_defined -or
+                $_ -match '^[v]?\d+(\.\d+){0,4}(_.+)?$'
+                # 1
+                # v1
+                # 1.0
+                # v1.0
+                # 1_alpha
+                # v1_alpha
+                # 0.904.0
+                # v0.904.0
+            })]
+        [string] $VersionB
+    )
+
+    $m = $ModuleName
+    $a = $VersionA
+    $b = $VersionB
+
+    if ( $version_not_installed -eq $a ) {
+        if ( $version_not_installed -eq $b ) {
+            $compare_value_10_not_installed
+        }
+        else {
+            $compare_value_90_new
+        }
+    }
+    else {
+        if ( $version_not_installed -eq $b ) {
+            $compare_value_20_removed
+        }
+        else {
+            # changed installed versions ?
+            if ( $version_not_defined -eq $a ) {
+                if ( $version_not_defined -eq $b ) {
+                    $compare_value_30_undef
+                }
+                else {
+                    $compare_value_80_undef_v
+                }
+            }
+            else {
+                if ( $version_not_defined -eq $b ) {
+                    $compare_value_40_v_undef
+                }
+                else {
+                    # version number diff
+                    $version_a = $null
+                    $version_b = $null
+
+                    try {
+                        # if starting wiht v remove it & if ending wiht _0123 remove -> v5.4.3_21 -> 5.4.3
+                        $t = [string] (($a -replace '^v', '') -replace '_\d+$', '')
+                        $dotCount = ([regex]::Matches($t, '\.' )).Count
+                        if (  $dotCount -gt 3 ) {
+                            # to long version more than 4 sections
+                            # keep new() exception
+                        }
+                        elseif ($dotCount -lt 1 ) {
+                            # only number no .
+                            $t = "$($t).0" # [version]::new()  needs 2a
+                        }
+
+                        $version_a = [version]::new($t)
+                    }
+                    catch {
+                        Write-Host -ForegroundColor Red "ERROR: can't parse Version '$m' -> '$a' - $_"
+                    }
+
+                    try {
+                        # if starting wiht v remove it & if ending wiht _0123 remove -> v5.4.3_21 -> 5.4.3
+                        $t = [string] (($b -replace '^v', '') -replace '_\d+$', '')
+                        $dotCount = ([regex]::Matches($t, '\.' )).Count
+                        if (  $dotCount -gt 3 ) {
+                            # to long version more than 4 sections
+                            # keep new() exception
+                        }
+                        elseif ($dotCount -lt 1 ) {
+                            # only number no .
+                            $t = "$($t).0" # [version]::new()  needs 2a
+                        }
+
+                        $version_b = [version]::new($t)
+                    }
+                    catch {
+                        Write-Host -ForegroundColor Red "ERROR: can't parse Version '$m' -> '$b' - $_"
+                    }
+
+                    if ( $null -eq $version_a) {
+                        if ( $null -eq $version_b) {
+                            # TODO: what to do ? - Both unknown = Equal :)
+                            $compare_value_60_same
+                        }
+                        else {
+                            # TODO: what to do ? - new known vs. old unknown => Newer :)
+                            $compare_value_70_update
+                        }
+                    }
+                    else {
+                        if ( $null -eq $version_b) {
+                            # TODO: what to do ? - new unknown vs. old known => Lower :)
+                            $compare_value_50_downgrade
+                        }
+                        else {
+                            if ( $version_a -lt $version_b) {
+                                $compare_value_70_update
+                            }
+                            elseif ( $version_a -gt $version_b) {
+                                $compare_value_50_downgrade
+                            }
+                            else {
+                                $compare_value_60_same
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 $ScriptStartTime = Get-Date
 $ScriptPath = ''
 $transcript = $false
@@ -184,135 +358,13 @@ try {
     Write-Host -ForegroundColor Green 'sort an prepare csv'
     Write-Host ''
 
-    # Sorting:
-    $compare_value_10_not_installed = 10 # | not-installed | not-installed
-    $compare_value_20_removed = 20 # | any version   | not-installed (removed)
-    $compare_value_30_undef = 30 # | undef | undef
-    $compare_value_40_v_undef = 40 # | v* | undef
-    $compare_value_50_downgrade = 50 # | vU | vL (downgraded-lower?)
-    $compare_value_60_same = 60 # | vE | vE (equal)
-    $compare_value_70_update = 70 # | vL | vU (updated)
-    $compare_value_80_undef_v = 80 # | undef | v*
-    $compare_value_90_new = 90 # | not-installed | any version (new)
-
-    $compare_text = @{
-        "$compare_value_10_not_installed" = 'not installed'
-        "$compare_value_20_removed"       = 'removed'
-        "$compare_value_30_undef"         = 'undefined'
-        "$compare_value_40_v_undef"       = 'defined to undefined'
-        "$compare_value_50_downgrade"     = 'downgraded'
-        "$compare_value_60_same"          = 'equal'
-        "$compare_value_70_update"        = 'updated'
-        "$compare_value_80_undef_v"       = 'undefined to defined'
-        "$compare_value_90_new"           = 'added'
-    }
-
-    $moduleLines = $combinedModules.Keys | ForEach-Object {
+    $combinedModules.Keys | ForEach-Object {
         $m = $_
         $a = $combinedModules[$m]['ListA'] # old
         $b = $combinedModules[$m]['ListB'] # new
         $combinedModules[$m]['CompareValue'] = 0
 
-        $combinedModules[$m]['CompareValue'] = if ( $version_not_installed -eq $a ) {
-            if ( $version_not_installed -eq $b ) {
-                $compare_value_10_not_installed
-            }
-            else {
-                $compare_value_90_new
-            }
-        }
-        else {
-            if ( $version_not_installed -eq $b ) {
-                $compare_value_20_removed
-            }
-            else {
-                # changed installed versions ?
-                if ( $version_not_defined -eq $a ) {
-                    if ( $version_not_defined -eq $b ) {
-                        $compare_value_30_undef
-                    }
-                    else {
-                        $compare_value_80_undef_v
-                    }
-                }
-                else {
-                    if ( $version_not_defined -eq $b ) {
-                        $compare_value_40_v_undef
-                    }
-                    else {
-                        # version number diff
-                        $version_a = $null
-                        $version_b = $null
-
-                        try {
-                            # if starting wiht v remove it & if ending wiht _0123 remove -> v5.4.3_21 -> 5.4.3
-                            $t = [string] (($a -replace '^v', '') -replace '_\d+$', '')
-                            $dotCount = ([regex]::Matches($t, '\.' )).Count
-                            if (  $dotCount -gt 3 ) {
-                                # to long version more than 4 sections
-                                # keep new() exception
-                            }
-                            elseif ($dotCount -lt 1 ) {
-                                # only number no .
-                                $t = "$($t).0" # [version]::new()  needs 2a
-                            }
-
-                            $version_a = [version]::new($t)
-                        }
-                        catch {
-                            Write-Host -ForegroundColor Red "ERROR: can't parse Version '$m' -> '$a' - $_"
-                        }
-
-                        try {
-                            # if starting wiht v remove it & if ending wiht _0123 remove -> v5.4.3_21 -> 5.4.3
-                            $t = [string] (($b -replace '^v', '') -replace '_\d+$', '')
-                            $dotCount = ([regex]::Matches($t, '\.' )).Count
-                            if (  $dotCount -gt 3 ) {
-                                # to long version more than 4 sections
-                                # keep new() exception
-                            }
-                            elseif ($dotCount -lt 1 ) {
-                                # only number no .
-                                $t = "$($t).0" # [version]::new()  needs 2a
-                            }
-
-                            $version_b = [version]::new($t)
-                        }
-                        catch {
-                            Write-Host -ForegroundColor Red "ERROR: can't parse Version '$m' -> '$b' - $_"
-                        }
-
-                        if ( $null -eq $version_a) {
-                            if ( $null -eq $version_b) {
-                                # TODO: what to do ? - Both unknown = Equal :)
-                                $compare_value_60_same
-                            }
-                            else {
-                                # TODO: what to do ? - new known vs. old unknown => Newer :)
-                                $compare_value_70_update
-                            }
-                        }
-                        else {
-                            if ( $null -eq $version_b) {
-                                # TODO: what to do ? - new unknown vs. old known => Lower :)
-                                $compare_value_50_downgrade
-                            }
-                            else {
-                                if ( $version_a -lt $version_b) {
-                                    $compare_value_70_update
-                                }
-                                elseif ( $version_a -gt $version_b) {
-                                    $compare_value_50_downgrade
-                                }
-                                else {
-                                    $compare_value_60_same
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        $combinedModules[$m]['CompareValue'] = Compare-PerlModuleVersion -ModuleName $m -VersionA $a -VersionB $b
     }
 
     $moduleLines = $combinedModules.Keys | Sort-Object -Unique -CaseSensitive -Property {
