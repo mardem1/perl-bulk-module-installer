@@ -204,59 +204,98 @@ try {
             }
             else {
                 # elseif ( $version_not_defined -ne $modules[$m] -and $version_not_defined -ne $v ) {
-                $version_m = $null
-                $version_v = $null
 
-                try {
-                    # if starting wiht v remove it & if ending wiht _0123 remove -> v5.4.3_21 -> 5.4.3
-                    $t = [string] (($modules[$m] -replace '^v', '') -replace '_\d+$', '')
-                    $dotCount = ([regex]::Matches($t, '\.' )).Count
-                    if (  $dotCount -gt 3 ) {
-                        # to long version more than 4 sections
-                        # keep new() exception
+                # Perl Module Version can be double value or version number value
+                # check https://metacpan.org/release/LEONT/version-0.9933/view/lib/version.pm
+
+                $aIsDouble = "$($modules[$m])" -match '^\d+([.]\d+)?$'
+                $bIsDouble = "$v" -match '^\d+([.]\d+)?$'
+
+                if ( "$($modules[$m])" -eq "$v" ) {
+                    # fast check
+                    Write-Host "    => known module equal (1)'$m' $($modules[$m]) vs. $v"
+                }
+                elseif ( $aIsDouble -and $bIsDouble ) {
+                    # both double value
+                    if ( $modules[$m] -eq $v ) {
+                        Write-Host "    => known module equal (2) '$m' $($modules[$m]) vs. $v"
+                        $compare_value_60_same
                     }
-                    elseif ($dotCount -lt 1 ) {
-                        # only number no .
-                        $t = "$($t).0" # [version]::new()  needs 2a
+                    elseif ( $modules[$m] -gt $v) {
+                        Write-Host "    => known module newer (2) '$m' $($modules[$m]) vs. $v"
                     }
-
-                    $version_m = [version]::new($t)
-                }
-                catch {
-                    Write-Host -ForegroundColor Red "ERROR: can't parse Version $($modules[$m]) - $_"
-                }
-
-                try {
-                    # if starting wiht v remove it & if ending wiht _0123 remove -> v5.4.3_21 -> 5.4.3
-                    $t = [string] (($v -replace '^v', '') -replace '_\d+$', '')
-                    $dotCount = ([regex]::Matches($t, '\.' )).Count
-                    if (  $dotCount -gt 3 ) {
-                        # to long version more than 4 sections
-                        # keep new() exception
+                    else {
+                        Write-Host "    => found module newer, replace (2) '$m' $($modules[$m]) vs. $v"
+                        $modules[$m] = $v
                     }
-                    elseif ($dotCount -lt 1 ) {
-                        # only number no .
-                        $t = "$($t).0" # [version]::new()  needs 2a
-                    }
-
-                    $version_v = [version]::new($t)
-                }
-                catch {
-                    Write-Host -ForegroundColor Red "ERROR: can't parse Version $($v) - $_"
-                }
-
-                if ( $null -eq $version_m) {
-                    # TODO: what to do ?
-                }
-                elseif ( $null -eq $version_v ) {
-                    # TODO: what to do ?
-                }
-                elseif ( $version_m -ge $version_v) {
-                    Write-Host "    => known module equal or newer '$m' $($modules[$m]) vs. $v"
                 }
                 else {
-                    Write-Host "    => found module newer, replace '$m' $($modules[$m]) vs. $v"
-                    $modules[$m] = $v
+                    # One is Version-Number not only Double
+
+                    # version number diff
+                    $version_m = $null
+                    $version_v = $null
+
+                    try {
+                        # if starting wiht v remove it & if ending wiht _0123 remove -> v5.4.3_21 -> 5.4.3
+                        $t = [string] (($modules[$m] -replace '^v', '') -replace '_.+$', '')
+                        $dotCount = ([regex]::Matches($t, '\.' )).Count
+                        if (  $dotCount -gt 3 ) {
+                            # to long version more than 4 sections
+                            # keep new() exception
+                        }
+
+                        # [version]::new(1,1) -eq  [version]::new(1,1,0) # false => lower -lt ? -> not set values are -1
+                        $sections = @(0, 0, 0, 0)
+                        $i = 0
+                        $t.Split('.') | ForEach-Object {
+                            $sections[$i] = $_
+                            $i++
+                        }
+                        $version_m = [version]::new($sections[0] , $sections[1], $sections[2], $sections[3])
+                    }
+                    catch {
+                        Write-Host -ForegroundColor Red "ERROR: can't parse Version '$m' -> '$($modules[$m])' - $_"
+                    }
+
+                    try {
+                        # if starting wiht v remove it & if ending wiht _0123 remove -> v5.4.3_21 -> 5.4.3
+                        $t = [string] (($v -replace '^v', '') -replace '_.+$', '')
+                        $dotCount = ([regex]::Matches($t, '\.' )).Count
+                        if (  $dotCount -gt 3 ) {
+                            # to long version more than 4 sections
+                            throw "invalid version '$t'"
+                        }
+
+                        # [version]::new(1,1) -eq  [version]::new(1,1,0) # false => lower -lt ? -> not set values are -1
+                        $sections = @(0, 0, 0, 0)
+                        $i = 0
+                        $t.Split('.') | ForEach-Object {
+                            $sections[$i] = $_
+                            $i++
+                        }
+                        $version_v = [version]::new($sections[0] , $sections[1], $sections[2], $sections[3])
+                    }
+                    catch {
+                        Write-Host -ForegroundColor Red "ERROR: can't parse Version '$m' -> '$v' - $_"
+                    }
+
+                    if ( $null -eq $version_m) {
+                        # TODO: what to do ?
+                    }
+                    elseif ( $null -eq $version_v ) {
+                        # TODO: what to do ?
+                    }
+                    elseif ( $version_m -eq $version_v) {
+                        Write-Host "    => known module equal (3) '$m' $($modules[$m]) vs. $v"
+                    }
+                    elseif ( $version_m -gt $version_v) {
+                        Write-Host "    => known module newer (3) '$m' $($modules[$m]) vs. $v"
+                    }
+                    else {
+                        Write-Host "    => found module newer, replace (3) '$m' $($modules[$m]) vs. $v"
+                        $modules[$m] = $v
+                    }
                 }
             }
         }
