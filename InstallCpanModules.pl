@@ -5,15 +5,18 @@ use 5.010;
 use strict;
 use warnings;
 
-use lib "./lib";
-
-use PerlBulkModuleInstaller qw( say_ex main );
-
 BEGIN {
     if ( $^O !~ /win32/io ) {
         die 'sorry this is only for windows :(';
     }
 }
+
+BEGIN {
+    use File::Basename qw(dirname);
+    use lib dirname( __FILE__ ) . '/lib';
+}
+
+use PerlBulkModuleInstaller qw( say_ex main );
 
 $| = 1;
 
