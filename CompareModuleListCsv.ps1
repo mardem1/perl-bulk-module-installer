@@ -563,7 +563,7 @@ try {
         $combinedModules[$m]['CompareValue'] = Compare-PerlModuleVersion -ModuleName $m -VersionA $a -VersionB $b
     }
 
-    $moduleLines = $combinedModules.Keys | Sort-Object -Unique -CaseSensitive -Property {
+    $moduleLines = $combinedModules.Keys | Sort-Object -Property {
         $combinedModules[$_]['CompareValue']
     }, { $_
     } | ForEach-Object {
