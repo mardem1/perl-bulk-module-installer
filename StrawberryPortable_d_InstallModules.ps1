@@ -132,8 +132,6 @@ try {
     Start-Transcript -LiteralPath "$($ScriptItem.Directory.FullName)\log\$(Get-Date -Format 'yyyyMMdd_HHmmss')_$($ScriptItem.BaseName).log" -ErrorAction Stop
     $transcript = $true
 
-    $InstallCpanModules = "$($ScriptItem.Directory.FullName)\InstallCpanModules.pl"
-
     Write-Host ''
     Write-Host -ForegroundColor Green "Script '$ScriptPath' started at $( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' -Date $ScriptStartTime )"
     Write-Host ''
@@ -152,7 +150,11 @@ try {
     }
 
     # for PerlBulkModuleInstaller
-    $Env:PERL5LIB = "$((Get-Item -LiteralPath $InstallCpanModules).Directory.FullName)\lib".Replace('\', '/')
+    # $Env:PERL5LIB = "$((Get-Item -LiteralPath $InstallCpanModules).Directory.FullName)\lib".Replace('\', '/')
+
+    $InstallCpanModules = "$($ScriptItem.Directory.FullName)\InstallCpanModules.pl"
+
+    Set-Location -LiteralPath "($ScriptItem.Directory.FullName)"
 
     0..25 | ForEach-Object { Write-Host '' }
 
