@@ -1,4 +1,7 @@
+
 # test fail because of external dependencies which are currently wrong - dns names, ip addresses
 Net::Nslookup
+
 # test fail if execution with admin privileges
+# Making symbolic link 'C:\Users\root\AppData\Local\Temp\PXZ3f4hjaA\Module-CPANTS-Analyse-Test-0.01\MANIFEST.lnk' to 'C:\Users\root\AppData\Local\Temp\wQEtfHY9f9\MANIFEST' failed at C:/perl-build/strawberry-perl-5.38.4.1-64bit-portable/perl/site/lib/Archive/Any/Lite.pm line 130.
 Module::CPANTS::Analyse
