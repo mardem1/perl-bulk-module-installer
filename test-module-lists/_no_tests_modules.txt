@@ -6,5 +6,8 @@ Net::Nslookup
 # Making symbolic link 'C:\Users\root\AppData\Local\Temp\PXZ3f4hjaA\Module-CPANTS-Analyse-Test-0.01\MANIFEST.lnk' to 'C:\Users\root\AppData\Local\Temp\wQEtfHY9f9\MANIFEST' failed at C:/perl-build/strawberry-perl-5.38.4.1-64bit-portable/perl/site/lib/Archive/Any/Lite.pm line 130.
 Module::CPANTS::Analyse
 
+# test fail because of memory leak detected ? t/leak/no_leak.t
+LWP
+
 # test fail t/Duplicate.t because it's not expecting windows path style paths with "\" must be escaped for json
 Config::JSON
