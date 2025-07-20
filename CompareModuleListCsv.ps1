@@ -140,7 +140,7 @@ function Compare-PerlModuleVersion {
     $a = $VersionA
     $b = $VersionB
 
-    if ( $version_not_installed -eq $a ) {
+    $cmpv = if ( $version_not_installed -eq $a ) {
         if ( $version_not_installed -eq $b ) {
             $compare_value_10_not_installed
         }
@@ -163,28 +163,55 @@ function Compare-PerlModuleVersion {
                 }
             }
             else {
+                # Perl Module Version can be double value or version number value
+                # check https://metacpan.org/release/LEONT/version-0.9933/view/lib/version.pm
+
+                $aIsDouble = "$a" -match '^\d+([.]\d+)?$'
+                $bIsDouble = "$b" -match '^\d+([.]\d+)?$'
+
                 if ( $version_not_defined -eq $b ) {
                     $compare_value_40_v_undef
                 }
+                elseif ( "$a" -eq "$b" ) {
+                    # fast check
+                    $compare_value_60_same
+                }
+                elseif ( $aIsDouble -and $bIsDouble ) {
+                    # both double value
+                    if ($a -eq $b ) {
+                        $compare_value_60_same
+                    }
+                    elseif ($b -gt $a) {
+                        $compare_value_70_update
+                    }
+                    else {
+                        $compare_value_50_downgrade
+                    }
+                }
                 else {
+                    # One is Version-Number not only Double
+
                     # version number diff
                     $version_a = $null
                     $version_b = $null
 
                     try {
                         # if starting wiht v remove it & if ending wiht _0123 remove -> v5.4.3_21 -> 5.4.3
-                        $t = [string] (($a -replace '^v', '') -replace '_\d+$', '')
+                        $t = [string] (($a -replace '^v', '') -replace '_.+$', '')
                         $dotCount = ([regex]::Matches($t, '\.' )).Count
                         if (  $dotCount -gt 3 ) {
                             # to long version more than 4 sections
                             # keep new() exception
                         }
-                        elseif ($dotCount -lt 1 ) {
-                            # only number no .
-                            $t = "$($t).0" # [version]::new()  needs 2a
-                        }
 
-                        $version_a = [version]::new($t)
+                        # [version]::new(1,1) -eq  [version]::new(1,1,0) # false => lower -lt ? -> not set values are -1
+                        $sections = @(0, 0, 0, 0)
+                        $i = 0
+                        $t.Split('.') | ForEach-Object {
+                            $sections[$i] = $_
+                            $i++
+                        }
+                        $version_a = [version]::new($sections[0] , $sections[1], $sections[2], $sections[3])
                     }
                     catch {
                         Write-Host -ForegroundColor Red "ERROR: can't parse Version '$m' -> '$a' - $_"
@@ -192,18 +219,21 @@ function Compare-PerlModuleVersion {
 
                     try {
                         # if starting wiht v remove it & if ending wiht _0123 remove -> v5.4.3_21 -> 5.4.3
-                        $t = [string] (($b -replace '^v', '') -replace '_\d+$', '')
+                        $t = [string] (($b -replace '^v', '') -replace '_.+$', '')
                         $dotCount = ([regex]::Matches($t, '\.' )).Count
                         if (  $dotCount -gt 3 ) {
                             # to long version more than 4 sections
-                            # keep new() exception
-                        }
-                        elseif ($dotCount -lt 1 ) {
-                            # only number no .
-                            $t = "$($t).0" # [version]::new()  needs 2a
+                            throw "invalid version '$t'"
                         }
 
-                        $version_b = [version]::new($t)
+                        # [version]::new(1,1) -eq  [version]::new(1,1,0) # false => lower -lt ? -> not set values are -1
+                        $sections = @(0, 0, 0, 0)
+                        $i = 0
+                        $t.Split('.') | ForEach-Object {
+                            $sections[$i] = $_
+                            $i++
+                        }
+                        $version_b = [version]::new($sections[0] , $sections[1], $sections[2], $sections[3])
                     }
                     catch {
                         Write-Host -ForegroundColor Red "ERROR: can't parse Version '$m' -> '$b' - $_"
@@ -232,7 +262,7 @@ function Compare-PerlModuleVersion {
                                 $compare_value_50_downgrade
                             }
                             else {
-                                $compare_value_60_same
+                                $compare_value_60_same # difference after _ possible - not checked jet TODO: implement ?
                             }
                         }
                     }
@@ -240,7 +270,173 @@ function Compare-PerlModuleVersion {
             }
         }
     }
+
+    # Write-Host -ForegroundColor Darkgray "Version-Check - '$m' -> '$a' vs. '$b' -> $($compare_text["$cmpv"]) ($cmpv)"
+    return $cmpv
 }
+
+function Invoke-TestComparePerlModuleVersion {
+
+    $tests = @(
+        @{
+            'A'        = $version_not_installed
+            'B'        = $version_not_installed
+            'expected' = $compare_value_10_not_installed
+        },
+        @{
+            'A'        = $version_not_defined
+            'B'        = $version_not_defined
+            'expected' = $compare_value_30_undef
+        },
+        @{
+            'A'        = $version_not_installed
+            'B'        = $version_not_defined
+            'expected' = $compare_value_90_new
+        },
+        @{
+            'A'        = $version_not_installed
+            'B'        = '1.1'
+            'expected' = $compare_value_90_new
+        },
+        @{
+            'A'        = $version_not_installed
+            'B'        = '1.1.1'
+            'expected' = $compare_value_90_new
+        },
+        @{
+            'A'        = $version_not_installed
+            'B'        = 'v1.1.1'
+            'expected' = $compare_value_90_new
+        },
+        @{
+            'A'        = $version_not_defined
+            'B'        = $version_not_installed
+            'expected' = $compare_value_20_removed
+        },
+        @{
+            'A'        = '1.1'
+            'B'        = $version_not_installed
+            'expected' = $compare_value_20_removed
+        },
+        @{
+            'A'        = '1.1.1'
+            'B'        = $version_not_installed
+            'expected' = $compare_value_20_removed
+        },
+        @{
+            'A'        = 'v1.1.1'
+            'B'        = $version_not_installed
+            'expected' = $compare_value_20_removed
+        },
+        @{
+            'A'        = '1.1'
+            'B'        = $version_not_defined
+            'expected' = $compare_value_40_v_undef
+        },
+        @{
+            'A'        = '1.1.1'
+            'B'        = $version_not_defined
+            'expected' = $compare_value_40_v_undef
+        },
+        @{
+            'A'        = 'v1.1.1'
+            'B'        = $version_not_defined
+            'expected' = $compare_value_40_v_undef
+        }
+        @{
+            'A'        = $version_not_defined
+            'B'        = '1.1'
+            'expected' = $compare_value_80_undef_v
+        },
+        @{
+            'A'        = $version_not_defined
+            'B'        = '1.1.1'
+            'expected' = $compare_value_80_undef_v
+        },
+        @{
+            'A'        = $version_not_defined
+            'B'        = 'v1.1.1'
+            'expected' = $compare_value_80_undef_v
+        }
+        @{
+            'A'        = '1'
+            'B'        = '1'
+            'expected' = $compare_value_60_same
+        }
+        @{
+            'A'        = '1.1'
+            'B'        = '1.1'
+            'expected' = $compare_value_60_same
+        }
+        @{
+            'A'        = 'v1.1.1'
+            'B'        = 'v1.1.1'
+            'expected' = $compare_value_60_same
+        }
+        @{
+            'A'        = '1.1'
+            'B'        = '1.1.0'
+            'expected' = $compare_value_60_same
+        }
+        @{
+            'A'        = '1.1'
+            'B'        = '1.1_x'
+            'expected' = $compare_value_60_same
+        },
+        @{
+            'A'        = '2'
+            'B'        = '1'
+            'expected' = $compare_value_50_downgrade
+        },
+        @{
+            'A'        = '1.3'
+            'B'        = '1.2'
+            'expected' = $compare_value_50_downgrade
+        },
+        @{
+            'A'        = '1.3.1'
+            'B'        = 'v1.3.0'
+            'expected' = $compare_value_50_downgrade
+        },
+
+        @{
+            'A'        = '1'
+            'B'        = '2'
+            'expected' = $compare_value_70_update
+        },
+        @{
+            'A'        = '1.2'
+            'B'        = '1.3'
+            'expected' = $compare_value_70_update
+        },
+        @{
+            'A'        = '1.50'
+            'B'        = '1.60'
+            'expected' = $compare_value_70_update
+        },
+        @{
+            'A'        = '1.801'
+            'B'        = '1.823'
+            'expected' = $compare_value_70_update
+        },
+        @{
+            'A'        = 'v1.3.0'
+            'B'        = '1.3.1'
+            'expected' = $compare_value_70_update
+        }
+    )
+
+    $tests | ForEach-Object {
+        $cmp = Compare-PerlModuleVersion -ModuleName "Compre-$($_['expected'])" -VersionA $_['A'] -VersionB $_['B']
+        if ($_['expected'] -ne $cmp) {
+            Write-Host -ForegroundColor Red 'mismatch'
+        }
+    }
+
+    exit
+}
+
+# Invoke-TestComparePerlModuleVersion
 
 $ScriptStartTime = Get-Date
 $ScriptPath = ''
