@@ -223,6 +223,8 @@ Module::Build::TestReporter
 Module::Faker::Dist
 Module::Install::POE::Test::Loops
 Module::License::Report
+# no problem with build
+# Module::Pluggable
 Module::Release
 Module:Starter
 Mojolicious
