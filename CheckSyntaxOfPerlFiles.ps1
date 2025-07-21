@@ -129,6 +129,14 @@ try {
         "# check done at '$now'"
     )
 
+    Write-Host ''
+    Write-Host '# FILE-HEADERS-START'
+    $fileHeaders | ForEach-Object {
+        Write-Host $_
+    }
+    Write-Host '# FILE-HEADERS-END'
+    Write-Host ''
+
     $fileFooters = (
         '', # empty line after list
         '#',
