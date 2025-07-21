@@ -294,6 +294,8 @@ Perl6::Rules
 # Perl::Critic::DynamicPolicy
 # requrie Perl::Critic::DynamicPolicy
 # Perl::Critic::Policy::Dynamic::NoIndirect
+# if Devel::Cover::Report::Clover installed with no tests than ok
+# Perl::Critic::CognitiveComplexity
 Perl::Lint
 Perl::Metrics::Lite
 Pinto
