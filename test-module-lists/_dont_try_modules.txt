@@ -363,6 +363,12 @@ Test::HTML::Lint
 Test::HTML::Tidy
 Test::Mock::LWP
 Test::MockDBI
+# no problem with build
+# Test::MockObject
+# no problem with build
+# Test::MockObject::Extends
+# no problem with build
+# Test::MockObject::Extra
 Test::Output::Tie
 Test::Perinci::CmdLine
 Test::Perl::Metrics::Lite
