@@ -161,6 +161,14 @@ Devel::SmallProf
 Device::SerialPort
 Dist::Metadata
 Distribution::Cooker
+# no problem with build
+# Email::Send
+# # no problem with build
+# Email::Send::SMTP
+# # no problem with build
+# Email::Send::Test
+# # no problem with build
+# Email::Stuff
 Env::Sourced
 Expect
 Expect::Simple
