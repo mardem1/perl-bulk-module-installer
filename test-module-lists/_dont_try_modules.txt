@@ -182,6 +182,7 @@ IO::Async
 IO::InSitu
 IO::Pty
 IO::Socket::SSL
+# IO-Tty-1.20 ... This module requires a POSIX compliant system to work. Try cygwin if you need this module on windows
 IO::Tty
 IPC::Msg
 IPC::Open3::Utils
@@ -324,6 +325,7 @@ Term::Rendezvous
 Test::Between
 Test::CSV
 Test::CSV_XS
+# Test::Expect needs -> IO-Tty-1.20 ... This module requires a POSIX compliant system to work. Try cygwin if you need this module on windows
 Test::Expect
 Test::Flatten
 Test::Git
