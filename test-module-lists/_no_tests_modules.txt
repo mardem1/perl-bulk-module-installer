@@ -11,3 +11,7 @@ LWP
 
 # test fail t/Duplicate.t because it's not expecting windows path style paths with "\" must be escaped for json
 Config::JSON
+
+# tests fail? - Called UNIVERSAL::isa() as a function, not a method
+# if installed - Test::MockObject::Extra works good
+Test::MockObject

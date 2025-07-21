@@ -332,10 +332,6 @@ Test::HTML::Lint
 Test::HTML::Tidy
 Test::Mock::LWP
 Test::MockDBI
-Test::MockObject
-Test::MockObject::Extends
-Test::MockObject::Extra
-Test::more
 Test::Output::Tie
 Test::Perinci::CmdLine
 Test::Perl::Metrics::Lite
