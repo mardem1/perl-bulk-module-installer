@@ -152,6 +152,7 @@ DBD::mysql
 DBD::Oracle
 DBD::Pg
 Devel::DProf
+# test fail - v5.22+ - https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-SmallProf
 Devel::SmallProf
 Device::SerialPort
 Dist::Metadata
