@@ -339,7 +339,7 @@ try {
     else {
         Write-Host ''
         Write-Host -ForegroundColor Green "write log file $ModuleExportLog"
-        $generatedList | Out-File -LiteralPath $ModuleExportLog -Encoding default -Force -Confirm:$false -Width 999
+        $generatedList | Out-File -LiteralPath $ModuleExportLog -Encoding utf8 -Force -Confirm:$false -Width 999
 
         $moduleLines = $allModuleNames | ForEach-Object {
             $m = $_
@@ -349,7 +349,7 @@ try {
 
         Write-Host ''
         Write-Host -ForegroundColor Green "write csv file $ModuleListFileCsv"
-        "# installed_modules_found;$perlVersion", $moduleLines | Out-File -LiteralPath $ModuleListFileCsv -Encoding default -Force -Confirm:$false -Width 999
+        "# installed_modules_found;$perlVersion", $moduleLines | Out-File -LiteralPath $ModuleListFileCsv -Encoding utf8 -Force -Confirm:$false -Width 999
     }
 
     if ( ! $ucModuleNames ) {
@@ -362,7 +362,7 @@ try {
 
         Write-Host ''
         Write-Host -ForegroundColor Green "write list file $ModuleListFileTxt"
-        $fileHeaders, $ucModuleNames, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt -Encoding default -Force -Confirm:$false -Width 999
+        $fileHeaders, $ucModuleNames, $fileFooters | Out-File -LiteralPath $ModuleListFileTxt -Encoding utf8 -Force -Confirm:$false -Width 999
     }
 
     Write-Host ''
