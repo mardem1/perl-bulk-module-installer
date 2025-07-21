@@ -98,9 +98,6 @@ try {
     # BAT files for perl in batch wrapper
     $extensions = ( '.pl', '.pm', '.bat', '.t' )
 
-    [hashtable] $modules = @{}
-    [hashtable] $foundPerlFiles = @{}
-
     $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
     $winUser = $env:USERNAME
     $winHostName = $env:COMPUTERNAME
@@ -117,6 +114,9 @@ try {
     else {
         'no hypervisor found'
     }
+
+    [hashtable] $modules = @{}
+    [hashtable] $foundPerlFiles = @{}
 
     $ModuleListFilePl = $ModuleListFileTxt.Replace('.txt', '.pl')
     $PerlFilesListFileTxt = $ModuleListFileTxt.Replace('.txt', '.perlfiles.txt')
