@@ -341,7 +341,8 @@ Test::POE::Server::TCP
     # STDOUT: Fetching http://www.cpan.org/authors/id/C/CO/CONTRA/Test-Smoke-1.83.tar.gz ... OK
     # Test::Smoke require user input ?
 Test::Smoke
-Test::Tutorial
+# in Test::Simple
+# Test::Tutorial
 Test::WWW::Mechanize
 Test::WWW::Mechanize::Catalyst
 Test::WWW::Mechanize::PSGI
