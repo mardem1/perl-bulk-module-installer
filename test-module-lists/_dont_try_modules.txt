@@ -226,7 +226,9 @@ MooseX::POE
 MooX::Log::Any
 Net::EmptyPort
 Net::proto
+# tests fail t/Port_Configuration.t - test blocked/stuck t/Server_PreFork.t
 Net::Server
+# require Net::Server
 Net::Server::Daemonize
 Net::Server::Fork
 Net::Server::HTTP
@@ -247,6 +249,7 @@ Net::Server::Proto::UNIXDGRAM
 Net::Server::PSGI
 Net::Server::SIG
 Net::Server::Single
+# require Net::Server
 Net::Server::SSL
 Nodejs::Util
 only
