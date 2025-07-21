@@ -577,7 +577,7 @@ try {
 
     Write-Host ''
     Write-Host -ForegroundColor Green "write csv file $CompareResultList"
-    "Module;ListA-$($shortNameVersionInfo['ListA']);ListB-$($shortNameVersionInfo['ListB']);CompareText;CompareValue" , $moduleLines | Out-File -LiteralPath $CompareResultList -Encoding default -Force -Confirm:$false -Width 999
+    "Module;ListA-$($shortNameVersionInfo['ListA']);ListB-$($shortNameVersionInfo['ListB']);CompareText;CompareValue" , $moduleLines | Out-File -LiteralPath $CompareResultList -Encoding utf8 -Force -Confirm:$false -Width 999
 
     exit 0
 }
