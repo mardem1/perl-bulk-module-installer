@@ -149,14 +149,6 @@ try {
 
     # INFO: add custom header here ?
 
-    $fileHeaders += (
-        "# search done at  : '$now'",
-        '#',
-        '# modules found:',
-        '#',
-        '' # empty line before list
-    )
-
     Write-Host ''
     Write-Host '# FILE-HEADERS-START'
     $fileHeaders | ForEach-Object {
@@ -164,13 +156,6 @@ try {
     }
     Write-Host '# FILE-HEADERS-END'
     Write-Host ''
-
-    $fileFooters = (
-        '', # empty line after list
-        '#',
-        '# list ended',
-        '#'
-    )
 
     Write-Host -ForegroundColor Green '=> search modules via cpan -l ...'
     # TODO: replace with Start-Process and created ARGV
@@ -327,8 +312,6 @@ try {
         }
     }
 
-    $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewd finished search
-
     $allModuleNames = $($modules.Keys | Select-Object | Sort-Object )
 
     # for module list txt files reduce to Upper-Case start - see above
@@ -341,6 +324,22 @@ try {
 
     Write-Host ''
     Write-Host -ForegroundColor Green "=> found modules: $($modules.Count)"
+
+    $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
+    $fileHeaders += (
+        "# search done at  : '$now'",
+        '#',
+        '# modules found:',
+        '#',
+        '' # empty line before list
+    )
+
+    $fileFooters = (
+        '', # empty line after list
+        '#',
+        '# list ended',
+        '#'
+    )
 
     if ( ! $allModuleNames ) {
         if (Test-Path -LiteralPath $ModuleExportLog) {
