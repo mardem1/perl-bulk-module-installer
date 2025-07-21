@@ -251,6 +251,7 @@ Net::Server::SSL
 Nodejs::Util
 only
 Padre::Util::Win32
+# test fail on windows
 Parallel::Runner
 Param::Validate
 Path::Iter
