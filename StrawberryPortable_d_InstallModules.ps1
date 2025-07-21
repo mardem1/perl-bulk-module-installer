@@ -160,7 +160,9 @@ try {
     }
 
     $perlexe = $StrawberryDir + '\perl\bin\perl.exe'
-    & $perlexe -MConfig -e 'printf(qq{Perl executable: %s\nPerl version   : %s / $Config{archname}\n\n}, $^X, $^V)' | Out-String | Write-Host -ForegroundColor Green
+    $perlVersionInfoStr = & $perlexe -MConfig -e 'printf(qq{Perl executable : %s\nPerl version    : %s / $Config{archname}\n\n}, $^X, $^V)' | Out-String
+    $perlVersionInfoStr | Write-Host -ForegroundColor Green
+    Write-Host ''
 
     if ( 0 -ne $LASTEXITCODE) {
         Write-Host -ForegroundColor Red "FATAL ERROR: 'perl' failed with '$LASTEXITCODE' - abort!"
