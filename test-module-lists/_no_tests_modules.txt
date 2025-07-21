@@ -15,3 +15,10 @@ Config::JSON
 # tests fail? - Called UNIVERSAL::isa() as a function, not a method
 # if installed - Test::MockObject::Extra works good
 Test::MockObject
+
+# Can't find Unicode property definition "E" in regex;
+# http://www.cpantesters.org/cpan/report/d03315ea-6c11-1014-a303-d6b7a5b63b95
+# http://www.cpantesters.org/dist/Devel-Cover-Report-Clover.html?oncpan=1&distmat=1&version=1.01&grade=3
+# v5.24 Bug ?
+# install without test than Perl::Critic::CognitiveComplexity works good
+Devel::Cover::Report::Clover

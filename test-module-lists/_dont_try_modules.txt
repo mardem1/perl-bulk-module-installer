@@ -260,7 +260,6 @@ Perinci::Sub::To::CLIDocData
 Perinci::Sub::Wrapper
 Perl6::Builtins
 Perl6::Rules
-Perl::Critic::CognitiveComplexity
 Perl::Critic::Dynamic
 Perl::Critic::DynamicPolicy
 Perl::Critic::Policy::Dynamic::NoIndirect
