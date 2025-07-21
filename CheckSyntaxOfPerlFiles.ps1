@@ -125,25 +125,30 @@ try {
 
     $fileHeaders = (
         '#',
-        '# => do perl check wiht files',
-        '#'
+        '# => do perl check with files',
+        '#',
+        "# PerlFilesListFileTxt : $PerlFilesListFileTxt",
+        "# StrawberryDir   : $StrawberryDir"
     )
+
+    $perlVersionInfoStr.Split("`n") | Where-Object {
+        ! [string]::IsNullOrWhiteSpace($_)
+    } | ForEach-Object {
+        $fileHeaders += (
+            "# $("$_".Trim())"
+        )
+    }
 
     $fileHeaders += (
         '#',
-        "# Win-User     : $winUser",
-        "# Win-Host     : $winHostName",
-        "# Win-OS       : $winOs",
-        "# PS-Version   : $psVersion",
-        "# Device-Model : $hwModel",
-        "# CPU          : $hwCpu",
-        "# RAM          : $hwRam",
-        "# VM Check     : $isVm"
-    )
-
-    $fileHeaders += (
-        '#',
-        "# check done at '$now'"
+        "# PS-Version      : $psVersion",
+        "# Win-User        : $winUser",
+        "# Win-Host        : $winHostName",
+        "# Win-OS          : $winOs",
+        "# RAM             : $hwRam",
+        "# CPU             : $hwCpu",
+        "# Device-Model    : $hwModel",
+        "# VM Check        : $isVm"
     )
 
     Write-Host ''
@@ -154,12 +159,6 @@ try {
     Write-Host '# FILE-HEADERS-END'
     Write-Host ''
 
-    $fileFooters = (
-        '', # empty line after list
-        '#',
-        '# list ended',
-        '#'
-    )
 
     $filesToCheck = Get-Content -LiteralPath $PerlFilesListFileTxt | Where-Object { ! [string]::IsNullOrWhiteSpace( $_ ) -and $_ -notlike '#*' } | Sort-Object -Unique
     if ( ! $filesToCheck ) {
@@ -251,6 +250,19 @@ try {
             Write-Host -ForegroundColor $color "CheckOk '$CheckOk' in '$diff_sec' sec - '$FullName'"
             $testPerlFile[$FullName] = $CheckOk
         }
+
+        $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
+        $fileHeaders += (
+            '#',
+            "# check done at '$now'"
+        )
+
+        $fileFooters = (
+            '', # empty line after list
+            '#',
+            '# list ended',
+            '#'
+        )
 
         $success = $testPerlFile.Keys | Where-Object {
             $null -ne $testPerlFile[$_] -and $testPerlFile[$_]
