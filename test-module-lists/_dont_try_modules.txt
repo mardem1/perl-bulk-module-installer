@@ -126,6 +126,8 @@ CPAN::YACSmoke
 # OS unsupported
 Crypt::OpenSSL::CA
 Crypt::PBKDF2
+# no problem with build
+# Crypt::Random
 Curses
 Data::Fake
 Data::Fake::Names
