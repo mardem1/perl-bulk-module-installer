@@ -272,9 +272,12 @@ Perinci::Sub::To::CLIDocData
 Perinci::Sub::Wrapper
 Perl6::Builtins
 Perl6::Rules
-Perl::Critic::Dynamic
-Perl::Critic::DynamicPolicy
-Perl::Critic::Policy::Dynamic::NoIndirect
+# Couldn't require Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter : PPI::Document version 1.281 required--this is only version 1.236 
+# Perl::Critic::Dynamic
+# in Perl::Critic::Dynamic
+# Perl::Critic::DynamicPolicy
+# requrie Perl::Critic::DynamicPolicy
+# Perl::Critic::Policy::Dynamic::NoIndirect
 Perl::Lint
 Perl::Metrics::Lite
 Pinto
