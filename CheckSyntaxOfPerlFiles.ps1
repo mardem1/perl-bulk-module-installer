@@ -315,36 +315,34 @@ try {
             Write-Host -ForegroundColor Green "=> generate perl failed files list file '$PerlFilesCheckFailedListFileTxt'"
             $fileHeaders, $perlFailedHeaders, $failed, $fileFooters | Out-File -LiteralPath $PerlFilesCheckFailedListFileTxt
         }
-    }
-
-    Write-Host ''
-    Write-Host 'files check success summary:'
-    if (!$success) {
-        Write-Host '- no successed files'
-
-        if ( Test-Path -LiteralPath $PerlFilesCheckSuccessListFileTxt ) {
-            Write-Host "remove success txt file $PerlFilesCheckSuccessListFileTxt"
-            Remove-Item -LiteralPath $PerlFilesCheckSuccessListFileTxt
-        }
-    }
-    else {
-        $success | Sort-Object | ForEach-Object {
-            Write-Host "- '$_'"
-        }
-
-        $perlSuccessHeaders = (
-            '#',
-            '# perl -c succeeded for files:',
-            '#',
-            '' # empty line before list
-        )
 
         Write-Host ''
-        Write-Host -ForegroundColor Green "=> generate perl success files list file '$PerlFilesCheckSuccessListFileTxt'"
-        $fileHeaders, $perlSuccessHeaders, $success, $fileFooters | Out-File -LiteralPath $PerlFilesCheckSuccessListFileTxt
-    }
+        Write-Host 'files check success summary:'
+        if (!$success) {
+            Write-Host '- no successed files'
 
-    $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
+            if ( Test-Path -LiteralPath $PerlFilesCheckSuccessListFileTxt ) {
+                Write-Host "remove success txt file $PerlFilesCheckSuccessListFileTxt"
+                Remove-Item -LiteralPath $PerlFilesCheckSuccessListFileTxt
+            }
+        }
+        else {
+            $success | Sort-Object | ForEach-Object {
+                Write-Host "- '$_'"
+            }
+
+            $perlSuccessHeaders = (
+                '#',
+                '# perl -c succeeded for files:',
+                '#',
+                '' # empty line before list
+            )
+
+            Write-Host ''
+            Write-Host -ForegroundColor Green "=> generate perl success files list file '$PerlFilesCheckSuccessListFileTxt'"
+            $fileHeaders, $perlSuccessHeaders, $success, $fileFooters | Out-File -LiteralPath $PerlFilesCheckSuccessListFileTxt
+        }
+    }
 
     exit 0
 }
