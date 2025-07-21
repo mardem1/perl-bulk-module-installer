@@ -673,7 +673,7 @@ sub was_module_already_tried
     }
 
     if ( exists $modules_install_dont_try_from_file{ $module } ) {
-        mark_module_as_failed();    # mark failed
+        mark_module_as_failed($module);    # mark failed
         say_ex( 'WARN: install module - ' . $module . ' - marked dont try - abort' );
 
         return 1;
