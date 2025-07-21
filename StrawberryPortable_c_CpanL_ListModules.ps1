@@ -104,9 +104,6 @@ try {
 
     $perlVersion = & $perlexe -e 'print "$^V"' | Out-String # = eg. 5.40.2
 
-    $ModuleListFileCsv = $ModuleListFileTxt.Replace('.txt', '.csv')
-    $ModuleExportLog = $ModuleListFileTxt.Replace('.txt', '.log')
-
     $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
     $winUser = $env:USERNAME
     $winHostName = $env:COMPUTERNAME
@@ -345,6 +342,9 @@ try {
         '# list ended',
         '#'
     )
+
+    $ModuleListFileCsv = $ModuleListFileTxt.Replace('.txt', '.csv')
+    $ModuleExportLog = $ModuleListFileTxt.Replace('.txt', '.log')
 
     if ( ! $allModuleNames ) {
         if (Test-Path -LiteralPath $ModuleExportLog) {
