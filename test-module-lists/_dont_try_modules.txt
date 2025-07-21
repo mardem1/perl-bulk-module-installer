@@ -212,7 +212,8 @@ Mason
 # Math::Pari
 Matrix
 MIME
-MIME::Entity
+# no problem with build
+# MIME::Entity
 ModPerl::PerlRun
 Module::Build::TestReporter
 Module::Faker::Dist
