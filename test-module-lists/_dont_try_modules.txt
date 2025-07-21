@@ -181,6 +181,10 @@ Inline::Java
 IO::Async
 IO::InSitu
 IO::Pty
+# tests fail - at some older perl versions
+t/protocol_version.t .............. # Failed to set SSL cipher list error:140E6118:SSL routines:SSL_CIPHER_PROCESS_RULESTR:invalid command - assuming SECLEVEL not supported
+t/protocol_version.t .............. 5/? # looks like OpenSSL was compiled without TLSv1_3 support
+test blocked/stuck - t/verify_fingerprint.t ............ 1/15
 IO::Socket::SSL
 # IO-Tty-1.20 ... This module requires a POSIX compliant system to work. Try cygwin if you need this module on windows
 IO::Tty
