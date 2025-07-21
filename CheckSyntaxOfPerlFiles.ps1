@@ -100,12 +100,6 @@ try {
         throw 'perl not working'
     }
 
-    [hashtable] $testPerlFile = @{}
-
-    $PerlFilesCheckNotFoundListFileTxt = $PerlFilesListFileTxt.Replace('.txt', '.notfound.perlfiles.txt')
-    $PerlFilesCheckFailedListFileTxt = $PerlFilesListFileTxt.Replace('.txt', '.failed.perlfiles.txt')
-    $PerlFilesCheckSuccessListFileTxt = $PerlFilesListFileTxt.Replace('.txt', '.success.perlfiles.txt')
-
     $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
     $winUser = $env:USERNAME
     $winHostName = $env:COMPUTERNAME
@@ -159,6 +153,11 @@ try {
     Write-Host '# FILE-HEADERS-END'
     Write-Host ''
 
+    [hashtable] $testPerlFile = @{}
+
+    $PerlFilesCheckNotFoundListFileTxt = $PerlFilesListFileTxt.Replace('.txt', '.notfound.perlfiles.txt')
+    $PerlFilesCheckFailedListFileTxt = $PerlFilesListFileTxt.Replace('.txt', '.failed.perlfiles.txt')
+    $PerlFilesCheckSuccessListFileTxt = $PerlFilesListFileTxt.Replace('.txt', '.success.perlfiles.txt')
 
     $filesToCheck = Get-Content -LiteralPath $PerlFilesListFileTxt | Where-Object { ! [string]::IsNullOrWhiteSpace( $_ ) -and $_ -notlike '#*' } | Sort-Object -Unique
     if ( ! $filesToCheck ) {
