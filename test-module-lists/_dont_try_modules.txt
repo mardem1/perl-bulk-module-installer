@@ -153,6 +153,8 @@ DBD::AnyData
 DBD::mysql
 DBD::Oracle
 DBD::Pg
+# in no test
+# Devel::Cover::Report::Clover
 Devel::DProf
 # test fail - v5.22+ - https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-SmallProf
 Devel::SmallProf
