@@ -157,11 +157,6 @@ Devel::SmallProf
 Device::SerialPort
 Dist::Metadata
 Distribution::Cooker
-EMail
-Email::Send
-Email::Send::SMTP
-Email::Send::Test
-Email::Stuff
 Env::Sourced
 Expect
 Expect::Simple
