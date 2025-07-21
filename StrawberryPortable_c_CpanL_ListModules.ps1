@@ -113,7 +113,7 @@ try {
     $hwModel = "$($wcs.Model) $($wcs.Manufacturer)"
     $hwRam = "$([System.Math]::Round( [double] $wcs.TotalPhysicalMemory / 1GB , 2)) GByte" # ( Get-CimInstance Win32_OperatingSystem ).TotalVisibleMemorySize
     $wp = Get-CimInstance -ClassName Win32_Processor | Sort-Object -Property NumberOfLogicalProcessors -Descending | Select-Object -First 1 # TODO: dual socket system support ?
-    $hwCpu = "$($wp.Name) $($wp.NumberOfCores)C / $($wp.NumberOfLogicalProcessors)T" # ( Get-CimInstance Win32_OperatingSystem ).TotalVisibleMemorySize
+    $hwCpu = "$($($wp.Name).Trim()) ($($wp.NumberOfCores)C / $($wp.NumberOfLogicalProcessors)T)" # ( Get-CimInstance Win32_OperatingSystem ).TotalVisibleMemorySize
     $isVm = if ( $wcs.HypervisorPresent ) {
         'Hypervisor present'
     }
