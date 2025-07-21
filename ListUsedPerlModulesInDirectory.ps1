@@ -115,6 +115,38 @@ try {
         'no hypervisor found'
     }
 
+    $fileHeaders = (
+        '#',
+        '# => search for files',
+        '#  => with extensions:'
+    )
+    $fileHeaders += $extensions | ForEach-Object { "#   - $_" }
+
+    $fileHeaders += (
+        '#  => in directories:'
+    )
+    $fileHeaders += $SearchPath | ForEach-Object { "#   - $_" }
+
+    $fileHeaders += (
+        '#',
+        "# Win-User        : $winUser",
+        "# Win-Host        : $winHostName",
+        "# Win-OS          : $winOs",
+        "# PS-Version      : $psVersion",
+        "# Device-Model    : $hwModel",
+        "# CPU             : $hwCpu",
+        "# RAM             : $hwRam",
+        "# VM Check        : $isVm"
+    )
+
+    Write-Host ''
+    Write-Host '# FILE-HEADERS-START'
+    $fileHeaders | ForEach-Object {
+        Write-Host $_
+    }
+    Write-Host '# FILE-HEADERS-END'
+    Write-Host ''
+
     [hashtable] $modules = @{}
     [hashtable] $foundPerlFiles = @{}
 
@@ -122,14 +154,6 @@ try {
     $PerlFilesListFileTxt = $ModuleListFileTxt.Replace('.txt', '.perlfiles.txt')
 
     Write-Host -ForegroundColor Green '=> search for files ...'
-    Write-Host -ForegroundColor Green '  => with extensions:'
-    $extensions | ForEach-Object {
-        Write-Host -ForegroundColor Green "    => $_"
-    }
-    Write-Host -ForegroundColor Green '  => in directories:'
-    $SearchPath | ForEach-Object {
-        Write-Host -ForegroundColor Green "    => $_"
-    }
 
     $files = Get-ChildItem -Recurse -File -Force -LiteralPath $SearchPath -ErrorAction Continue | Where-Object {
         $_.Extension -in $extensions
@@ -167,8 +191,6 @@ try {
         }
     }
 
-    $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
-
     Write-Host ''
     Write-Host -ForegroundColor Green '=> filter unique'
     $moduleNames = $($modules.Keys | Select-Object -Unique | Sort-Object )
@@ -189,42 +211,11 @@ try {
     Write-Host -ForegroundColor Green '=> Perl-Files'
     $perlFilePaths | ForEach-Object { "$_" }
 
-    $fileHeaders = (
-        '#',
-        '# => search for files',
-        '#  => with extensions:'
-    )
-    $fileHeaders += $extensions | ForEach-Object { "#   - $_" }
-
-    $fileHeaders += (
-        '#  => in directories:'
-    )
-    $fileHeaders += $SearchPath | ForEach-Object { "#   - $_" }
-
-    $fileHeaders += (
-        '#',
-        "# Win-User     : $winUser",
-        "# Win-Host     : $winHostName",
-        "# Win-OS       : $winOs",
-        "# PS-Version   : $psVersion",
-        "# Device-Model : $hwModel",
-        "# CPU          : $hwCpu",
-        "# RAM          : $hwRam",
-        "# VM Check     : $isVm",
-    )
-
+    $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
     $fileHeaders += (
         '#',
         "# search done at '$now'"
     )
-
-    Write-Host ''
-    Write-Host '# FILE-HEADERS-START'
-    $fileHeaders | ForEach-Object {
-        Write-Host $_
-    }
-    Write-Host '# FILE-HEADERS-END'
-    Write-Host ''
 
     $modulesHeaders = (
         '#',
