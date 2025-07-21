@@ -102,11 +102,7 @@ try {
         throw 'perl not working'
     }
 
-    # perl -e "printf(qq{%s}, $^X)" = $perlexe
     $perlVersion = & $perlexe -e 'print "$^V"' | Out-String # = eg. 5.40.2
-    # perl -MConfig -e "print $Config{archname}" = MSWin32-x64-multi-thread
-
-    $perlInfoList = $perlVersionInfoStr.Split("`n") | Where-Object { ! [string]::IsNullOrWhiteSpace( $_ ) } | ForEach-Object { $_.Trim() } | ForEach-Object { "$_" }
 
     $ModuleListFileCsv = $ModuleListFileTxt.Replace('.txt', '.csv')
     $ModuleExportLog = $ModuleListFileTxt.Replace('.txt', '.log')
@@ -132,9 +128,18 @@ try {
         '#',
         '# list perl module via cpan -l',
         '#',
-        "# StrawberryDir   : $StrawberryDir",
-        "# $($perlInfoList[0])",
-        "# $($perlInfoList[1])",
+        "# StrawberryDir   : $StrawberryDir"
+    )
+
+    $perlVersionInfoStr.Split("`n") | Where-Object {
+        ! [string]::IsNullOrWhiteSpace($_)
+    } | ForEach-Object {
+        $fileHeaders += (
+            "# $("$_".Trim())"
+        )
+    }
+
+    $fileHeaders += (
         '#',
         "# Win-User        : $winUser",
         "# Win-Host        : $winHostName",
@@ -143,8 +148,7 @@ try {
         "# Device-Model    : $hwModel",
         "# CPU             : $hwCpu",
         "# RAM             : $hwRam",
-        "# VM Check        : $isVm",
-        '#'
+        "# VM Check        : $isVm"
     )
 
     # INFO: add custom header here ?
@@ -327,6 +331,7 @@ try {
 
     $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
     $fileHeaders += (
+        '#',
         "# search done at  : '$now'",
         '#',
         '# modules found:',
