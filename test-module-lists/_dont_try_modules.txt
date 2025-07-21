@@ -151,7 +151,6 @@ DBD::AnyData
 DBD::mysql
 DBD::Oracle
 DBD::Pg
-Devel::Cover::Report::Clover
 Devel::DProf
 Devel::SmallProf
 Device::SerialPort
