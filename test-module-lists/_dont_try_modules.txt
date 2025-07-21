@@ -191,9 +191,12 @@ IO::Tty
 IPC::Msg
 IPC::Open3::Utils
 IPC::Open3SelfLoader
+# require IPC::SysV
 IPC::Semaphore
+# require IPC::Semaphore -> require IPC::SysV
 IPC::Shareable
 IPC::System::Options
+# OS unsupported
 IPC::SysV
 Kavorka
 Language::Expr
