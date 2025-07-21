@@ -135,10 +135,10 @@ param (
     [string] $PbmiDir = '', # based on Script-Dir if empty
 
     [Parameter(Mandatory = $false)]
-    [string] $LogDir = '',  # based on Pbmi-Dir if empty
+    [string] $LogDir = '', # based on Pbmi-Dir if empty
 
     [Parameter(Mandatory = $false)]
-    [string] $ModuleListsDirPath = '',  # based on Pbmi-Dir if empty
+    [string] $ModuleListsDirPath = '', # based on Pbmi-Dir if empty
 
     [Parameter(Mandatory = $false)]
     # [string] $DontTryListFilePath = '', # based on ModuleListsDirPath if empty

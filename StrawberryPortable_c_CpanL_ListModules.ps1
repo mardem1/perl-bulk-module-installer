@@ -114,6 +114,7 @@ try {
     $winUser = $env:USERNAME
     $winHostName = $env:COMPUTERNAME
     $winOs = ( Get-CimInstance Win32_OperatingSystem ).Caption
+    $psVersion = $PSVersionTable.PSVersion.ToString()
 
     $fileHeaders = (
         '#',
@@ -126,6 +127,7 @@ try {
         "# Win-User        : $winUser",
         "# Win-Host        : $winHostName",
         "# Win-OS          : $winOs",
+        "# PS-Version      : $psVersion",
         '#'
     )
 

@@ -105,6 +105,8 @@ try {
     $winUser = $env:USERNAME
     $winHostName = $env:COMPUTERNAME
     $winOs = ( Get-CimInstance Win32_OperatingSystem ).Caption
+    $psVersion = $PSVersionTable.PSVersion.ToString()
+
     $ModuleListFilePl = $ModuleListFileTxt.Replace('.txt', '.pl')
     $PerlFilesListFileTxt = $ModuleListFileTxt.Replace('.txt', '.perlfiles.txt')
 
@@ -190,7 +192,8 @@ try {
         '#',
         "# Win-User     : $winUser",
         "# Win-Host     : $winHostName",
-        "# Win-OS       : $winOs"
+        "# Win-OS       : $winOs",
+        "# PS-Version   : $psVersion"
     )
 
     $fileHeaders += (
