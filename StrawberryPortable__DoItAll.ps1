@@ -235,7 +235,7 @@ try {
     }
 
     if ( [string]::IsNullOrWhiteSpace($NoTestsListFilePath) ) {
-        $NoTestsListFilePath = "$ModuleListsDirPath\_dont_try_modules.txt"
+        $NoTestsListFilePath = "$ModuleListsDirPath\_no_tests_modules.txt"
     }
 
     if ( !( Test-Path -LiteralPath $NoTestsListFilePath -PathType Leaf ) ) {
