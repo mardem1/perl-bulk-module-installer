@@ -135,14 +135,14 @@ try {
 
     $fileHeaders += (
         '#',
-        "# PS-Version      : $psVersion",
-        "# Win-User        : $winUser",
-        "# Win-Host        : $winHostName",
-        "# Win-OS          : $winOs",
-        "# RAM             : $hwRam",
-        "# CPU             : $hwCpu",
         "# Device-Model    : $hwModel",
-        "# VM Check        : $isVm"
+        "# CPU             : $hwCpu",
+        "# RAM             : $hwRam",
+        "# VM Check        : $isVm",
+        "# Win-OS          : $winOs",
+        "# Win-Host        : $winHostName",
+        "# Win-User        : $winUser",
+        "# PS-Version      : $psVersion"
     )
 
     # ADD CUSTOM HEADERS HERE
