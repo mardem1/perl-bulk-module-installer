@@ -155,9 +155,9 @@ try {
 
     [hashtable] $testPerlFile = @{}
 
-    $PerlFilesCheckNotFoundListFileTxt = $PerlFilesListFileTxt.Replace('.txt', '.notfound.perlfiles.txt')
-    $PerlFilesCheckFailedListFileTxt = $PerlFilesListFileTxt.Replace('.txt', '.failed.perlfiles.txt')
-    $PerlFilesCheckSuccessListFileTxt = $PerlFilesListFileTxt.Replace('.txt', '.success.perlfiles.txt')
+    $PerlFilesCheckNotFoundListFileTxt = $PerlFilesListFileTxt.Replace('.perlfiles.txt', '.perlfiles.notfound.txt')
+    $PerlFilesCheckFailedListFileTxt = $PerlFilesListFileTxt.Replace('.perlfiles.txt', '.perlfiles.failed.txt')
+    $PerlFilesCheckSuccessListFileTxt = $PerlFilesListFileTxt.Replace('.perlfiles.txt', '.perlfiles.success.txt')
 
     $filesToCheck = Get-Content -LiteralPath $PerlFilesListFileTxt | Where-Object { ! [string]::IsNullOrWhiteSpace( $_ ) -and $_ -notlike '#*' } | Sort-Object -Unique
     if ( ! $filesToCheck ) {
