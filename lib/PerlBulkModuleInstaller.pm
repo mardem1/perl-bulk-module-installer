@@ -994,6 +994,7 @@ sub search_for_installed_modules
         croak 'log_dir_path empty!';
     }
 
+    local $ENV{'PERL5LIB'} = ''; # do not export custom modules
     my @cmd = ( 'cmd.exe', '/c', 'cpan', '-l', '2>&1' );
 
     my $logfile_suffix = 'installed_modules_found';

@@ -160,6 +160,7 @@ try {
 
     Write-Host -ForegroundColor Green '=> search modules via cpan -l ...'
     # TODO: replace with Start-Process and created ARGV
+    $Env:PERL5LIB = '' # reset
     $generatedList = ( & cmd.exe '/c' 'cpan.bat' '-l' '2>&1' )
     Write-Host -ForegroundColor Green '=> ... module list generated'
 
