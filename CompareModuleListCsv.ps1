@@ -489,7 +489,7 @@ try {
         $lines = Get-Content -LiteralPath $file -ErrorAction Stop
 
         Write-Host -ForegroundColor Green 'analyze perl version'
-        $perlVerison = $lines | Where-Object { $_ -like '# *' } | ForEach-Object {
+        $perlVersion = $lines | Where-Object { $_ -like '# *' } | ForEach-Object {
             $t = $_.Split(';')
 
             if ([string]::IsNullOrWhiteSpace($t[0])) {
@@ -497,18 +497,18 @@ try {
             }
 
             if ([string]::IsNullOrWhiteSpace($t[1])) {
-                throw 'perl verison in CSV file not found'
+                throw 'perl version in CSV file not found'
             }
 
             $t[1]
         }
 
-        if ($null -eq $perlVerison) {
+        if ($null -eq $perlVersion) {
             throw 'perl info in CSV file not found'
         }
 
-        Write-Host -ForegroundColor Green "perl info detected: $perlVerison"
-        $shortNameVersionInfo[$shotName] = $perlVerison
+        Write-Host -ForegroundColor Green "perl info detected: $perlVersion"
+        $shortNameVersionInfo[$shotName] = $perlVersion
 
         Write-Host -ForegroundColor Green 'analyze module infos'
         # https://github.com/PowerShell/PowerShell/blob/744a53a2038056467b6ddeb2045336d79480c4c0/src/Microsoft.PowerShell.Commands.Utility/commands/utility/CsvCommands.cs#L1362
@@ -528,7 +528,7 @@ try {
     }
 
     Write-Host ''
-    Write-Host -ForegroundColor Green 'init moudules not found or empty in verison'
+    Write-Host -ForegroundColor Green 'init moudules not found or empty in version'
     Write-Host ''
 
     $version_not_installed = 'not-installed'

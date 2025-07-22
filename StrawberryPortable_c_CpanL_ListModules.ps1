@@ -129,7 +129,7 @@ try {
     )
 
     $perlVersionInfoStr.Split("`n") | Where-Object {
-        ! [string]::IsNullOrWhiteSpace($_)
+        ! [string]::IsNullOrWhiteSpace( $_ )
     } | ForEach-Object {
         $fileHeaders += (
             "# $("$_".Trim())"
@@ -192,7 +192,7 @@ try {
             $v = $Matches[2]
             $v = "$v".Trim()
             if ( '' -eq $v ) {
-                $v = $version_not_defined # as perl verison
+                $v = $version_not_defined # as perl version
             }
 
             # some modules wrong listed - end with : ? => ignore?
