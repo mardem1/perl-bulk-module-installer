@@ -994,8 +994,25 @@ sub search_for_installed_modules
         croak 'log_dir_path empty!';
     }
 
+    # ignore error lines, wrong version format or version var not set.
+
+    #
+    # would result in eg.
+    #
+    # ignore - unknown line format 'Bio::SeqIO::Use of uninitialized value $HTML::Parser::VERSION in numeric ge (>=) at (eval 1033) line 7, <FILE> line 323.'
+    # ignore - unknown line format 'Log::ger::Format::MultilevelLogUse of uninitialized value $ExtUtils::MakeMaker::_version::CVSVERSION in pattern match (m//) at (eval 4216) line 7, <FILE> line 17.'
+    # ignore - unknown line format 'Use of uninitialized value $ExtUtils::MakeMaker::_version::CVSVERSION in pattern match (m//) at (eval 4217) line 7, <FILE> line 19.'
+    # ignore - unknown line format 'Use of uninitialized value $ExtUtils::MakeMaker::_version::CVSVERSION in pattern match (m//) at (eval 4218) line 7, <FILE> line 19.'
+    # ignore - unknown line format '0.040'
+    # ignore - unknown line format 'MemoizeUse of uninitialized value $ExtUtils::MakeMaker::_version::version in concatenation (.) or string at (eval 4493) line 7, <FILE> line 142.'
+    # ignore - no match '::Storable'
+    # ignore - unknown line format 'Minilla::Profile::Base	<%  %>'
+    # ignore - unknown line format 'TOML::Missing argument in sprintf at (eval 7730) line 7, <FILE> line 47.'
+    # ignore - unknown line format 'Missing argument in sprintf at (eval 7730) line 7, <FILE> line 47.'
+    #
+
     local $ENV{'PERL5LIB'} = ''; # do not export custom modules
-    my @cmd = ( 'cmd.exe', '/c', 'cpan', '-l', '2>&1' );
+    my @cmd = ( 'cmd.exe', '/c', 'cpan.bat', '-l', '2>nul' );
 
     my $logfile_suffix = 'installed_modules_found';
     my $logfile_title  = 'installed_modules_found';
