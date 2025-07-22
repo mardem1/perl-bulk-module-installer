@@ -126,7 +126,7 @@ try {
     )
 
     $perlVersionInfoStr.Split("`n") | Where-Object {
-        ! [string]::IsNullOrWhiteSpace($_)
+        ! [string]::IsNullOrWhiteSpace( $_ )
     } | ForEach-Object {
         $fileHeaders += (
             "# $("$_".Trim())"
@@ -276,30 +276,30 @@ try {
         }
 
         Write-Host ''
-        Write-Host 'files not-found summary:'
-        if (!$notFound) {
-            Write-Host '- no not-found files'
+        Write-Host 'files check success summary:'
+        if (!$success) {
+            Write-Host '- no successed files'
 
-            if ( Test-Path -LiteralPath $PerlFilesCheckNotFoundListFileTxt ) {
-                Write-Host "remove notfound txt file $PerlFilesCheckNotFoundListFileTxt"
-                Remove-Item -LiteralPath $PerlFilesCheckNotFoundListFileTxt
+            if ( Test-Path -LiteralPath $PerlFilesCheckSuccessListFileTxt ) {
+                Write-Host "remove success txt file $PerlFilesCheckSuccessListFileTxt"
+                Remove-Item -LiteralPath $PerlFilesCheckSuccessListFileTxt
             }
         }
         else {
-            $notFound | Sort-Object | ForEach-Object {
+            $success | Sort-Object | ForEach-Object {
                 Write-Host "- '$_'"
             }
 
-            $perlNotFoundHeaders = (
+            $perlSuccessHeaders = (
                 '#',
-                '# files not found:',
+                '# perl -c succeeded for files:',
                 '#',
                 '' # empty line before list
             )
 
             Write-Host ''
-            Write-Host -ForegroundColor Green "=> generate perl found files list file '$PerlFilesCheckNotFoundListFileTxt'"
-            $fileHeaders, $perlNotFoundHeaders, $notFound, $fileFooters | Out-File -LiteralPath $PerlFilesCheckNotFoundListFileTxt
+            Write-Host -ForegroundColor Green "=> generate perl success files list file '$PerlFilesCheckSuccessListFileTxt'"
+            $fileHeaders, $perlSuccessHeaders, $success, $fileFooters | Out-File -LiteralPath $PerlFilesCheckSuccessListFileTxt
         }
 
         Write-Host ''
@@ -330,30 +330,30 @@ try {
         }
 
         Write-Host ''
-        Write-Host 'files check success summary:'
-        if (!$success) {
-            Write-Host '- no successed files'
+        Write-Host 'files not-found summary:'
+        if (!$notFound) {
+            Write-Host '- no not-found files'
 
-            if ( Test-Path -LiteralPath $PerlFilesCheckSuccessListFileTxt ) {
-                Write-Host "remove success txt file $PerlFilesCheckSuccessListFileTxt"
-                Remove-Item -LiteralPath $PerlFilesCheckSuccessListFileTxt
+            if ( Test-Path -LiteralPath $PerlFilesCheckNotFoundListFileTxt ) {
+                Write-Host "remove notfound txt file $PerlFilesCheckNotFoundListFileTxt"
+                Remove-Item -LiteralPath $PerlFilesCheckNotFoundListFileTxt
             }
         }
         else {
-            $success | Sort-Object | ForEach-Object {
+            $notFound | Sort-Object | ForEach-Object {
                 Write-Host "- '$_'"
             }
 
-            $perlSuccessHeaders = (
+            $perlNotFoundHeaders = (
                 '#',
-                '# perl -c succeeded for files:',
+                '# files not found:',
                 '#',
                 '' # empty line before list
             )
 
             Write-Host ''
-            Write-Host -ForegroundColor Green "=> generate perl success files list file '$PerlFilesCheckSuccessListFileTxt'"
-            $fileHeaders, $perlSuccessHeaders, $success, $fileFooters | Out-File -LiteralPath $PerlFilesCheckSuccessListFileTxt
+            Write-Host -ForegroundColor Green "=> generate perl found files list file '$PerlFilesCheckNotFoundListFileTxt'"
+            $fileHeaders, $perlNotFoundHeaders, $notFound, $fileFooters | Out-File -LiteralPath $PerlFilesCheckNotFoundListFileTxt
         }
     }
 
