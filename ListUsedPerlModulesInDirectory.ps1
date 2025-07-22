@@ -139,6 +139,12 @@ try {
         "# VM Check        : $isVm"
     )
 
+    # ADD CUSTOM HEADERS HERE
+
+    $fileHeaders += (
+        '#'
+    )
+
     Write-Host ''
     Write-Host '# FILE-HEADERS-START'
     $fileHeaders | ForEach-Object {

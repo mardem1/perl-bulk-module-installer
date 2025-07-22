@@ -148,7 +148,11 @@ try {
         "# VM Check        : $isVm"
     )
 
-    # INFO: add custom header here ?
+    # ADD CUSTOM HEADERS HERE
+
+    $fileHeaders += (
+        '#'
+    )
 
     Write-Host ''
     Write-Host '# FILE-HEADERS-START'
