@@ -143,17 +143,13 @@ param (
     [string] $ModuleListsDirPath = '', # based on Pbmi-Dir if empty
 
     [Parameter(Mandatory = $false)]
-    # [string] $DontTryListFilePath = '', # based on ModuleListsDirPath if empty
-    [string] $DontTryListFilePath = 'C:\perl-build\perl-bulk-module-installer\test-module-lists\_dont_try_modules.txt', # based on ModuleListsDirPath if empty
+    [string] $DontTryListFilePath = '', # based on ModuleListsDirPath if empty
 
     [Parameter(Mandatory = $false)]
-    # [string] $NoTestsListFilePath = '', # based on ModuleListsDirPath if empty
-    [string] $NoTestsListFilePath = 'C:\perl-build\perl-bulk-module-installer\test-module-lists\_no_tests_modules.txt', # based on ModuleListsDirPath if empty
+    [string] $NoTestsListFilePath = '', # based on ModuleListsDirPath if empty
 
     [Parameter(Mandatory = $false)]
-    # [string] $InstallListFilePath = '' # unused if empty
-    [string] $InstallListFilePath = 'C:\perl-build\perl-bulk-module-installer\test-module-lists\Net_Nslookup.txt' # unused if empty
-    # [string] $InstallListFilePath = 'C:\perl-build\perl-bulk-module-installer\test-module-lists\Module_CPANTS_Analyse.txt' # unused if empty
+    [string] $InstallListFilePath = '' # unused if empty
 )
 
 $ScriptStartTime = Get-Date
