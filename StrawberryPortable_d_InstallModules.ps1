@@ -169,6 +169,64 @@ try {
         throw 'perl not working'
     }
 
+    $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss K' # renewed at searched finished
+    $winUser = $env:USERNAME
+    $winHostName = $env:COMPUTERNAME
+    $winOs = ( Get-CimInstance Win32_OperatingSystem ).Caption
+    $psVersion = $PSVersionTable.PSVersion.ToString()
+    $wcs = Get-CimInstance -ClassName Win32_ComputerSystem
+    $hwModel = "$($wcs.Model) $($wcs.Manufacturer)"
+    $hwRam = "$([System.Math]::Round( [double] $wcs.TotalPhysicalMemory / 1GB , 2)) GByte" # ( Get-CimInstance Win32_OperatingSystem ).TotalVisibleMemorySize
+    $wp = Get-CimInstance -ClassName Win32_Processor | Sort-Object -Property NumberOfLogicalProcessors -Descending | Select-Object -First 1 # TODO: dual socket system support ?
+    $hwCpu = "$($($wp.Name).Trim()) ($($wp.NumberOfCores)C / $($wp.NumberOfLogicalProcessors)T)" # ( Get-CimInstance Win32_OperatingSystem ).TotalVisibleMemorySize
+    $isVm = if ( $wcs.HypervisorPresent ) {
+        'Hypervisor present'
+    }
+    else {
+        'no hypervisor found'
+    }
+
+    $fileHeaders = (
+        '#',
+        '# install modules ...',
+        '#',
+        "# StrawberryDir   : $StrawberryDir"
+    )
+
+    $perlVersionInfoStr.Split("`n") | Where-Object {
+        ! [string]::IsNullOrWhiteSpace( $_ )
+    } | ForEach-Object {
+        $fileHeaders += (
+            "# $("$_".Trim())"
+        )
+    }
+
+    $fileHeaders += (
+        '#',
+        "# Device-Model    : $hwModel",
+        "# CPU             : $hwCpu",
+        "# RAM             : $hwRam",
+        "# VM Check        : $isVm",
+        "# Win-OS          : $winOs",
+        "# Win-Host        : $winHostName",
+        "# Win-User        : $winUser",
+        "# PS-Version      : $psVersion"
+    )
+
+    # ADD CUSTOM HEADERS HERE
+
+    $fileHeaders += (
+        '#'
+    )
+
+    Write-Host ''
+    Write-Host '# FILE-HEADERS-START'
+    $fileHeaders | ForEach-Object {
+        Write-Host $_
+    }
+    Write-Host '# FILE-HEADERS-END'
+    Write-Host ''
+
     # for PerlBulkModuleInstaller
     # $Env:PERL5LIB = "$((Get-Item -LiteralPath $InstallCpanModules).Directory.FullName)\lib".Replace('\', '/')
 
