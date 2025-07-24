@@ -423,9 +423,16 @@ function Invoke-TestComparePerlModuleVersion {
     )
 
     $tests | ForEach-Object {
-        $cmp = Compare-PerlModuleVersion -ModuleName "Compre-$($_['expected'])" -VersionA $_['A'] -VersionB $_['B']
-        if ($_['expected'] -ne $cmp) {
-            Write-Host -ForegroundColor Red 'mismatch'
+        $name = "Compare-$($_['expected'])"
+        $a = $_['A']
+        $b = $_['B']
+        $expected = $_['expected']
+        $cmp = Compare-PerlModuleVersion -ModuleName $name -VersionA $a -VersionB $b
+        if ($expected -ne $cmp) {
+            Write-Host -ForegroundColor Red "failed $($name) -> '$a' vs. '$b' -> expected '$expected' -> got '$cmp'"
+        }
+        else {
+            Write-Host -ForegroundColor Green "ok $($name) -> '$a' vs. '$b' -> expected '$expected' -> got '$cmp'"
         }
     }
 
