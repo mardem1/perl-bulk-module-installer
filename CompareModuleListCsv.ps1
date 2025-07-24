@@ -139,6 +139,11 @@ function Compare-PerlModuleVersion {
                 }
             }
             else {
+                # Perl Module Version can be double value or version number value
+                # check https://metacpan.org/release/LEONT/version-0.9933/view/lib/version.pm
+                $aIsDouble = "$a" -match '^\d+([.]\d+)?$'
+                $bIsDouble = "$b" -match '^\d+([.]\d+)?$'
+
                 # 1
                 # v1
                 # 1.0
@@ -150,116 +155,108 @@ function Compare-PerlModuleVersion {
                 $aIsVersion = $a -match '^[v]?\d+(\.\d+){0,4}(_.+)?$'
                 $bIsVersion = $b -match '^[v]?\d+(\.\d+){0,4}(_.+)?$'
 
-                if ( !$aIsVersion -or !$bIsVersion ) {
+                if ($version_not_defined -eq $b) {
+                    $compare_value_40_v_undef
+                }
+                elseif ( "$a" -eq "$b" ) {
+                    # fast check
+                    $compare_value_60_same
+                }
+                elseif ( !$aIsVersion -or !$bIsVersion ) {
                     # https://metacpan.org/release/DCONWAY/Contextual-Return-0.004014/source/lib/Contextual/Return/Failure.pm
                     # our $VERSION = 0.000_003;
                     # cpan.bat -l >c:\temp\out.log 2>&1
-                    # Contextual::Return	0.004014
-                    # Contextual::Return::Failure	3e-006 # ERROR - exported by cpan -l !
+                    # Contextual::Return    0.004014
+                    # Contextual::Return::Failure    3e-006 # ERROR - exported by cpan -l !
                     $compare_value_99_unknown_format
                 }
-                else {
-                    # Perl Module Version can be double value or version number value
-                    # check https://metacpan.org/release/LEONT/version-0.9933/view/lib/version.pm
-
-                    $aIsDouble = "$a" -match '^\d+([.]\d+)?$'
-                    $bIsDouble = "$b" -match '^\d+([.]\d+)?$'
-
-                    if ($version_not_defined -eq $b) {
-                        $compare_value_40_v_undef
-                    }
-                    elseif ( "$a" -eq "$b" ) {
-                        # fast check
+                elseif ( $aIsDouble -and $bIsDouble ) {
+                    # both double value
+                    if ($a -eq $b) {
                         $compare_value_60_same
                     }
-                    elseif ( $aIsDouble -and $bIsDouble ) {
-                        # both double value
-                        if ($a -eq $b) {
+                    elseif ($b -gt $a) {
+                        $compare_value_70_update
+                    }
+                    else {
+                        $compare_value_50_downgrade
+                    }
+                }
+                else {
+                    # One is Version-Number not only Double
+
+                    # version number diff
+                    $version_a = $null
+                    $version_b = $null
+
+                    try {
+                        # if starting wiht v remove it & if ending wiht _0123 remove -> v5.4.3_21 -> 5.4.3
+                        $t = [string](($a -replace '^v', '') -replace '_.+$', '')
+                        $dotCount = ([regex]::Matches($t, '\.')).Count
+                        if ($dotCount -gt 3) {
+                            # to long version more than 4 sections
+                            # keep new() exception
+                        }
+
+                        # [version]::new(1,1) -eq  [version]::new(1,1,0) # false => lower -lt ? -> not set values are -1
+                        $sections = @(0, 0, 0, 0)
+                        $i = 0
+                        $t.Split('.') | ForEach-Object {
+                            $sections[$i] = $_
+                            $i++
+                        }
+                        $version_a = [version]::new($sections[0], $sections[1], $sections[2], $sections[3])
+                    }
+                    catch {
+                        Write-Host -ForegroundColor Red "ERROR: can't parse Version '$m' -> '$a' - $_"
+                    }
+
+                    try {
+                        # if starting wiht v remove it & if ending wiht _0123 remove -> v5.4.3_21 -> 5.4.3
+                        $t = [string](($b -replace '^v', '') -replace '_.+$', '')
+                        $dotCount = ([regex]::Matches($t, '\.')).Count
+                        if ($dotCount -gt 3) {
+                            # to long version more than 4 sections
+                            throw "invalid version '$t'"
+                        }
+
+                        # [version]::new(1,1) -eq  [version]::new(1,1,0) # false => lower -lt ? -> not set values are -1
+                        $sections = @(0, 0, 0, 0)
+                        $i = 0
+                        $t.Split('.') | ForEach-Object {
+                            $sections[$i] = $_
+                            $i++
+                        }
+                        $version_b = [version]::new($sections[0], $sections[1], $sections[2], $sections[3])
+                    }
+                    catch {
+                        Write-Host -ForegroundColor Red "ERROR: can't parse Version '$m' -> '$b' - $_"
+                    }
+
+                    if ($null -eq $version_a) {
+                        if ($null -eq $version_b) {
+                            # TODO: what to do ? - Both unknown = Equal :)
                             $compare_value_60_same
                         }
-                        elseif ($b -gt $a) {
-                            $compare_value_70_update
-                        }
                         else {
-                            $compare_value_50_downgrade
+                            # TODO: what to do ? - new known vs. old unknown => Newer :)
+                            $compare_value_70_update
                         }
                     }
                     else {
-                        # One is Version-Number not only Double
-
-                        # version number diff
-                        $version_a = $null
-                        $version_b = $null
-
-                        try {
-                            # if starting wiht v remove it & if ending wiht _0123 remove -> v5.4.3_21 -> 5.4.3
-                            $t = [string](($a -replace '^v', '') -replace '_.+$', '')
-                            $dotCount = ([regex]::Matches($t, '\.')).Count
-                            if ($dotCount -gt 3) {
-                                # to long version more than 4 sections
-                                # keep new() exception
-                            }
-
-                            # [version]::new(1,1) -eq  [version]::new(1,1,0) # false => lower -lt ? -> not set values are -1
-                            $sections = @(0, 0, 0, 0)
-                            $i = 0
-                            $t.Split('.') | ForEach-Object {
-                                $sections[$i] = $_
-                                $i++
-                            }
-                            $version_a = [version]::new($sections[0], $sections[1], $sections[2], $sections[3])
-                        }
-                        catch {
-                            Write-Host -ForegroundColor Red "ERROR: can't parse Version '$m' -> '$a' - $_"
-                        }
-
-                        try {
-                            # if starting wiht v remove it & if ending wiht _0123 remove -> v5.4.3_21 -> 5.4.3
-                            $t = [string](($b -replace '^v', '') -replace '_.+$', '')
-                            $dotCount = ([regex]::Matches($t, '\.')).Count
-                            if ($dotCount -gt 3) {
-                                # to long version more than 4 sections
-                                throw "invalid version '$t'"
-                            }
-
-                            # [version]::new(1,1) -eq  [version]::new(1,1,0) # false => lower -lt ? -> not set values are -1
-                            $sections = @(0, 0, 0, 0)
-                            $i = 0
-                            $t.Split('.') | ForEach-Object {
-                                $sections[$i] = $_
-                                $i++
-                            }
-                            $version_b = [version]::new($sections[0], $sections[1], $sections[2], $sections[3])
-                        }
-                        catch {
-                            Write-Host -ForegroundColor Red "ERROR: can't parse Version '$m' -> '$b' - $_"
-                        }
-
-                        if ($null -eq $version_a) {
-                            if ($null -eq $version_b) {
-                                # TODO: what to do ? - Both unknown = Equal :)
-                                $compare_value_60_same
-                            }
-                            else {
-                                # TODO: what to do ? - new known vs. old unknown => Newer :)
-                                $compare_value_70_update
-                            }
+                        if ($null -eq $version_b) {
+                            # TODO: what to do ? - new unknown vs. old known => Lower :)
+                            $compare_value_50_downgrade
                         }
                         else {
-                            if ($null -eq $version_b) {
-                                # TODO: what to do ? - new unknown vs. old known => Lower :)
+                            if ($version_a -lt $version_b) {
+                                $compare_value_70_update
+                            }
+                            elseif ( $version_a -gt $version_b) {
                                 $compare_value_50_downgrade
                             }
                             else {
-                                if ($version_a -lt $version_b) {
-                                    $compare_value_70_update
-                                }
-                                elseif ( $version_a -gt $version_b) {
-                                    $compare_value_50_downgrade
-                                }
-                                else {
-                                    $compare_value_60_same # difference after _ possible - not checked jet TODO: implement ?
-                                }
+                                $compare_value_60_same # difference after _ possible - not checked jet TODO: implement ?
                             }
                         }
                     }
