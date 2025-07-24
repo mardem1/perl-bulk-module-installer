@@ -419,6 +419,11 @@ function Invoke-TestComparePerlModuleVersion {
             'A'        = 'v1.3.0'
             'B'        = '1.3.1'
             'expected' = $compare_value_70_update
+        },
+        @{
+            'A'        = '3e-006'
+            'B'        = '1.3.1'
+            'expected' = $compare_value_99_unknown_format
         }
     )
 
