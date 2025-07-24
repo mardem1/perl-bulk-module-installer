@@ -271,15 +271,15 @@ try {
 
         $success = $testPerlFile.Keys | Where-Object {
             $null -ne $testPerlFile[$_] -and $testPerlFile[$_]
-        }
+        } | Sort-Object
 
         $failed = $testPerlFile.Keys | Where-Object {
             $null -ne $testPerlFile[$_] -and ! $testPerlFile[$_]
-        }
+        } | Sort-Object
 
         $notFound = $testPerlFile.Keys | Where-Object {
             $null -eq $testPerlFile[$_]
-        }
+        } | Sort-Object
 
         Write-Host ''
         Write-Host 'files check success summary:'
