@@ -151,6 +151,11 @@ function Compare-PerlModuleVersion {
                 $bIsVersion = $b -match '^[v]?\d+(\.\d+){0,4}(_.+)?$'
 
                 if ( !$aIsVersion -or !$bIsVersion ) {
+                    # https://metacpan.org/release/DCONWAY/Contextual-Return-0.004014/source/lib/Contextual/Return/Failure.pm
+                    # our $VERSION = 0.000_003;
+                    # cpan.bat -l >c:\temp\out.log 2>&1
+                    # Contextual::Return	0.004014
+                    # Contextual::Return::Failure	3e-006 # ERROR - exported by cpan -l !
                     $compare_value_99_unknown_format
                 }
                 else {
